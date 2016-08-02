@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<!-- extend from base layout -->
+{% extends "base.html" %}
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>{{  title }}</title>
+</head>
+<body>
+    <h2> iSocket output for {{ title }}</h2>
+<div id="canvas" class="boxed" ></div>
+    <h2> Protein Viewer: </h2>
+<div id="viewer" class="boxed"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename = 'js/graph_drawing.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename = 'js/bio-pv.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename = 'js/pv_custom.js') }}"></script>
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}"/>
+<body>
+<script type="text/javascript">
+    var json = JSON.parse({{ graph_as_json|tojson }});
+    plotter(json)
+</script>
+<script type="text/javascript">
+    var options = {
+        width: 600,
+        height: 600,
+        antialias: true,
+        quality : 'medium'
+    };
+    var viewer = pv.Viewer(document.getElementById('viewer'), options);
+</script>
+<script type='text/javascript'>
+    var pdb = "{{ url_for('static', filename = '1p7b.pdb') }}";
+    loadpdb(pdb);
+    // load the methyl transferase once the DOM has finished loading. That's
+    // the earliest point the WebGL context is available.
+    document.addEventListener('DOMContentLoaded', loadpdb);
+</script>
+</body>
+{%  endblock %}
+</html>
