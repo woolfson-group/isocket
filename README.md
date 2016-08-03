@@ -1,2 +1,2 @@
-# isocket
-isocket web applicaton
+# iSocket
+iSocket web applicaton
