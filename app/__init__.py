@@ -5,3 +5,4 @@ app.config.from_object('config')
 app.config.from_pyfile('config.py')
 
 from app import views, models
+from .util import assets

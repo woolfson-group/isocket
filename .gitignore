@@ -3,3 +3,6 @@ venv/
 .idea/
 __pycache__/
 instance/
+app/static/.webassets-cache/
+app/static/js/lib
+uploads/
