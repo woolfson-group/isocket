@@ -1,14 +1,13 @@
 import os
 from isambard.add_ons.knobs_into_holes import KnobGroup
 from isambard.ampal.pdb_parser import convert_pdb_to_ampal
-from flask import render_template, flash, redirect, request, url_for, send_from_directory, render_template_string
+from flask import render_template, flash, redirect, request, url_for
 from app import app
-from .forms import LoginForm, SocketForm
-from config import ALLOWED_EXTENSIONS, UPLOAD_FOLDER, TEMP_FOLDER, STATIC_FOLDER
+from .forms import SocketForm
+from config import ALLOWED_EXTENSIONS, STATIC_FOLDER
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
-import tempfile
 import json
 
 @app.route('/')
@@ -25,8 +24,7 @@ def allowed_file(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     form = SocketForm()
-    if request.method == 'POST':
-    #if form.validate_on_submit():
+    if form.validate_on_submit():
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
