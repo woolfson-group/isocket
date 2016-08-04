@@ -48,6 +48,7 @@ Flask-Login==0.3.2
 Flask-Mail==0.9.1
 Flask-OpenID==1.2.5
 Flask-SQLAlchemy==2.1
+Flask-Uploads==0.2.1
 Flask-WhooshAlchemy==0.56
 Flask-WTF==0.12
 flipflop==1.0

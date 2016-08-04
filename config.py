@@ -5,7 +5,8 @@ DEBUG = False
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
 STATIC_FOLDER = os.path.join(basedir, 'app', 'static')
+UPLOADS_DEFAULT_DEST = os.path.join(STATIC_FOLDER, 'uploads')
+UPLOADED_STRUCTURES_DEST = os.path.join(UPLOADS_DEFAULT_DEST, 'structures')
 TEMP_FOLDER = os.path.join(basedir, 'tmp')
-ALLOWED_EXTENSIONS = {'pdb', 'mmol', 'cif'}
+UPLOADED_STRUCTURES_ALLOW = ('pdb', 'mmol', 'cif', 'mmcif')

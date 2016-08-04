@@ -4,11 +4,16 @@ from isambard.ampal.pdb_parser import convert_pdb_to_ampal
 from flask import render_template, flash, redirect, request, url_for
 from app import app
 from .forms import SocketForm
-from config import ALLOWED_EXTENSIONS, STATIC_FOLDER
+from flask_uploads import UploadSet, configure_uploads
+from config import STATIC_FOLDER, UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
 import json
+
+structures = UploadSet(name='structures', extensions=UPLOADED_STRUCTURES_ALLOW)
+configure_uploads(app, structures)
+
 
 @app.route('/')
 @app.route('/index')
@@ -16,28 +21,17 @@ def index():
     return render_template('index.html', title='iSOCKET')
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     form = SocketForm()
     if form.validate_on_submit():
-        if 'file' not in request.files:
-            flash('No file part')
+        print(request.__dict__)
+        if 'structure' not in request.files:
+            flash('Please upload a structure file.')
             return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            #file.save(os.path.join(UPLOAD_FOLDER, filename))
-            request.view_args['blah'] = 5
-            return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
-
+        structure = request.files['structure']
+        filename = secure_filename(structures.save(structure))
+        return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
     return render_template('upload.html', form=form)
 
 
@@ -45,7 +39,7 @@ def upload_file():
 # (e.g. same filename with differnet file content).
 @app.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
 def uploaded_file(filename, scut, kcut):
-    file = os.path.join(STATIC_FOLDER, filename)
+    file = os.path.join(UPLOADED_STRUCTURES_DEST, filename)
     a = convert_pdb_to_ampal(file, path=True)
     kg = KnobGroup.from_helices(a, cutoff=scut)
     g = kg.graph
