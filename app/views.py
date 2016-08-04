@@ -4,7 +4,7 @@ from isambard.ampal.pdb_parser import convert_pdb_to_ampal
 from flask import render_template, flash, redirect, request, url_for, send_from_directory, render_template_string
 from app import app
 from .forms import LoginForm, SocketForm
-from config import ALLOWED_EXTENSIONS, UPLOAD_FOLDER, TEMP_FOLDER
+from config import ALLOWED_EXTENSIONS, UPLOAD_FOLDER, TEMP_FOLDER, STATIC_FOLDER
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
@@ -15,15 +15,6 @@ import json
 @app.route('/index')
 def index():
     return render_template('index.html', title='iSOCKET')
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for OpenID={0}, remember_me={1}'.format(form.openid.data, form.remember_me.data))
-        return redirect('/index')
-    return render_template('login.html', title='Sign in', form=form, providers=app.config['OPENID_PROVIDERS'])
 
 
 def allowed_file(filename):
@@ -45,7 +36,7 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
+            #file.save(os.path.join(UPLOAD_FOLDER, filename))
             request.view_args['blah'] = 5
             return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
 
@@ -53,10 +44,10 @@ def upload_file():
 
 
 #TODO add tokens to urls to avoid problems with same url and different data
-# (e.g. smae filename with differnet file content).
+# (e.g. same filename with differnet file content).
 @app.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
 def uploaded_file(filename, scut, kcut):
-    file = os.path.join(UPLOAD_FOLDER, filename)
+    file = os.path.join(STATIC_FOLDER, filename)
     a = convert_pdb_to_ampal(file, path=True)
     kg = KnobGroup.from_helices(a, cutoff=scut)
     g = kg.graph
@@ -66,5 +57,5 @@ def uploaded_file(filename, scut, kcut):
     graph_as_json = json_graph.node_link_data(h)
     graph_as_json = json.dumps(graph_as_json)
     print(graph_as_json)
-    return render_template('structure.html', title=filename, kg=kg, graph_as_json=graph_as_json, pdb=a.pdb)
+    return render_template('structure.html', title=filename, kg=kg, graph_as_json=graph_as_json)
 

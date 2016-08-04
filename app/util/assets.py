@@ -3,11 +3,11 @@ from .. import app
 
 bundles = {
     'structure_js': Bundle(
+        'js/graph_drawing.js',
         'js/lib/bio-pv.min.js',
         'js/lib/pv_custom.js',
-        'js/lib/d3.js',
-        'js/graph_drawing.js',
-        output='gen/structure.js'
+        output='gen/structure.js',
+        filters='jsmin'
     )
 }
 

@@ -12,11 +12,13 @@
 <div id="canvas" class="boxed" ></div>
     <h2> Protein Viewer: </h2>
 <div id="viewer" class="boxed"></div>
-    {% assets "structure_js" %}
+    <!-- REMINDER: UPDATE TO d3.v4. This will mean modifying graph_drawing.js extensively -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    {%  assets 'structure_js' %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
 <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}"/>
-<body>
+
 <script type="text/javascript">
     var json = JSON.parse({{ graph_as_json|tojson }});
     plotter(json)
