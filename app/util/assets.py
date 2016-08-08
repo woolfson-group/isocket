@@ -20,6 +20,7 @@ bundles = {
     'base_css': Bundle(
         'css/lib/bootstrap.min.css',
         'css/lib/bootstrap-responsive.min.css',
+        'css/lib/font-awesome.css',
         output='gen/base.css',
         filters='cssmin'
     )
