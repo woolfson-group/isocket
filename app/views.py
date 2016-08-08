@@ -25,7 +25,6 @@ def index():
 def upload_file():
     form = SocketForm()
     if form.validate_on_submit():
-        print(request.__dict__)
         if 'structure' not in request.files:
             flash('Please upload a structure file.')
             return redirect(request.url)
@@ -48,6 +47,7 @@ def uploaded_file(filename, scut, kcut):
     h.add_edges_from([(e[0].number, e[1].number) for e in g.edges()])
     graph_as_json = json_graph.node_link_data(h)
     graph_as_json = json.dumps(graph_as_json)
-    print(graph_as_json)
-    return render_template('structure.html', title=filename, kg=kg, graph_as_json=graph_as_json)
+
+    print(file)
+    return render_template('structure.html', structure=file, title=filename, kg=kg, graph_as_json=graph_as_json)
 

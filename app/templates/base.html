@@ -3,14 +3,22 @@
 <head>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     {%  if title %}
-    <title>{{ title }}</title>
+        <title>{{ title }}</title>
     {% else %}
-    <title>iSOCKET</title>
+        <title>iSOCKET</title>
     {%  endif %}
+    {%  assets 'base_js' %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {%  assets 'base_css' %}
+        <link rel="stylesheet" media="screen" href="{{ ASSET_URL }}"/>
+    {% endassets %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <div>
+    <div class="container-fluid">
         <a href="/index">
         <img src="{{ url_for('static', filename = 'img/isocket_logo.png') }}" width="200" height="146">
         </a>

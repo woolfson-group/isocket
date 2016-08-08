@@ -33,7 +33,7 @@
     var viewer = pv.Viewer(document.getElementById('viewer'), options);
 </script>
 <script type='text/javascript'>
-    var pdb = "{{ url_for('static', filename = '1p7b.pdb') }}";
+    var pdb = "{{ url_for('static', filename = 'uploads/structures/{}'.format(title)) }}";
     loadpdb(pdb);
     // load the methyl transferase once the DOM has finished loading. That's
     // the earliest point the WebGL context is available.

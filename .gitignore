@@ -5,4 +5,5 @@ __pycache__/
 instance/
 app/static/.webassets-cache/
 app/static/js/lib
-uploads/
+app/static/css/lib
+app/static/uploads
