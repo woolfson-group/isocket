@@ -8,37 +8,47 @@
     <title>{{  title }}</title>
 </head>
 <body>
-    <h2> iSocket output for {{ title }}</h2>
-<div id="canvas" class="boxed" ></div>
-    <h2> Protein Viewer: </h2>
-<div id="viewer" class="boxed"></div>
-    <!-- REMINDER: UPDATE TO d3.v4. This will mean modifying graph_drawing.js extensively -->
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    {%  assets 'structure_js' %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}"/>
+<div class="row row-flex row-flex-wrap">
+    <div class="col-md-6">
+        <div class="panel panel-default flex-col">
+            <div class="panel-heading"><h3 class="panel-title">Protein Viewer</h3></div>
+            <div class="panel-body flex-grow" id="viewer"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-default flex-col">
+            <div class="panel-heading"><h3 class="panel-title"> iSocket output for {{ title }}</h3></div>
+            <div class="panel-body flex-grow svg-container svg-content-responsive" id="canvas"></div>
+        </div>
+    </div>
+        <!-- REMINDER: UPDATE TO d3.v4. This will mean modifying graph_drawing.js extensively -->
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        {%  assets 'structure_js' %}
+            <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}"/>
 
-<script type="text/javascript">
-    var json = JSON.parse({{ graph_as_json|tojson }});
-    plotter(json)
-</script>
-<script type="text/javascript">
-    var options = {
-        width: 600,
-        height: 600,
-        antialias: true,
-        quality : 'medium'
-    };
-    var viewer = pv.Viewer(document.getElementById('viewer'), options);
-</script>
-<script type='text/javascript'>
-    var pdb = "{{ url_for('static', filename = 'uploads/structures/{}'.format(title)) }}";
-    loadpdb(pdb);
-    // load the methyl transferase once the DOM has finished loading. That's
-    // the earliest point the WebGL context is available.
-    document.addEventListener('DOMContentLoaded', loadpdb);
-</script>
+    <script type="text/javascript">
+        var json = JSON.parse({{ graph_as_json| tojson | safe }});
+        plotter(json)
+    </script>
+    <script type="text/javascript">
+        var element = document.getElementById('viewer');
+        var options = {
+            width: 600,
+            height: 600,
+            antialias: true,
+            quality : 'medium'
+        };
+        var viewer = pv.Viewer(element, options);
+
+        var pdb = "{{ url_for('static', filename = 'uploads/structures/{}'.format(title)) }}";
+        loadpdb(pdb);
+        // load the methyl transferase once the DOM has finished loading. That's
+        // the earliest point the WebGL context is available.
+        document.addEventListener('DOMContentLoaded', loadpdb);
+    </script>
+</div>
 </body>
 {%  endblock %}
 </html>

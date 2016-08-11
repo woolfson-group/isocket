@@ -1,8 +1,8 @@
-
-var width = 960,
-    height = 500;
+var width = 600,
+    height = 600;
 
 var svg = d3.select("#canvas").append("svg")
+    //.attr("viewBox", "0 0 600 600")
     .attr("width", width)
     .attr("height", height);
 
