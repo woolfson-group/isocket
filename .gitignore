@@ -7,3 +7,4 @@ app/static/.webassets-cache/
 app/static/js/lib
 app/static/css/lib
 app/static/uploads
+.gitignore
