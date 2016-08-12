@@ -3,14 +3,11 @@ import numpy
 import networkx as nx
 from networkx.generators.atlas import graph_atlas_g
 from collections import OrderedDict
-import pickle
-from bokeh.plotting import show, Figure, Document, curdoc, output_notebook
+from bokeh.plotting import Figure, curdoc
 from bokeh.palettes import Reds9
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
-from bokeh.models import Slider, HBox, VBoxForm, Select
-from bokeh.client import push_session
-from bokeh.embed import autoload_server
+from bokeh.models import Slider, HBox, Select
 
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
