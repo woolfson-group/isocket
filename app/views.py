@@ -56,3 +56,8 @@ def uploaded_file(filename, scut, kcut):
 def atlas():
     script = autoload_server(model=None, app_path='/atlas')
     return render_template('atlas.html', title='AtlasCC', bokeh_script=script)
+
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html', title='contact')
