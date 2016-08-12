@@ -20,6 +20,7 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous">
     </script>
+    <script href="{{ url_for('static', filename = 'js/base.js') }}"></script>
 </head>
 <body>
 
@@ -32,11 +33,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index">iSocket</a>
+      <a class="navbar-brand active" href="index">iSocket</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="index"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+        <!--<li class="active"><a href="index"><span class="glyphicon glyphicon-home"></span> Home</a></li>-->
         <li><a href="{{ url_for('about') }}"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
         <li><a href="{{ url_for('upload_file') }}"><span class="glyphicon glyphicon-eye-open"></span> Run</a></li>
         <li><a href="{{ url_for('atlas') }}"><span class="glyphicon glyphicon-map-marker"></span> Atlas </a></li>
