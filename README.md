@@ -2,7 +2,7 @@
 iSocket web applicaton
 
 ---
-To run the Atlas aapp via bokeh server:
+To run the Atlas app via bokeh server:
 
 In one terminal, navigate to the isocket folder and run bokeh server (in the isocket virtual environment):
 
