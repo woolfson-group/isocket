@@ -4,9 +4,12 @@
 {% block content %}
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>{{ title }}</title>
 </head>
 <body>
-
+    <div class="bk-root">
+      {{ bokeh_script|safe }}
+    </div>
 </body>
+{% endblock %}
 </html>

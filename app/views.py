@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
 import json
+from bokeh.embed import autoload_server
 
 structures = UploadSet(name='structures', extensions=UPLOADED_STRUCTURES_ALLOW)
 configure_uploads(app, structures)
@@ -47,7 +48,11 @@ def uploaded_file(filename, scut, kcut):
     h.add_edges_from([(e[0].number, e[1].number) for e in g.edges()])
     graph_as_json = json_graph.node_link_data(h)
     graph_as_json = json.dumps(graph_as_json)
-
     print(file)
     return render_template('structure.html', structure=file, title=filename, kg=kg, graph_as_json=graph_as_json)
 
+
+@app.route('/atlas')
+def atlas():
+    script = autoload_server(model=None, app_path='/atlas')
+    return render_template('atlas.html', title='AtlasCC', bokeh_script=script)
