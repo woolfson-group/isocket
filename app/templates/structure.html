@@ -34,19 +34,21 @@
     </script>
     <script type="text/javascript">
         var element = document.getElementById('viewer');
+        var width = $(element).width();
+        var height = $(element).height();
         var options = {
-            width: 600,
-            height: 600,
+            width: width,
+            height: height,
             antialias: true,
             quality : 'medium'
         };
         var viewer = pv.Viewer(element, options);
-
         var pdb = "{{ url_for('static', filename = 'uploads/structures/{}'.format(title)) }}";
         loadpdb(pdb);
         // load the methyl transferase once the DOM has finished loading. That's
         // the earliest point the WebGL context is available.
         document.addEventListener('DOMContentLoaded', loadpdb);
+        window.addEventListener('resize', changeViewer);
     </script>
 </div>
 </body>
