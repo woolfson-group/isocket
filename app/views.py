@@ -61,3 +61,13 @@ def atlas():
 @app.route('/contact')
 def contact():
     return render_template('contact.html', title='contact')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html', title='about')
+
+
+@app.route('/reference')
+def reference():
+    return render_template('reference.html', title='reference')
