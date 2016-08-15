@@ -3,8 +3,8 @@ venv/
 .idea/
 __pycache__/
 instance/
-app/static/.webassets-cache/
-app/static/js/lib
-app/static/css/lib
-app/static/uploads
+isocket_app/static/.webassets-cache/
+isocket_app/static/js/lib
+isocket_app/static/css/lib
+isocket_app/static/uploads
 .gitignore

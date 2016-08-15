@@ -9,5 +9,5 @@ app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 migrate = Migrate(app=app, db=db)
 
-from app import views, models
+from isocket_app import views, models
 from .util import assets
