@@ -1,4 +1,5 @@
 alabaster==0.7.9
+alembic==0.8.7
 anaconda-client==1.5.1
 anaconda-navigator==1.2.3
 appnope==0.1.0
@@ -46,7 +47,9 @@ Flask-Babel==0.11.1
 Flask-Cors==2.1.2
 Flask-Login==0.3.2
 Flask-Mail==0.9.1
+Flask-Migrate==2.0.0
 Flask-OpenID==1.2.5
+Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 Flask-Uploads==0.2.1
 Flask-WhooshAlchemy==0.56
@@ -77,6 +80,7 @@ jupyter-core==4.1.1
 llvmlite==0.12.1
 locket==0.2.0
 lxml==3.6.1
+Mako==1.0.4
 MarkupSafe==0.23
 matplotlib==1.5.1
 mistune==0.7.3
@@ -124,6 +128,7 @@ pyOpenSSL==16.0.0
 pyparsing==2.1.6
 pytest==2.9.2
 python-dateutil==2.5.3
+python-editor==1.0.1
 python3-openid==3.0.10
 pytz==2016.6.1
 PyYAML==3.11
