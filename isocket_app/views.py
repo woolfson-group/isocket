@@ -1,11 +1,11 @@
 import os
-from isambard.add_ons.knobs_into_holes import KnobGroup
-from isambard.ampal.pdb_parser import convert_pdb_to_ampal
+from isambard_dev.add_ons.knobs_into_holes import KnobGroup
+from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from flask import render_template, flash, redirect, request, url_for
 from isocket_app import app
 from .forms import SocketForm
 from flask_uploads import UploadSet, configure_uploads
-from config import STATIC_FOLDER, UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
+from config import UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
