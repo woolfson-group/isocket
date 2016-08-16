@@ -1,4 +1,22 @@
+from decimal import Decimal as D
+import sqlalchemy.types as types
+
 from . import db
+
+
+# For converting numeric types for sqlite. Code taken from:
+# http://stackoverflow.com/questions/10355767/how-should-i-handle-decimal-in-sqlalchemy-sqlite/10386911#10386911
+class SqliteNumeric(types.TypeDecorator):
+    impl = types.String
+
+    def load_dialect_impl(self, dialect):
+        return dialect.type_descriptor(types.VARCHAR(100))
+
+    def process_bind_param(self, value, dialect):
+        return str(value)
+
+    def process_result_value(self, value, dialect):
+        return D(value)
 
 
 class AtlasDB(db.Model):
@@ -20,7 +38,7 @@ class CutoffDB(db.Model):
     __tablename__ = 'cutoff'
     __table_args__ = (db.UniqueConstraint('scut', 'kcut'), {'mysql_engine': 'InnoDB'})
     id = db.Column(db.Integer, primary_key=True)
-    scut = db.Column(db.Numeric(4, 2), nullable=False)
+    scut = db.Column(SqliteNumeric(4, 2), nullable=False)
     kcut = db.Column(db.Integer, nullable=False)
     graphs = db.relationship('GraphDB', back_populates='cutoff')
 
