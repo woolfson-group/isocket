@@ -41,7 +41,6 @@ class GraphDB(db.Model):
     atlas = db.relationship('AtlasDB', back_populates='graphs')
     cutoff = db.relationship('CutoffDB', back_populates='graphs')
     pdbe = db.relationship('PdbeDB', back_populates='graphs')
-    helices = db.relationship('GraphHelixDB', back_populates='graph', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
         return '<GraphDB(pdb={0}, name={1})>'.format(self.pdbe.pdb.pdb, self.atlas.name)
@@ -54,7 +53,6 @@ class PdbDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pdb = db.Column(db.String(4), nullable=False, unique=True)
 
-    protein = db.relationship('ProteinDB', back_populates='pdb', cascade='all, delete-orphan', passive_deletes=True)
     cdhit_full = db.relationship('CdhitFullDB', back_populates='pdb', cascade='all, delete-orphan', passive_deletes=True)
     pdbes = db.relationship('PdbeDB', back_populates='pdb', cascade='all, delete-orphan', passive_deletes=True)
 
@@ -73,7 +71,6 @@ class PdbeDB(db.Model):
     pdb_id = db.Column(db.ForeignKey('pdb.id', ondelete='CASCADE'), nullable=False, index=True)
 
     pdb = db.relationship('PdbDB', back_populates='pdbes')
-    chains = db.relationship('ChainDB', back_populates='pdbe', cascade='all, delete-orphan', passive_deletes=True)
     graphs = db.relationship('GraphDB', back_populates='pdbe', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
