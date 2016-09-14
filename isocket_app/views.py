@@ -39,10 +39,12 @@ def upload_file():
 # (e.g. same filename with differnet file content).
 @app.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
 def uploaded_file(filename, scut, kcut):
+    scut = float(scut)
+    kcut = int(kcut)
     file = os.path.join(UPLOADED_STRUCTURES_DEST, filename)
     a = convert_pdb_to_ampal(file, path=True)
     kg = KnobGroup.from_helices(a, cutoff=scut)
-    g = kg.graph
+    g = kg.filter_graph(kg.graph, cutoff=scut, min_kihs=kcut)
     h = networkx.Graph()
     h.add_nodes_from([x.number for x in g.nodes()])
     h.add_edges_from([(e[0].number, e[1].number) for e in g.edges()])
