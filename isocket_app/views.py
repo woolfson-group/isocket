@@ -41,8 +41,8 @@ def upload_file():
 def uploaded_file(filename, scut, kcut):
     scut = float(scut)
     kcut = int(kcut)
-    file = os.path.join(UPLOADED_STRUCTURES_DEST, filename)
-    a = convert_pdb_to_ampal(file, path=True)
+    static_file_path = os.path.join(UPLOADED_STRUCTURES_DEST, filename)
+    a = convert_pdb_to_ampal(static_file_path, path=True)
     kg = KnobGroup.from_helices(a, cutoff=scut)
     g = kg.filter_graph(kg.graph, cutoff=scut, min_kihs=kcut)
     h = networkx.Graph()
@@ -50,8 +50,8 @@ def uploaded_file(filename, scut, kcut):
     h.add_edges_from([(e[0].number, e[1].number) for e in g.edges()])
     graph_as_json = json_graph.node_link_data(h)
     graph_as_json = json.dumps(graph_as_json)
-    print(file)
-    return render_template('structure.html', structure=file, title=filename, kg=kg, graph_as_json=graph_as_json)
+    return render_template('structure.html', structure=static_file_path, title=filename, kg=kg,
+                           graph_as_json=graph_as_json)
 
 
 @app.route('/atlas')
