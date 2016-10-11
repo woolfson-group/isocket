@@ -90,3 +90,14 @@ def add_pdb_code(code):
                           atlas=atlas_db, pdbe=pdbe_db)
             session.commit()
     return
+
+
+def remove_pdb_code(code):
+    session.rollback()
+    q = session.query(PdbDB).filter(PdbeDB.pdb==code)
+    p = q.one_or_none()
+    if p is not None:
+        session.delete(p)
+        session.commit()
+    session.rollback()
+    return 
