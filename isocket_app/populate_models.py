@@ -1,11 +1,11 @@
 import networkx
 import sqlalchemy
+import itertools
 
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.databases.general_tools import get_or_create
-#from isambard_dev.databases.coeus.populate_coeus import populate_atlas
 from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
     get_graph_name, store_graph, two_core_names, get_unknown_graph_list, add_two_core_name_to_json
 from . import db
@@ -14,6 +14,30 @@ from .models import GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 session = db.session
 graph_list = list_of_graphs(unknown_graphs=True)
 cutoff_dbs = session.query(CutoffDB).all()
+
+
+def populate_cutoff():
+    """ Populate CutoffDB using internally-defined range of kcuts and scuts.
+
+    Returns
+    -------
+    created_objs : list, or None
+        List of Django model objects created, if any.
+    """
+    # clear session before starting - good practice.
+    session.rollback()
+    # Create cutoff objects from lists of kcut and scut values.
+    kcuts = list(range(4))
+    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    cutoffs = [CutoffDB(scut=scut, kcut=kcut) for kcut, scut in itertools.product(kcuts, scuts)]
+    # Add cutoffs to session and commit.
+    session.add_all(cutoffs)
+    try:
+        session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        session.rollback()
+        return 0
+    return 1
 
 
 def populate_atlas():
@@ -100,4 +124,4 @@ def remove_pdb_code(code):
         session.delete(p)
         session.commit()
     session.rollback()
-    return 
+    return
