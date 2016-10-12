@@ -11,12 +11,8 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
-app.config.from_pyfile('config.py')
 
-db = SQLAlchemy(app)
-migrate = Migrate(app=app, db=db)
+#migrate = Migrate(app=app, db=db)
 
 from isocket_app import views, models, populate_models
 from .util import assets

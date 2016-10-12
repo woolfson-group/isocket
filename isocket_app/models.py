@@ -1,8 +1,8 @@
 from decimal import Decimal as D
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from .extensions import db
 import sqlalchemy.types as types
-
-from . import db
-
 
 # For converting numeric types for sqlite. Code taken from:
 # http://stackoverflow.com/questions/10355767/how-should-i-handle-decimal-in-sqlalchemy-sqlite/10386911#10386911
