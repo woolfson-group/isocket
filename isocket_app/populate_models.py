@@ -11,12 +11,12 @@ from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph
 from . import db
 from .models import GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
-session = db.session
+#session = db.session
 graph_list = list_of_graphs(unknown_graphs=True)
-cutoff_dbs = session.query(CutoffDB).all()
+#cutoff_dbs = session.query(CutoffDB).all()
 
 
-def populate_cutoff():
+def populate_cutoff(session=db.session):
     """ Populate CutoffDB using internally-defined range of kcuts and scuts.
 
     Returns
@@ -40,7 +40,7 @@ def populate_cutoff():
     return 1
 
 
-def populate_atlas():
+def populate_atlas(session=db.session):
     """ Populate AtlasDB with graphs from the extended list_of_graphs.
 
     Notes
@@ -85,7 +85,8 @@ def populate_atlas():
     return 1
 
 
-def add_pdb_code(code):
+def add_pdb_code(code, session=db.session):
+    cutoff_dbs = session.query(CutoffDB).all()
     fs = FileSystem(code)
     cif = fs.cifs[fs.preferred_mmol]
     a = convert_cif_to_ampal(cif, assembly_id=fs.code)
@@ -116,7 +117,7 @@ def add_pdb_code(code):
     return
 
 
-def remove_pdb_code(code):
+def remove_pdb_code(code, session=db.session):
     session.rollback()
     q = session.query(PdbDB).filter(PdbeDB.pdb==code)
     p = q.one_or_none()
