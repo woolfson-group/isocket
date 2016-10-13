@@ -25,6 +25,8 @@ def create_app(config_filename=None):
     app.register_blueprint(home)
     from isocket_app.atlas import atlas_bp
     app.register_blueprint(atlas_bp)
+    from isocket_app.structure import structure_bp
+    app.register_blueprint(structure_bp)
     from isocket_app.util.assets import bundles, assets
     assets.init_app(app)
     assets.register(bundles)
@@ -36,5 +38,6 @@ def create_app(config_filename=None):
 
 from isocket_app.home import views
 from isocket_app.atlas import views
+from isocket_app.structure import views
 from isocket_app import models, populate_models
 from .util import assets
