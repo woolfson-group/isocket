@@ -8,8 +8,7 @@ from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.databases.general_tools import get_or_create
 from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
     get_graph_name, store_graph, two_core_names, get_unknown_graph_list, add_two_core_name_to_json
-from . import db
-from .models import GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 #session = db.session
 graph_list = list_of_graphs(unknown_graphs=True)
