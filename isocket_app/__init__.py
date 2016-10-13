@@ -21,8 +21,10 @@ def create_app(config_filename=None):
         app.config.from_pyfile(config_filename)
     from isocket_app.models import db
     db.init_app(app)
-    from isocket_app.views import mod
-    app.register_blueprint(mod)
+    from isocket_app.home import home
+    app.register_blueprint(home)
+    from isocket_app.atlas import atlas_bp
+    app.register_blueprint(atlas_bp)
     from isocket_app.util.assets import bundles, assets
     assets.init_app(app)
     assets.register(bundles)
@@ -31,5 +33,8 @@ def create_app(config_filename=None):
     configure_uploads(app, structures)
     return app
 
-from isocket_app import views, models, populate_models
+
+from isocket_app.home import views
+from isocket_app.atlas import views
+from isocket_app import models, populate_models
 from .util import assets
