@@ -21,8 +21,8 @@ def create_app(config_filename=None):
         app.config.from_pyfile(config_filename)
     from isocket_app.models import db
     db.init_app(app)
-    from isocket_app.home import home
-    app.register_blueprint(home)
+    from isocket_app.home import home_bp
+    app.register_blueprint(home_bp)
     from isocket_app.atlas import atlas_bp
     app.register_blueprint(atlas_bp)
     from isocket_app.structure import structure_bp
