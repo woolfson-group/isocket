@@ -1,6 +1,6 @@
 from flask_wtf import Form
-from wtforms import StringField, BooleanField, SelectField, FileField, DecimalField, IntegerField
-from wtforms.validators import DataRequired, Regexp, NumberRange
+from wtforms import FileField, DecimalField, IntegerField
+from wtforms.validators import DataRequired, NumberRange
 
 
 class SocketForm(Form):

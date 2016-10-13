@@ -4,7 +4,7 @@
 {% block content %}
     <div class="container-fluid">
         <h1>Upload new file</h1>
-        <form class="form-group" action="{{ url_for('mod.upload_file') }}" method="post" name="upload" enctype=multipart/form-data>
+        <form class="form-group" action="{{ url_for('structure_bp.upload_file') }}" method="post" name="upload" enctype=multipart/form-data>
             <div class="form-group">
                 <label for="InputPdbFile">PDB file</label>
                 <input type="file" id="InputPdbFile" name="{{ form.structure.name }}" >
