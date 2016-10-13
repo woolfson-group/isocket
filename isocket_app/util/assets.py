@@ -1,5 +1,4 @@
 from flask_assets import Bundle, Environment
-from .. import app
 
 bundles = {
     'structure_js': Bundle(
@@ -26,5 +25,5 @@ bundles = {
     )
 }
 
-assets = Environment(app)
-assets.register(bundles)
+assets = Environment()
+
