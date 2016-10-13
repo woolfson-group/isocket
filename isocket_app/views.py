@@ -55,7 +55,7 @@ def uploaded_file(filename, scut, kcut):
 
 @mod.route('/atlas')
 def atlas():
-    script = autoload_server(model=None, mod_path='/atlas')
+    script = autoload_server(model=None, app_path='/atlas')
     return render_template('atlas.html', title='AtlasCC', bokeh_script=script)
 
 
