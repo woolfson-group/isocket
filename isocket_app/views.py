@@ -3,8 +3,7 @@ from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from flask import render_template, flash, redirect, request, url_for, current_app, Blueprint
 from .forms import SocketForm
-from flask_uploads import UploadSet, configure_uploads
-#from config import UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
+from flask_uploads import UploadSet
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
@@ -23,14 +22,15 @@ def index():
 
 @mod.route('/upload', methods=['GET', 'POST'])
 def upload_file():
+    structures = UploadSet(name='structures', extensions=current_app.config['UPLOADED_STRUCTURES_ALLOW'])
     form = SocketForm()
     if form.validate_on_submit():
         if 'structure' not in request.files:
             flash('Please upload a structure file.')
             return redirect(request.url)
         structure = request.files['structure']
-        #filename = secure_filename(structures.save(structure))
-        #return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
+        filename = secure_filename(structures.save(structure))
+        return redirect(url_for('mod.uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
     return render_template('upload.html', form=form)
 
 
@@ -40,7 +40,8 @@ def upload_file():
 def uploaded_file(filename, scut, kcut):
     scut = float(scut)
     kcut = int(kcut)
-    static_file_path = os.path.join(UPLOADED_STRUCTURES_DEST, filename)
+    uploaded_structures_dest = current_app.config['UPLOADED_STRUCTURES_DEST']
+    static_file_path = os.path.join(uploaded_structures_dest, filename)
     a = convert_pdb_to_ampal(static_file_path, path=True)
     kg = KnobGroup.from_helices(a, cutoff=scut)
     g = kg.filter_graph(kg.graph, cutoff=scut, min_kihs=kcut)
