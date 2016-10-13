@@ -38,11 +38,10 @@
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
         <!--<li class="active"><a href="index"><span class="glyphicon glyphicon-home"></span> Home</a></li>-->
-        <li><a href="{{ url_for('mod.about') }}"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
-        <li><a href="{{ url_for('mod.upload_file') }}"><span class="glyphicon glyphicon-eye-open"></span> Run</a></li>
-        <li><a href="{{ url_for('mod.atlas') }}"><span class="glyphicon glyphicon-map-marker"></span> Atlas </a></li>
-        <li><a href="{{ url_for('mod.contact') }}"><span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
-        <li><a href="{{ url_for('mod.reference') }}"><span class="glyphicon glyphicon-book"></span> Reference</a></li>
+        <li><a href="{{ url_for('home.about') }}"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
+        <li><a href="{{ url_for('atlas_bp.atlas') }}"><span class="glyphicon glyphicon-map-marker"></span> Atlas </a></li>
+        <li><a href="{{ url_for('home.contact') }}"><span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
+        <li><a href="{{ url_for('home.reference') }}"><span class="glyphicon glyphicon-book"></span> Reference</a></li>
       </ul>
     </div>
   </div>
