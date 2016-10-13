@@ -25,5 +25,5 @@ bundles = {
     )
 }
 
-assets = Environment()
+#assets = Environment()
 
