@@ -10,7 +10,7 @@ def create_app(config_filename=None):
     if config_filename is not None:
         app.config.from_pyfile(config_filename)
     # Database set up
-    from isocket_app.models import db
+    from isocket_app.extensions import db
     db.init_app(app)
     # Register Blueprints
     from isocket_app.home import home_bp
