@@ -1,28 +1,27 @@
 import os
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
-from flask import render_template, flash, redirect, request, url_for
-from isocket_app import app
+from flask import render_template, flash, redirect, request, url_for, current_app, Blueprint
 from .forms import SocketForm
 from flask_uploads import UploadSet, configure_uploads
-from config import UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
+#from config import UPLOADED_STRUCTURES_ALLOW, UPLOADED_STRUCTURES_DEST
 from werkzeug.utils import secure_filename
 import networkx
 from networkx.readwrite import json_graph
 import json
 from bokeh.embed import autoload_server
 
-structures = UploadSet(name='structures', extensions=UPLOADED_STRUCTURES_ALLOW)
-configure_uploads(app, structures)
+
+mod = Blueprint('mod', __name__)
 
 
-@app.route('/')
-@app.route('/index')
+@mod.route('/')
+@mod.route('/index')
 def index():
     return render_template('index.html', title='iSOCKET')
 
 
-@app.route('/upload', methods=['GET', 'POST'])
+@mod.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     form = SocketForm()
     if form.validate_on_submit():
@@ -30,14 +29,14 @@ def upload_file():
             flash('Please upload a structure file.')
             return redirect(request.url)
         structure = request.files['structure']
-        filename = secure_filename(structures.save(structure))
-        return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
+        #filename = secure_filename(structures.save(structure))
+        #return redirect(url_for('uploaded_file', filename=filename, scut=form.scut.data, kcut=form.kcut.data))
     return render_template('upload.html', form=form)
 
 
 #TODO add tokens to urls to avoid problems with same url and different data
 # (e.g. same filename with differnet file content).
-@app.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
+@mod.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
 def uploaded_file(filename, scut, kcut):
     scut = float(scut)
     kcut = int(kcut)
@@ -54,22 +53,22 @@ def uploaded_file(filename, scut, kcut):
                            graph_as_json=graph_as_json)
 
 
-@app.route('/atlas')
+@mod.route('/atlas')
 def atlas():
-    script = autoload_server(model=None, app_path='/atlas')
+    script = autoload_server(model=None, mod_path='/atlas')
     return render_template('atlas.html', title='AtlasCC', bokeh_script=script)
 
 
-@app.route('/contact')
+@mod.route('/contact')
 def contact():
     return render_template('contact.html', title='contact')
 
 
-@app.route('/about')
+@mod.route('/about')
 def about():
     return render_template('about.html', title='about')
 
 
-@app.route('/reference')
+@mod.route('/reference')
 def reference():
     return render_template('reference.html', title='reference')
