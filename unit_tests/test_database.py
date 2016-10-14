@@ -22,10 +22,6 @@ class BaseTestCase(TestCase):
         db.session.remove()
         db.drop_all()
 
-    def uber_simple(self):
-        print(db.engine)
-        self.assertTrue(True)
-
 
 class PdbDBTestCase(BaseTestCase):
 
@@ -35,3 +31,11 @@ class PdbDBTestCase(BaseTestCase):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
         p = q.one()
         self.assertEqual(p.pdb, code)
+
+
+class FixedTablesTestCase(BaseTestCase):
+
+    def test_cutoff_rows(self):
+        populate_cutoff()
+        cutoff_count = db.session.query(CutoffDB).count()
+        self.assertEqual(cutoff_count, 28)
