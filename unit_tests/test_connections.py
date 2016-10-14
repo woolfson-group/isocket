@@ -1,7 +1,9 @@
 from flask_testing import TestCase
+import os
 
 from isocket_app.factory import create_app
 
+os.environ['ISOCKET_CONFIG'] = 'testing'
 
 class ConnectionTestCase(TestCase):
 
