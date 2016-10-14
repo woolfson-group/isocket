@@ -21,13 +21,13 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.path.join('sqlite://', basedir, 'isocket_app', 'atlas.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///atlas.db'
 
 
 class TestingConfig(BaseConfig):
     DEBUG = False
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.path.join('sqlite://', basedir, 'unit_tests', 'test_atlas.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///../unit_tests/tests.db'
 
 
 config = {
