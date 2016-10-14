@@ -51,6 +51,7 @@ Flask-Migrate==2.0.0
 Flask-OpenID==1.2.5
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
+Flask-Testing==0.6.1
 Flask-Uploads==0.2.1
 Flask-WhooshAlchemy==0.56
 Flask-WTF==0.12
@@ -83,6 +84,7 @@ lxml==3.6.1
 Mako==1.0.4
 MarkupSafe==0.23
 matplotlib==1.5.1
+mdtraj==1.7.2
 mistune==0.7.3
 mpmath==0.19
 multipledispatch==0.4.8
@@ -164,7 +166,7 @@ traitlets==4.2.2
 unicodecsv==0.14.1
 wcwidth==0.1.7
 webassets==0.11.1
-Werkzeug==0.11.10
+Werkzeug==0.11.11
 Whoosh==2.7.4
 widgetsnbextension==1.2.6
 WTForms==2.1
