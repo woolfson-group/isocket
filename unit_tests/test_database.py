@@ -1,35 +1,40 @@
-from flask import Flask
+import os
 from flask_testing import TestCase
-from flask_sqlalchemy import SQLAlchemy
 
-from isocket_app.populate_models import add_pdb_code, populate_atlas, populate_cutoff
-from isocket_app.models import GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket_app.factory import create_app
+from isocket_app.extensions import db
+from isocket_app.populate_models import add_pdb_code, populate_cutoff
+from isocket_app.models import PdbDB, CutoffDB
 
-class DBTest(TestCase):
+os.environ['ISOCKET_CONFIG'] = 'testing'
+
+class BaseTestCase(TestCase):
 
     def create_app(self):
-        app = Flask(__name__, instance_relative_config=True)
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////Users/jackheal/Projects/isocket/isocket_app/unit_tests/test_atlas.db'
-        app.config['TESTING'] = True
+        app = create_app()
         return app
 
     def setUp(self):
-        self.app = self.create_app()
-        self.db = SQLAlchemy(app=self.app)
-        self.db.create_all()
+        db.create_all()
 
     def tearDown(self):
-        self.db.session.remove()
-        self.db.drop_all()
+        db.session.remove()
+        db.drop_all()
 
-    def test_basic_test(self):
-        print(self.db.engine)
-        self.assertTrue(self.app.config['TESTING'])
+
+class PdbDBTestCase(BaseTestCase):
 
     def test_add_pdb_code(self):
-        populate_cutoff()
         code = '2ebo'
-        add_pdb_code(code, session=self.db.session)
-        q = self.db.session.query(PdbDB).filter(PdbDB.pdb == code)
+        add_pdb_code(code, session=db.session)
+        q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
         p = q.one()
         self.assertEqual(p.pdb, code)
+
+
+class FixedTablesTestCase(BaseTestCase):
+
+    def test_cutoff_rows(self):
+        populate_cutoff()
+        cutoff_count = db.session.query(CutoffDB).count()
+        self.assertEqual(cutoff_count, 28)
