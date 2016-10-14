@@ -1,11 +1,11 @@
 from flask import Flask
 from flask_uploads import UploadSet, configure_uploads
+from config import configure_app
 
 
 def create_app(config_filename=None):
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object('config')
-    app.config.from_pyfile('config.py')
+    configure_app(app=app)
     if config_filename is not None:
         app.config.from_pyfile(config_filename)
     # Database set up
