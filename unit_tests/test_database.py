@@ -33,8 +33,7 @@ class PdbDBTestCase(BaseTestCase):
     def test_add_pdb_code(self):
         code = self.test_code
         add_pdb_code(code, session=db.session)
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
-        p = q.one()
+        p = self.query_pdb.one()
         self.assertEqual(p.pdb, code)
 
     """
