@@ -4,7 +4,7 @@ from flask_testing import TestCase
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
 from isocket_app.populate_models import add_pdb_code, remove_pdb_code, populate_cutoff
-from isocket_app.models import PdbDB, CutoffDB
+from isocket_app.models import PdbDB, PdbeDB, CutoffDB
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 
@@ -25,24 +25,21 @@ class BaseTestCase(TestCase):
 
 class PdbDBTestCase(BaseTestCase):
 
-    def setUp(self):
-        super().setUp()
-        self.test_code = '2ebo'
-        self.query_pdb = db.session.query(PdbDB).filter(PdbDB.pdb == self.test_code)
-
     def test_add_pdb_code(self):
-        code = self.test_code
+        code = '2ebo'
         add_pdb_code(code, session=db.session)
-        p = self.query_pdb.one()
+        q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
+        p = q.one()
         self.assertEqual(p.pdb, code)
-
-    """
+"""
     def test_remove_pdb_code(self):
-        code = self.test_code
+        code = '2ebo'
+        add_pdb_code(code, session=db.session)
         remove_pdb_code(code, session=db.session)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
-    """
-
+        p = q.one_or_none()
+        self.assertIsNone(p)
+"""
 
 class FixedTablesTestCase(BaseTestCase):
 
