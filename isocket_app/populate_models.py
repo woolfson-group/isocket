@@ -94,25 +94,26 @@ def add_pdb_code(code, session=db.session):
                             mmol=fs.preferred_mmol, preferred=True)[0]
     session.commit()
     kg = KnobGroup.from_helices(a, cutoff=10.0)
-    g = kg.graph
-    for cutoff_db in cutoff_dbs:
-        session.rollback()
-        h = kg.filter_graph(g=g, cutoff=cutoff_db.scut, min_kihs=cutoff_db.kcut)
-        h = graph_to_plain_graph(g=h)
-        ccs = sorted_connected_components(h)
-        for cc_num, cc in enumerate(ccs):
-            storage_changed = store_graph(cc)
-            cc_name = get_graph_name(cc, graph_list=graph_list)
-            atlas_db = None
-            if not storage_changed:
-                atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one_or_none()
-                # atlas_db = next(filter(lambda x: x.name == cc_name, atlas_dbs), None)
-            if atlas_db is None:
-                populate_atlas()
-                atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one()
-            get_or_create(session=session, model=GraphDB, connected_component=cc_num, cutoff=cutoff_db,
-                          atlas=atlas_db, pdbe=pdbe_db)
-            session.commit()
+    if kg is not None:
+        g = kg.graph
+        for cutoff_db in cutoff_dbs:
+            session.rollback()
+            h = kg.filter_graph(g=g, cutoff=cutoff_db.scut, min_kihs=cutoff_db.kcut)
+            h = graph_to_plain_graph(g=h)
+            ccs = sorted_connected_components(h)
+            for cc_num, cc in enumerate(ccs):
+                storage_changed = store_graph(cc)
+                cc_name = get_graph_name(cc, graph_list=graph_list)
+                atlas_db = None
+                if not storage_changed:
+                    atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one_or_none()
+                    # atlas_db = next(filter(lambda x: x.name == cc_name, atlas_dbs), None)
+                if atlas_db is None:
+                    populate_atlas()
+                    atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one()
+                get_or_create(session=session, model=GraphDB, connected_component=cc_num, cutoff=cutoff_db,
+                              atlas=atlas_db, pdbe=pdbe_db)
+                session.commit()
     return
 
 
