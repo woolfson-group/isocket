@@ -35,6 +35,10 @@ class AddPdbCodeTestCase(BaseTestCase):
         p = q.one()
         self.assertEqual(p.pdb, self.code)
 
+    def test_pdbe_exists(self):
+        c = db.session.query(PdbeDB).count()
+        self.assertEqual(c, 1)
+
 
 class RemovePdbCodeTestCase(BaseTestCase):
 
