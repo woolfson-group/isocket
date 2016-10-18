@@ -23,20 +23,29 @@ class BaseTestCase(TestCase):
         db.drop_all()
 
 
-class PdbDBTestCase(BaseTestCase):
+class AddPdbCodeTestCase(BaseTestCase):
 
-    def test_add_pdb_code(self):
-        code = '2ebo'
-        add_pdb_code(code, session=db.session)
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
+    def setUp(self):
+        super().setUp()
+        self.code = '2ebo'
+        add_pdb_code(code=self.code)
+
+    def test_pdb_code_exists(self):
+        q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
         p = q.one()
-        self.assertEqual(p.pdb, code)
+        self.assertEqual(p.pdb, self.code)
 
-    def test_remove_pdb_code(self):
-        code = '2ebo'
-        add_pdb_code(code, session=db.session)
-        remove_pdb_code(code, session=db.session)
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
+
+class RemovePdbCodeTestCase(BaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.code = '2ebo'
+        add_pdb_code(code=self.code)
+        remove_pdb_code(code=self.code)
+
+    def test_pdb_code_is_gone(self):
+        q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
         p = q.one_or_none()
         self.assertIsNone(p)
 
