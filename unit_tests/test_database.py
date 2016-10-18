@@ -31,7 +31,7 @@ class PdbDBTestCase(BaseTestCase):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
         p = q.one()
         self.assertEqual(p.pdb, code)
-"""
+
     def test_remove_pdb_code(self):
         code = '2ebo'
         add_pdb_code(code, session=db.session)
@@ -39,7 +39,7 @@ class PdbDBTestCase(BaseTestCase):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code)
         p = q.one_or_none()
         self.assertIsNone(p)
-"""
+
 
 class FixedTablesTestCase(BaseTestCase):
 
