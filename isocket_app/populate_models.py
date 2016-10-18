@@ -85,13 +85,17 @@ def populate_atlas(session=db.session):
 
 
 def add_pdb_code(code, session=db.session):
+    pdb_db, created = get_or_create(session=session, model=PdbDB, pdb=code)
+    if not created:
+        return
     cutoff_dbs = session.query(CutoffDB).all()
+    if len(cutoff_dbs) == 0:
+        populate_cutoff(session=session)
     fs = FileSystem(code)
-    cif = fs.cifs[fs.preferred_mmol]
-    a = convert_cif_to_ampal(cif, assembly_id=fs.code)
-    pdb_db = get_or_create(session=session, model=PdbDB, pdb=fs.code)[0]
     pdbe_db = get_or_create(session=session, model=PdbeDB, pdb=pdb_db,
                             mmol=fs.preferred_mmol, preferred=True)[0]
+    cif = fs.cifs[fs.preferred_mmol]
+    a = convert_cif_to_ampal(cif, assembly_id=fs.code)
     session.commit()
     kg = KnobGroup.from_helices(a, cutoff=10.0)
     if kg is not None:
