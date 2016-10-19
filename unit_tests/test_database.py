@@ -3,9 +3,8 @@ from flask_testing import TestCase
 
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
-from isocket_app.populate_models import add_pdb_code, remove_pdb_code, populate_cutoff, populate_atlas, \
-    add_to_atlas, graph_list
-from isocket_app.models import PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, graph_list
+from isocket_app.models import CutoffDB, AtlasDB
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 
@@ -44,10 +43,6 @@ class AtlasDBTestCase(BaseTestCase):
         c = db.session.query(AtlasDB).count()
         self.assertEqual(c, len(graph_list))
 
-
-
-
-
 """
 class AddPdbCodeTestCase(BaseTestCase):
 
@@ -81,25 +76,9 @@ class RemovePdbCodeTestCase(BaseTestCase):
 """
 
 
-class FixedTablesTestCase(BaseTestCase):
-
-    """
-    def test_populate_cutoff(self):
-        x = populate_cutoff()
-        self.assertTrue(x)
-        x = populate_cutoff()
-        self.assertFalse(x)
-    """
+class CutoffDBTestCase(BaseTestCase):
 
     def test_cutoff_rows(self):
         populate_cutoff()
         cutoff_count = db.session.query(CutoffDB).count()
         self.assertEqual(cutoff_count, 28)
-
-    """
-    def test_populate_atlas(self):
-        x = populate_atlas()
-        self.assertTrue(x)
-        x = populate_atlas()
-        self.assertFalse(x)
-    """
