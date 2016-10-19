@@ -43,6 +43,53 @@ class PopulateModel:
         get_or_create(model=self.model, session=session, **self.parameters)
 
 
+class GraphHandler:
+    def __init__(self, graph):
+        self.graph = graph_to_plain_graph(graph)
+        self.storage_changed = store_graph(g=self.graph)
+        self.two_core_name = self.get_two_core_name()
+        self.name = self.get_name()
+
+    @property
+    def two_core(self):
+        return networkx.k_core(self.graph, 2)
+
+    @property
+    def is_two_core(self):
+        return networkx.is_isomorphic(self.graph, self.two_core)
+
+    def get_two_core_name(self):
+        return get_graph_name(self.two_core, graph_list=graph_list)
+
+    def get_name(self):
+        if self.is_two_core:
+            return self.two_core_name
+        else:
+            return get_graph_name(self.graph, graph_list=graph_list)
+
+    def graph_parameters(self):
+        return dict(name=self.name, nodes=self.graph.number_of_nodes(), edges=self.graph.number_of_edges())
+
+    def two_core_parameters(self):
+        return dict(name=self.two_core_name, nodes=self.two_core.number_of_nodes(),
+                    edges=self.two_core.number_of_edges())
+
+
+def add_to_atlas(graph):
+    gh = GraphHandler(graph)
+    with session_scope() as session:
+        PopulateModel(AtlasDB, **gh.two_core_parameters()).go(session)
+        PopulateModel(AtlasDB, **gh.graph_parameters()).go(session)
+
+
+def update_atlas_two_core_rows():
+    with session_scope() as session:
+        q = session.query(AtlasDB).filter(AtlasDB.two_core_id.is_(None))
+        for adb in q.all():
+            adb.two_core = session.query(AtlasDB).filter(AtlasDB.name == adb.name)
+
+
+
 """
 class PopulateCutoffDB:
     @property
