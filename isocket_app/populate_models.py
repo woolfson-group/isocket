@@ -61,20 +61,10 @@ def add_to_atlas(graph):
         PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
 
 
-"""
-class PopulateCutoffDB:
-    @property
-    def scuts(self):
-        return [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-
-    @property
-    def kcuts(self):
-        return list(range(4))
-
-    def go(self, session):
-        for kcut, scut in itertools.product(self.kcuts, self.scuts):
-            get_or_create(model=CutoffDB, session=session, scut=scut, kcut=kcut)
-"""
+def populate_atlas():
+    for g in graph_list:
+        add_to_atlas(g)
+    return
 
 
 def populate_cutoff():
@@ -90,51 +80,6 @@ def populate_cutoff():
     with session_scope() as session:
         for kcut, scut in itertools.product(kcuts, scuts):
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
-
-
-def populate_atlas(session=db.session):
-    """ Populate AtlasDB with graphs from the extended list_of_graphs.
-
-    Notes
-    -----
-    Depends on any new graphs being in the unknown_graphs shelf and in the two_core_names dictionary.
-    Running isambard.tools.graph_theory.store_graph(g) for each new graph g will accomplish this.
-    Runs session.commit() at the end, so any new graphs will have been added to the atlas table.
-    First adds new graphs and then subsequently fills the two_core_id.
-    Skips over graphs already in AtlasDB.
-    Run this function after new unknown graphs are added to the unknown_graph_shelf.
-
-    Returns
-    -------
-    None
-
-    """
-    # clear session before starting - good practice.
-    session.rollback()
-    # Full list of all graphs in Atlas and/or encountered to date.
-    # Get AtlasDB instances for graphs not currently in the coeus.atlas table. Add and commit them.
-    atlas_names = [x[0] for x in session.query(AtlasDB.name).all()]
-    atlas_dbs = [AtlasDB(nodes=g.number_of_nodes(), name=g.name, edges=g.number_of_edges())
-                 for g in graph_list if g.name not in atlas_names]
-    session.add_all(atlas_dbs)
-    session.commit()
-    # Fill in the two_core_id column for the recently added graphs.
-    for atlas_db in atlas_dbs:
-        try:
-            two_core_name = two_core_names[atlas_db.name]
-        except KeyError:
-            g = next(filter(lambda x: x.name == atlas_db.name, get_unknown_graph_list()))
-            two_core_name = get_graph_name(networkx.k_core(g, 2))
-            add_two_core_name_to_json(atlas_db.name, two_core_name, force_add=False)
-        two_core_db = session.query(AtlasDB).filter_by(name=two_core_name).one()
-        atlas_db.two_core_id = two_core_db.id
-    session.add_all(atlas_dbs)
-    try:
-        session.commit()
-    except sqlalchemy.exc.IntegrityError:
-        session.rollback()
-        return 0
-    return 1
 
 
 def add_pdb_code(code, session=db.session):
