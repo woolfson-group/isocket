@@ -3,11 +3,11 @@ from flask_uploads import UploadSet, configure_uploads
 from config import configure_app
 
 
-def create_app(config_filename=None):
+def create_app(config=None):
     app = Flask(__name__, instance_relative_config=True)
     configure_app(app=app)
-    if config_filename is not None:
-        app.config.from_pyfile(config_filename)
+    if config is not None:
+        app.config.from_pyfile(config)
     # Database set up
     from isocket_app.extensions import db
     db.init_app(app)
