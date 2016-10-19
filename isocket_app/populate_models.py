@@ -1,6 +1,7 @@
 import networkx
 import sqlalchemy
 import itertools
+from contextlib import contextmanager
 
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
@@ -10,33 +11,48 @@ from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph
     get_graph_name, store_graph, two_core_names, get_unknown_graph_list, add_two_core_name_to_json
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
-#session = db.session
+
 graph_list = list_of_graphs(unknown_graphs=True)
-#cutoff_dbs = session.query(CutoffDB).all()
 
 
-def populate_cutoff(session=db.session):
+@contextmanager
+def session_scope():
+    """Provide a transactional scope around a series of operations."""
+    session = db.session
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
+class PopulateCutoffDB:
+    @property
+    def scuts(self):
+        return [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+
+    @property
+    def kcuts(self):
+        return list(range(4))
+
+    def go(self, session):
+        for kcut, scut in itertools.product(self.kcuts, self.scuts):
+            get_or_create(model=CutoffDB, session=session, scut=scut, kcut=kcut)
+
+
+def populate_cutoff():
     """ Populate CutoffDB using internally-defined range of kcuts and scuts.
 
     Returns
     -------
-    created_objs : list, or None
-        List of Django model objects created, if any.
+    True if new values added to database
+    False otherwise
     """
-    # clear session before starting - good practice.
-    session.rollback()
-    # Create cutoff objects from lists of kcut and scut values.
-    kcuts = list(range(4))
-    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-    cutoffs = [CutoffDB(scut=scut, kcut=kcut) for kcut, scut in itertools.product(kcuts, scuts)]
-    # Add cutoffs to session and commit.
-    session.add_all(cutoffs)
-    try:
-        session.commit()
-    except sqlalchemy.exc.IntegrityError:
-        session.rollback()
-        return 0
-    return 1
+    with session_scope() as session:
+        PopulateCutoffDB().go(session)
 
 
 def populate_atlas(session=db.session):
