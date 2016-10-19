@@ -1,6 +1,7 @@
 import networkx
 import sqlalchemy
 import itertools
+from flask_sqlalchemy import _BoundDeclarativeMeta
 from contextlib import contextmanager
 
 from isambard_dev.add_ons.filesystem import FileSystem
@@ -29,6 +30,20 @@ def session_scope():
         session.close()
 
 
+class PopulateModel:
+    def __init__(self, model, **kwargs):
+        try:
+            self.model = model
+            self.instance = model(**kwargs)
+            self.parameters = kwargs
+        except Exception as e:
+            raise e
+
+    def go(self, session):
+        get_or_create(model=self.model, session=session, **self.parameters)
+
+
+"""
 class PopulateCutoffDB:
     @property
     def scuts(self):
@@ -41,6 +56,7 @@ class PopulateCutoffDB:
     def go(self, session):
         for kcut, scut in itertools.product(self.kcuts, self.scuts):
             get_or_create(model=CutoffDB, session=session, scut=scut, kcut=kcut)
+"""
 
 
 def populate_cutoff():
@@ -51,8 +67,11 @@ def populate_cutoff():
     True if new values added to database
     False otherwise
     """
+    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    kcuts = list(range(4))
     with session_scope() as session:
-        PopulateCutoffDB().go(session)
+        for kcut, scut in itertools.product(kcuts, scuts):
+            PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
 def populate_atlas(session=db.session):
