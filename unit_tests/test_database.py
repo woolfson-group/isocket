@@ -3,8 +3,9 @@ from flask_testing import TestCase
 
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
-from isocket_app.populate_models import add_pdb_code, remove_pdb_code, populate_cutoff, populate_atlas
-from isocket_app.models import PdbDB, PdbeDB, CutoffDB
+from isocket_app.populate_models import add_pdb_code, remove_pdb_code, populate_cutoff, populate_atlas, \
+    add_to_atlas, graph_list
+from isocket_app.models import PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 
@@ -21,6 +22,30 @@ class BaseTestCase(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+
+class AtlasDBTestCase(BaseTestCase):
+
+    def test_first_element_of_graph_list(self):
+        self.assertTrue(graph_list[0].name == 'G0')
+
+    def test_add_to_atlas(self):
+        c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
+        self.assertEqual(c, 0)
+        g = graph_list[0]
+        add_to_atlas(graph=g)
+        c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
+        self.assertEqual(c, 1)
+
+    def test_populate_atlas(self):
+        c = db.session.query(AtlasDB).count()
+        self.assertEqual(c, 0)
+        populate_atlas()
+        c = db.session.query(AtlasDB).count()
+        self.assertEqual(c, len(graph_list))
+
+
+
 
 
 """
