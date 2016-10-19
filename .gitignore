@@ -7,4 +7,5 @@ isocket_app/static/.webassets-cache/
 isocket_app/static/js/lib
 isocket_app/static/css/lib
 isocket_app/static/uploads
+unit_tests/tests.db
 .gitignore
