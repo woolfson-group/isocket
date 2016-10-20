@@ -21,7 +21,7 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///atlas.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/jackheal/Projects/isocket/isocket_app/atlas.db'
 
 
 class TestingConfig(BaseConfig):

@@ -26,9 +26,7 @@ class AtlasDB(db.Model):
     nodes = db.Column(db.SmallInteger, nullable=False)
     edges = db.Column(db.SmallInteger, nullable=False)
     name = db.Column(db.String(30), nullable=False, unique=True)
-    two_core_id = db.Column(db.Integer, db.ForeignKey('atlas.id', ondelete='CASCADE'))
     graphs = db.relationship('GraphDB', back_populates='atlas')
-    two_core = db.relationship('AtlasDB', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
         return '<AtlasDB(name={0}, nodes={1}, edges={2})>'.format(self.name, self.nodes, self.edges)
