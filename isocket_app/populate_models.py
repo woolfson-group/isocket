@@ -1,8 +1,5 @@
-import networkx
-import sqlalchemy
-from collections import namedtuple
 import itertools
-from flask_sqlalchemy import _BoundDeclarativeMeta
+from collections import namedtuple
 from contextlib import contextmanager
 
 from isambard_dev.add_ons.filesystem import FileSystem
@@ -10,7 +7,7 @@ from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.databases.general_tools import get_or_create
 from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
-    get_graph_name, store_graph, two_core_names, get_unknown_graph_list, add_two_core_name_to_json
+    get_graph_name
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 
@@ -67,8 +64,14 @@ def add_to_atlas(graph):
 
 
 def populate_atlas():
-    for g in graph_list:
-        add_to_atlas(g)
+    with session_scope() as session:
+        s1 = set([x[0] for x in session.query(AtlasDB.name).all()])  # graph names of Atlas objects already in db.
+    s2 = set([x.name for x in graph_list])
+    to_add = s2 - s1  # only want to add g in graph_list if not in Atlas already.
+    atlas_dbs = [AtlasDB(name=g.name, nodes=g.number_of_nodes(), edges=g.number_of_edges())
+                 for g in filter(lambda x: x.name in to_add, graph_list)]
+    with session_scope() as session:
+        session.add_all(atlas_dbs)
     return
 
 

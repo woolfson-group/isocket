@@ -44,6 +44,15 @@ class AtlasDBTestCase(BaseTestCase):
         c = db.session.query(AtlasDB).count()
         self.assertEqual(c, len(graph_list))
 
+    def test_populate_atlas_run_multiple_times(self):
+        populate_atlas()
+        c = db.session.query(AtlasDB).count()
+        self.assertEqual(c, len(graph_list))
+        populate_atlas()
+        c = db.session.query(AtlasDB).count()
+        self.assertEqual(c, len(graph_list))
+
+
 
 class AddPdbCodeTestCase(BaseTestCase):
 
