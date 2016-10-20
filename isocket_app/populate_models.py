@@ -64,7 +64,12 @@ def add_to_atlas(graph):
 
 
 def populate_atlas():
-    atlas_dbs = [AtlasDB(name=g.name, nodes=g.number_of_nodes(), edges=g.number_of_edges()) for g in graph_list]
+    with session_scope() as session:
+        s1 = set([x[0] for x in session.query(AtlasDB.name).all()])  # graph names of Atlas objects already in db.
+    s2 = set([x.name for x in graph_list])
+    to_add = s2 - s1  # only want to add g in graph_list if not in Atlas already.
+    atlas_dbs = [AtlasDB(name=g.name, nodes=g.number_of_nodes(), edges=g.number_of_edges())
+                 for g in filter(lambda x: x.name in to_add, graph_list)]
     with session_scope() as session:
         session.add_all(atlas_dbs)
     return
