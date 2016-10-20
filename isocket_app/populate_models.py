@@ -15,6 +15,8 @@ from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 
 graph_list = list_of_graphs(unknown_graphs=True)
+scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+kcuts = list(range(4))
 
 
 @contextmanager
@@ -41,7 +43,7 @@ class PopulateModel:
             raise e
 
     def go(self, session):
-        item = get_or_create(model=self.model, session=session, **self.parameters)
+        item, created = get_or_create(model=self.model, session=session, **self.parameters)
         return item
 
 
@@ -60,7 +62,8 @@ class AtlasHandler:
 def add_to_atlas(graph):
     ah = AtlasHandler(graph)
     with session_scope() as session:
-        PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
+        item = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
+    return item
 
 
 def populate_atlas():
@@ -77,8 +80,6 @@ def populate_cutoff():
     True if new values added to database
     False otherwise
     """
-    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-    kcuts = list(range(4))
     with session_scope() as session:
         for kcut, scut in itertools.product(kcuts, scuts):
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
@@ -95,50 +96,35 @@ def get_structure_data(code, preferred=True, mmol=1, cutoff=10.0):
     return Structure(code=code, mmol=mmol, preferred=preferred, knob_group=kg)
 
 
+def get_graphs_from_knob_group(knob_group):
+    g = knob_group.graph
+    knob_graphs = []
+    for scut, kcut in itertools.product(scuts[::-1], kcuts):
+        h = knob_group.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
+        h = graph_to_plain_graph(g=h)
+        ccs = sorted_connected_components(h)
+        for cc_num, cc in enumerate(ccs):
+            cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
+            knob_graphs.append(cc)
+    return knob_graphs
+
+
 def add_pdb_code(code, **kwargs):
     structure = get_structure_data(code=code, **kwargs)
+    knob_graphs = []
+    if structure.knob_group is not None:
+        knob_graphs = get_graphs_from_knob_group(knob_group=structure.knob_group)
     with session_scope() as session:
-        PopulateModel(model=PdbDB, pdb=structure.code).go(session=session)
-        pdb = session.query(PdbDB).filter(PdbDB.pdb == structure.code)
-        
-
-
-
-
-def add_pdb_code_old(code, session=db.session):
-    pdb_db, created = get_or_create(session=session, model=PdbDB, pdb=code)
-    if not created:
-        return
-    cutoff_dbs = session.query(CutoffDB).all()
-    if len(cutoff_dbs) == 0:
-        populate_cutoff(session=session)
-    fs = FileSystem(code)
-    pdbe_db = get_or_create(session=session, model=PdbeDB, pdb=pdb_db,
-                            mmol=fs.preferred_mmol, preferred=True)[0]
-    cif = fs.cifs[fs.preferred_mmol]
-    a = convert_cif_to_ampal(cif, assembly_id=fs.code)
-    session.commit()
-    kg = KnobGroup.from_helices(a, cutoff=10.0)
-    if kg is not None:
-        g = kg.graph
-        for cutoff_db in cutoff_dbs:
-            session.rollback()
-            h = kg.filter_graph(g=g, cutoff=cutoff_db.scut, min_kihs=cutoff_db.kcut)
-            h = graph_to_plain_graph(g=h)
-            ccs = sorted_connected_components(h)
-            for cc_num, cc in enumerate(ccs):
-                storage_changed = store_graph(cc)
-                cc_name = get_graph_name(cc, graph_list=graph_list)
-                atlas_db = None
-                if not storage_changed:
-                    atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one_or_none()
-                    # atlas_db = next(filter(lambda x: x.name == cc_name, atlas_dbs), None)
-                if atlas_db is None:
-                    populate_atlas()
-                    atlas_db = session.query(AtlasDB).filter_by(name=cc_name).one()
-                get_or_create(session=session, model=GraphDB, connected_component=cc_num, cutoff=cutoff_db,
-                              atlas=atlas_db, pdbe=pdbe_db)
-                session.commit()
+        pdb = PopulateModel(model=PdbDB, pdb=structure.code).go(session=session)
+        pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.preferred, mmol=structure.mmol).go(
+            session=session)
+        for g in knob_graphs:
+            ah = AtlasHandler(graph=g)
+            cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
+                                                    CutoffDB.kcut == g.graph['kcut']).one()
+            atlas = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
+            PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
+                session=session)
     return
 
 
