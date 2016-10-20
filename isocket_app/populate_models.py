@@ -67,8 +67,9 @@ def add_to_atlas(graph):
 
 
 def populate_atlas():
-    for g in graph_list:
-        add_to_atlas(g)
+    atlas_dbs = [AtlasDB(name=g.name, nodes=g.number_of_nodes(), edges=g.number_of_edges()) for g in graph_list]
+    with session_scope() as session:
+        session.add_all(atlas_dbs)
     return
 
 
