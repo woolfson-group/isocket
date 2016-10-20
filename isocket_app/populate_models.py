@@ -1,5 +1,6 @@
 import networkx
 import sqlalchemy
+from collections import namedtuple
 import itertools
 from flask_sqlalchemy import _BoundDeclarativeMeta
 from contextlib import contextmanager
@@ -40,7 +41,8 @@ class PopulateModel:
             raise e
 
     def go(self, session):
-        get_or_create(model=self.model, session=session, **self.parameters)
+        item = get_or_create(model=self.model, session=session, **self.parameters)
+        return item
 
 
 class AtlasHandler:
@@ -82,7 +84,28 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, session=db.session):
+def get_structure_data(code, preferred=True, mmol=1, cutoff=10.0):
+    Structure = namedtuple('Structure', ['code', 'mmol', 'preferred', 'knob_group'])
+    fs = FileSystem(code=code)
+    if preferred:
+        mmol = fs.preferred_mmol
+    cif = fs.cifs[mmol]
+    a = convert_cif_to_ampal(cif, assembly_id=code)
+    kg = KnobGroup.from_helices(a, cutoff=cutoff)
+    return Structure(code=code, mmol=mmol, preferred=preferred, knob_group=kg)
+
+
+def add_pdb_code(code, **kwargs):
+    structure = get_structure_data(code=code, **kwargs)
+    with session_scope() as session:
+        PopulateModel(model=PdbDB, pdb=structure.code).go(session=session)
+        pdb = session.query(PdbDB).filter(PdbDB.pdb == structure.code)
+        
+
+
+
+
+def add_pdb_code_old(code, session=db.session):
     pdb_db, created = get_or_create(session=session, model=PdbDB, pdb=code)
     if not created:
         return
