@@ -128,12 +128,10 @@ def add_pdb_code(code, **kwargs):
     return
 
 
-def remove_pdb_code(code, session=db.session):
-    session.rollback()
-    q = session.query(PdbDB).filter(PdbDB.pdb == code)
-    p = q.one_or_none()
-    if p is not None:
-        session.delete(p)
-        session.commit()
-    session.rollback()
+def remove_pdb_code(code):
+    with session_scope() as session:
+        q = session.query(PdbDB).filter(PdbDB.pdb == code)
+        p = q.one_or_none()
+        if p is not None:
+            session.delete(p)
     return
