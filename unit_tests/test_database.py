@@ -63,6 +63,15 @@ class AddPdbCodeTestCase(BaseTestCase):
         c = db.session.query(PdbeDB).count()
         self.assertEqual(c, 1)
 
+    def test_graph_db(self):
+        q = db.session.query(GraphDB, AtlasDB).join(AtlasDB)
+        c = q.filter(AtlasDB.name == 'G7').count()
+        self.assertEqual(c, 3)
+        c = q.filter(AtlasDB.name == 'G17').count()
+        self.assertEqual(c, 1)
+        c = q.filter(AtlasDB.name == 'G163').count()
+        self.assertEqual(c, 24)
+
 
 class RemovePdbCodeTestCase(BaseTestCase):
 
@@ -78,6 +87,10 @@ class RemovePdbCodeTestCase(BaseTestCase):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
         p = q.one_or_none()
         self.assertIsNone(p)
+
+    def test_graphs_are_gone(self):
+        c = db.session.query(GraphDB).count()
+        self.assertEqual(c, 0)
 
 
 class CutoffDBTestCase(BaseTestCase):
