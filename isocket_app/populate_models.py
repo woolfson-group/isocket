@@ -6,8 +6,7 @@ from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.databases.general_tools import get_or_create
-from isocket_app.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
-    GraphHandler
+from isocket_app.graph_theory import graph_to_plain_graph, sorted_connected_components, GraphHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
