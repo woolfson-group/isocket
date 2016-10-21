@@ -85,7 +85,6 @@ class GraphHandlerTestCase(unittest.TestCase):
         self.assertEqual(gh.graph_parameters()['edges'], 28)
 
 
-
 class IsomorphismCheckerTestCase(unittest.TestCase):
     """Tests for isambard.tools.graph_theory.isomorphism_checker"""
     def setUp(self):
