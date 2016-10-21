@@ -1,25 +1,119 @@
 import networkx
 from networkx.generators.atlas import graph_atlas_g
-from networkx.generators import cycle_graph
+from networkx.generators import cycle_graph, path_graph
 import shelve
 
 
 _unknown_graph_shelf = '/Users/jackheal/Projects/isocket/isocket_app/unknown_graphs'
 
 
-class GraphHandler:
-    def __init__(self, graph, shelf_name=_unknown_graph_shelf):
-        self.graph = graph_to_plain_graph(graph)
+class AtlasHandler:
+    def __init__(self, shelf_name=_unknown_graph_shelf):
         self.shelf_name = shelf_name
-        self.name = self.get_unknown_graph_name()
+
+    @property
+    def atlas_graphs(self):
+        graph_list = graph_atlas_g()
+        return graph_list
+
+    @property
+    def unknown_graphs(self):
+        with shelve.open(self.shelf_name, flag='r') as shelf:
+            graph_list = list(shelf.values())
+        return graph_list
+
+    def cyclic_graphs(self, max_nodes):
+        graph_list = []
+        for n in range(8, max_nodes + 1):
+            g = cycle_graph(n)
+            g.name = 'C{}'.format(n)
+            graph_list.append(g)
+        return graph_list
+
+    def path_graphs(self, max_nodes):
+        graph_list = []
+        for n in range(8, max_nodes + 1):
+            g = path_graph(n)
+            g.name = 'P{}'.format(n)
+            graph_list.append(g)
+        return graph_list
+
+    def get_graph_list(self, atlas=True, cyclics=True, paths=False, unknowns=False, max_cyclics=100, max_paths=100):
+        graph_list = []
+        if atlas:
+            graph_list = self.atlas_graphs
+        if cyclics:
+            graph_list += self.cyclic_graphs(max_nodes=max_cyclics)
+        if paths:
+            graph_list += self.path_graphs(max_nodes=max_paths)
+        if unknowns:
+            graph_list += self.unknown_graphs
+        return graph_list
+
+    def get_next_unknown_graph_name(self):
+        with shelve.open(self.shelf_name, 'r') as shelf:
+            number_of_graphs = len(shelf)
+        name = 'U{}'.format(number_of_graphs + 1)
+        return name
+
+    def _add_graph_to_shelf(self, g, name):
+        """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
+
+        Notes
+        -----
+        The dictionary of non-Atlas graphs is stored as a .db (output from shelve) file.
+            Keys are unknown graph names.
+            Values are dictionaries storing the unknown graphs themselves as well as some basic properties of the graphs.
+        If graph is not in Atlas, nor in this dictionary of non-Atlas graphs, then it is added to this dictionary.
+        Unknown graphs are named 'Un', where n is the order in which they have been encountered.
+        The number n does not tell you anything about the properties of the graph.
+
+        Parameters
+        ----------
+        g : A networkx Graph.
+
+        Returns
+        -------
+        added : bool
+            True if graph was added to shelf
+        """
+        added = False
+        h = graph_to_plain_graph(g)
+        with shelve.open(self.shelf_name, flag='w') as shelf:
+            if name not in shelf.keys():
+                h.name = name
+                shelf[name] = h
+                added = True
+        return added
+
+
+class GraphHandler(AtlasHandler):
+    def __init__(self, graph, shelf_name=_unknown_graph_shelf):
+        super().__init__(shelf_name=shelf_name)
+        self.graph = graph_to_plain_graph(graph)
         self.graph.name = self.name
+
+    @property
+    def name(self):
+        name = self.get_graph_name()
+        if name is None:
+            name = self.get_unknown_graph_name()
+        return name
+
+    def get_graph_name(self):
+        name = isomorphism_checker(self.graph, graph_list=self.get_graph_list(atlas=True, cyclics=True,
+                                                                              paths=True, unknowns=False))
+        if name is None:
+            name = isomorphism_checker(self.graph, graph_list=self.unknown_graphs)
+        return name
 
     def get_unknown_graph_name(self):
         name = get_graph_name(self.graph)
         if name is None:
             # process new unknown graph.
-            name = get_next_unknown_graph_name(shelf_name=self.shelf_name)
-            _add_graph_to_shelf(g=self.graph, name=name, shelf_name=self.shelf_name)
+            name = self.get_next_unknown_graph_name()
+            # TODO namedtuple to return item, created.
+            self._add_graph_to_shelf(g=self.graph, name=name)
         return name
 
     def graph_parameters(self):
@@ -94,9 +188,6 @@ def isomorphism_checker(g, graph_list=None):
         None if no such isomorph is found in the list_of_graphs.
 
     """
-    # if no graph_list is supplied, run list_of_graphs for the Graph Atlas list.
-    if graph_list is None:
-        graph_list = list_of_graphs()
     # run isomorphism check on the Graph of g (i.e. not the DiGraph or MultiGraph).
     h = graph_to_plain_graph(g)
     isomorph = next(filter(lambda x: networkx.is_isomorphic(h, x), graph_list), None)
@@ -140,43 +231,6 @@ def get_graph_name(g, graph_list=None):
         name = isomorphism_checker(h, graph_list=unknown_graph_list)
     return name
 
-
-def get_next_unknown_graph_name(shelf_name=_unknown_graph_shelf):
-    with shelve.open(shelf_name, 'r') as shelf:
-        number_of_graphs = len(shelf)
-    name = 'U{}'.format(number_of_graphs + 1)
-    return name
-
-
-def _add_graph_to_shelf(g, name, shelf_name=_unknown_graph_shelf):
-    """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
-
-    Notes
-    -----
-    The dictionary of non-Atlas graphs is stored as a .db (output from shelve) file.
-        Keys are unknown graph names.
-        Values are dictionaries storing the unknown graphs themselves as well as some basic properties of the graphs.
-    If graph is not in Atlas, nor in this dictionary of non-Atlas graphs, then it is added to this dictionary.
-    Unknown graphs are named 'Un', where n is the order in which they have been encountered.
-    The number n does not tell you anything about the properties of the graph.
-
-    Parameters
-    ----------
-    g : A networkx Graph.
-
-    Returns
-    -------
-    added : bool
-        True if graph was added to shelf
-    """
-    added = False
-    h = graph_to_plain_graph(g)
-    with shelve.open(shelf_name, flag='w') as shelf:
-        if name not in shelf.keys():
-            h.name = name
-            shelf[name] = h
-            added = True
-    return added
 
 
 __author__ = 'Jack W. Heal'
