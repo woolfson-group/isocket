@@ -1,16 +1,94 @@
 import unittest
-
+import shelve
 import networkx
 import numpy
 from networkx.generators import cycle_graph, complete_graph
 
-from isocket_app.graph_theory import AtlasHandler, isomorphism_checker, sorted_connected_components
+from isocket_app.graph_theory import AtlasHandler, GraphHandler, isomorphism_checker, sorted_connected_components
+
+unknown_graphs_test_shelf = '/Users/jackheal/Projects/isocket/unit_tests/unknown_graphs_test_shelf'
+
+
+class AtlasHandlerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.atlas_handler = AtlasHandler(shelf_name=unknown_graphs_test_shelf)
+        self.g1 = complete_graph(8)
+        self.g2 = complete_graph(9)
+        self.g1_name = 'U1'
+        self.g2_name = 'jack_test_graph'
+
+    def clear_shelf(self):
+        with shelve.open(unknown_graphs_test_shelf) as shelf:
+            shelf.clear()
+
+    def tearDown(self):
+        self.clear_shelf()
+
+    def test_atlas_graphs(self):
+        self.assertEqual(len(self.atlas_handler.atlas_graphs), 1253)
+
+    def test_cyclic_graphs(self):
+        self.assertEqual(len(self.atlas_handler.cyclic_graphs(max_nodes=88)), 81)
+
+    def test_path_graphs(self):
+        self.assertEqual(len(self.atlas_handler.path_graphs(max_nodes=88)), 81)
+
+    def test_unkown_graphs(self):
+        self.clear_shelf()
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 0)
+        self.atlas_handler._add_graph_to_shelf(g=self.g1, name=self.g1_name)
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 1)
+        self.atlas_handler._add_graph_to_shelf(g=self.g2, name=self.g2_name)
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 2)
+
+    def test_isomorphism_checker_with_atlas_handler(self):
+        self.clear_shelf()
+        self.atlas_handler._add_graph_to_shelf(g=self.g1, name=self.g1_name)
+        self.atlas_handler._add_graph_to_shelf(g=self.g2, name=self.g2_name)
+        self.assertEqual(isomorphism_checker(self.g1, graph_list=self.atlas_handler.unknown_graphs), self.g1_name)
+        self.assertEqual(isomorphism_checker(self.g2, graph_list=self.atlas_handler.unknown_graphs), self.g2_name)
+
+    def test_next_unknown_graph_name(self):
+        self.clear_shelf()
+        self.assertEqual(self.atlas_handler.get_next_unknown_graph_name(), 'U1')
+        self.atlas_handler._add_graph_to_shelf(g=self.g1, name=self.g1_name)
+        self.assertEqual(self.atlas_handler.get_next_unknown_graph_name(), 'U2')
+        self.atlas_handler._add_graph_to_shelf(g=self.g2, name=self.g2_name)
+        self.assertEqual(self.atlas_handler.get_next_unknown_graph_name(), 'U3')
+
+
+class GraphHandlerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.shelf_name = unknown_graphs_test_shelf
+        self.g1 = complete_graph(8)
+        self.g2 = complete_graph(9)
+        self.g1_name = 'U1'
+        self.g2_name = 'jack_test_graph'
+
+    def clear_shelf(self):
+        with shelve.open(self.shelf_name) as shelf:
+            shelf.clear()
+
+    def tearDown(self):
+        self.clear_shelf()
+
+    def test_complete_graph(self):
+        gh = GraphHandler(graph=self.g1, shelf_name=self.shelf_name)
+        self.assertEqual(gh.name, 'U1')
+        gh._add_graph_to_shelf(gh.graph, gh.name)
+        gh2 = GraphHandler(graph=self.g2, shelf_name=self.shelf_name)
+        self.assertEqual(gh2.name, 'U2')
+
+    def test_graph_parameters(self):
+        gh = GraphHandler(graph=self.g1, shelf_name=self.shelf_name)
+        self.assertEqual(gh.graph_parameters()['nodes'], 8)
+        self.assertEqual(gh.graph_parameters()['edges'], 28)
 
 
 class IsomorphismCheckerTestCase(unittest.TestCase):
     """Tests for isambard.tools.graph_theory.isomorphism_checker"""
     def setUp(self):
-        self.graph_list = AtlasHandler().get_graph_list()
+        self.graph_list = AtlasHandler(shelf_name=unknown_graphs_test_shelf).get_graph_list()
 
     def test_octomer(self):
         octamer = cycle_graph(8)
