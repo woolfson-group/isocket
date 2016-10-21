@@ -108,7 +108,7 @@ class GraphHandler(AtlasHandler):
         return name
 
     def get_unknown_graph_name(self):
-        name = get_graph_name(self.graph)
+        name = self.get_graph_name()
         if name is None:
             # process new unknown graph.
             name = self.get_next_unknown_graph_name()
