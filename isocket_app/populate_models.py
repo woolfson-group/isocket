@@ -7,7 +7,7 @@ from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.databases.general_tools import get_or_create
 from isocket_app.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
-    AtlasHandler
+    GraphHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
@@ -43,7 +43,7 @@ class PopulateModel:
 
 
 def add_to_atlas(graph):
-    ah = AtlasHandler(graph)
+    ah = GraphHandler(graph)
     with session_scope() as session:
         item = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
     return item
@@ -110,7 +110,7 @@ def add_pdb_code(code, **kwargs):
         pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.preferred, mmol=structure.mmol).go(
             session=session)
         for g in knob_graphs:
-            ah = AtlasHandler(graph=g)
+            ah = GraphHandler(graph=g)
             cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
                                                     CutoffDB.kcut == g.graph['kcut']).one()
             atlas = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
