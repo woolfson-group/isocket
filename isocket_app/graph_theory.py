@@ -161,3 +161,21 @@ def _add_graph_to_shelf(g, name, shelf_name=_unknown_graph_shelf):
 
 
 __author__ = 'Jack W. Heal'
+
+
+class AtlasHandler:
+    def __init__(self, graph, shelf_name=_unknown_graph_shelf):
+        self.graph = graph_to_plain_graph(graph)
+        self.shelf_name = shelf_name
+        self.name = self.get_unknown_graph_name()
+
+    def get_unknown_graph_name(self):
+        name = get_graph_name(self.graph)
+        if name is None:
+            # process new unknown graph.
+            name = get_next_unknown_graph_name(shelf_name=self.shelf_name)
+            _add_graph_to_shelf(g=self.graph, name=name, shelf_name=self.shelf_name)
+        return name
+
+    def graph_parameters(self):
+        return dict(name=self.name, nodes=self.graph.number_of_nodes(), edges=self.graph.number_of_edges())

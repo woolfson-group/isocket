@@ -3,13 +3,12 @@ from collections import namedtuple
 from contextlib import contextmanager
 
 from isambard_dev.add_ons.filesystem import FileSystem
-from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
+from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.databases.general_tools import get_or_create
 from isocket_app.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
-    get_graph_name, get_next_unknown_graph_name, _add_graph_to_shelf, _unknown_graph_shelf
+    AtlasHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
-
 
 scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 kcuts = list(range(4))
@@ -41,24 +40,6 @@ class PopulateModel:
     def go(self, session):
         item, created = get_or_create(model=self.model, session=session, **self.parameters)
         return item
-
-
-class AtlasHandler:
-    def __init__(self, graph, shelf_name=_unknown_graph_shelf):
-        self.graph = graph_to_plain_graph(graph)
-        self.shelf_name = shelf_name
-        self.name = self.get_unknown_graph_name()
-
-    def get_unknown_graph_name(self):
-        name = get_graph_name(self.graph)
-        if name is None:
-            # process new unknown graph.
-            name = get_next_unknown_graph_name(shelf_name=self.shelf_name)
-            _add_graph_to_shelf(g=self.graph, name=name, shelf_name=self.shelf_name)
-        return name
-
-    def graph_parameters(self):
-        return dict(name=self.name, nodes=self.graph.number_of_nodes(), edges=self.graph.number_of_edges())
 
 
 def add_to_atlas(graph):
