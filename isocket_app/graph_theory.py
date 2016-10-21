@@ -152,6 +152,8 @@ def isomorphism_checker(g, graph_list=None):
         None if no such isomorph is found in the list_of_graphs.
 
     """
+    if graph_list is None:
+        graph_list = graph_atlas_g()
     # run isomorphism check on the Graph of g (i.e. not the DiGraph or MultiGraph).
     h = graph_to_plain_graph(g)
     isomorph = next(filter(lambda x: networkx.is_isomorphic(h, x), graph_list), None)
