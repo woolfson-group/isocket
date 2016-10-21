@@ -6,7 +6,7 @@ from isocket_app.extensions import db
 from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
     remove_pdb_code
 from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
-from isocket_app.graph_theory import list_of_graphs
+from isocket_app.graph_theory import AtlasHandler
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 
@@ -29,7 +29,7 @@ class AtlasDBTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.graph_list = list_of_graphs()
+        self.graph_list = AtlasHandler().atlas_graphs
 
     def test_first_element_of_graph_list(self):
         self.assertTrue(self.graph_list[0].name == 'G0')
