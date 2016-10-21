@@ -2,25 +2,12 @@ import networkx
 from networkx.generators.atlas import graph_atlas_g
 from networkx.generators import cycle_graph, path_graph
 import shelve
-import os
 
 
 _unknown_graph_shelf = '/Users/jackheal/Projects/isocket/isocket_app/unknown_graphs'
 
 
 atlas_graph_list = graph_atlas_g()
-
-
-def get_unknown_graph_shelf():
-    # unknown_graphs contains details of graphs (including the graph objects themselves)
-    #  in atlas table (or to be added) that are not in list_of_graphs()
-    unknown_graph_shelf_filepath = '{0}.db'.format(_unknown_graph_shelf)
-    if not os.path.exists(unknown_graph_shelf_filepath):
-        message = 'File not found: {0}\n'.format(unknown_graph_shelf_filepath)
-        message += 'File should have unknown_graph names as keys, and dictionaries of graph information as values'
-        raise IOError(message)
-    else:
-        return _unknown_graph_shelf
 
 
 def list_of_graphs(unknown_graphs=False):
@@ -64,12 +51,10 @@ def graph_to_plain_graph(g):
     h.add_edges_from(edges)
     return h
 
-# TODO use context lib for accessing shelf?
+
 def get_unknown_graph_list():
-    unknown_graph_shelf = get_unknown_graph_shelf()
-    s = shelve.open(unknown_graph_shelf)
-    unknown_graph_list = list(s.values())
-    s.close()
+    with shelve.open(_unknown_graph_shelf) as shelf:
+        unknown_graph_list = list(shelf.values())
     return unknown_graph_list
 
 
@@ -132,7 +117,7 @@ def sorted_connected_components(g, include_trivials=False):
         components = [x for x in components if len(x.nodes()) > 1]
     return components
 
-# TODO what about disconnected graphs at this stage?
+
 def get_graph_name(g, graph_list=None):
     # construct h fully in case of unorderable/unsortable edges.
     h = graph_to_plain_graph(g)
@@ -145,7 +130,6 @@ def get_graph_name(g, graph_list=None):
     return name
 
 
-# TODO contextlib (see shelf handling above)
 def _add_graph_to_shelf(g):
     """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
 
@@ -171,13 +155,11 @@ def _add_graph_to_shelf(g):
     h = graph_to_plain_graph(g)
     name = get_graph_name(h)
     if name[0] == 'U':
-        unknown_graph_shelf = get_unknown_graph_shelf()
-        s = shelve.open(unknown_graph_shelf)
-        if name not in s.keys():
-            h.name = name
-            s[name] = h
-            added = True
-        s.close()
+        with shelve.open(_unknown_graph_shelf) as shelf:
+            if name not in shelf.keys():
+                h.name = name
+                shelf[name] = h
+                added = True
     return added
 
 
