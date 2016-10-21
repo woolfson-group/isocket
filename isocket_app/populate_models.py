@@ -6,7 +6,7 @@ from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.databases.general_tools import get_or_create
-from isambard_dev.tools.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
+from isocket_app.graph_theory import list_of_graphs, graph_to_plain_graph, sorted_connected_components, \
     get_graph_name
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
