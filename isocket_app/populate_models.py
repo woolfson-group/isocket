@@ -49,9 +49,7 @@ def add_to_atlas(graph):
     return item
 
 
-def populate_atlas(graph_list=None):
-    if graph_list is None:
-        graph_list = list_of_graphs(unknown_graphs=True)
+def populate_atlas(graph_list):
     with session_scope() as session:
         s1 = set([x[0] for x in session.query(AtlasDB.name).all()])  # graph names of Atlas objects already in db.
     s2 = set([x.name for x in graph_list])
