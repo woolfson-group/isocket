@@ -48,12 +48,6 @@ class AtlasHandler:
         self.graph = graph_to_plain_graph(graph)
         self.shelf_name = shelf_name
         self.name = self.get_unknown_graph_name()
-        """
-        if graph.name and graph.name[0] != 'U':
-            self.name = graph.name
-        else:
-            self.name = self.get_unknown_graph_name()
-        """
 
     def get_unknown_graph_name(self):
         name = get_graph_name(self.graph)
