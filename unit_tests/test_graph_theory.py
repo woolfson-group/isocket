@@ -6,11 +6,13 @@ from networkx.generators import cycle_graph, complete_graph
 
 from isocket_app.graph_theory import AtlasHandler, isomorphism_checker, sorted_connected_components
 
+unknown_graphs_test_shelf = '/Users/jackheal/Projects/isocket/unit_tests/unknown_graphs_test_shelf'
+
 
 class IsomorphismCheckerTestCase(unittest.TestCase):
     """Tests for isambard.tools.graph_theory.isomorphism_checker"""
     def setUp(self):
-        self.graph_list = AtlasHandler().get_graph_list()
+        self.graph_list = AtlasHandler(shelf_name=unknown_graphs_test_shelf).get_graph_list()
 
     def test_octomer(self):
         octamer = cycle_graph(8)
