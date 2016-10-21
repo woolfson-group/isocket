@@ -120,36 +120,6 @@ class GraphHandler(AtlasHandler):
         return dict(name=self.name, nodes=self.graph.number_of_nodes(), edges=self.graph.number_of_edges())
 
 
-def list_of_graphs(unknown_graphs=False, cyclics=True, max_cyclic=100):
-    """
-
-    Parameters
-    ----------
-    unknown_graphs : bool
-        If True, appends the graphs from the unknown_graphs.db shelf.
-
-    Returns
-    -------
-    graph_list : list(networkx.Graph)
-        List of graph objects with .name attributes corresponding to their names in the Atlas of Graphs.
-        These names are used in the coeus database table AtlasDB.
-
-    """
-    # atlas graphs
-    graph_list = graph_atlas_g()
-    # cycle and path graphs
-    if cyclics:
-        for n in range(8, max_cyclic + 1):
-            c = cycle_graph(n)
-            c.name = 'C{}'.format(n)
-            graph_list.append(c)
-    # Add other custom graphs here.
-    # If unknown_graphs, append them to the list from shelf.
-    if unknown_graphs:
-        graph_list += get_unknown_graph_list()
-    return graph_list
-
-
 def graph_to_plain_graph(g):
     # construct h fully in case of unorderable/unsortable edges.
     h = networkx.Graph()
