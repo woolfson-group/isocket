@@ -63,7 +63,7 @@ class AddPdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas()
+        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
         add_pdb_code(code=self.code)
 
@@ -91,7 +91,7 @@ class RemovePdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas()
+        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
         add_pdb_code(code=self.code)
         remove_pdb_code(code=self.code)
