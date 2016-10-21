@@ -129,12 +129,6 @@ def graph_to_plain_graph(g):
     return h
 
 
-def get_unknown_graph_list(shelf_name=_unknown_graph_shelf):
-    with shelve.open(shelf_name, flag='r') as shelf:
-        unknown_graph_list = list(shelf.values())
-    return unknown_graph_list
-
-
 def isomorphism_checker(g, graph_list=None):
     """ Finds the name of the graph by checking for isomorphism with the graphs in the graph_list.
 
