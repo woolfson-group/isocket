@@ -1,16 +1,13 @@
 import networkx
 from networkx.generators.atlas import graph_atlas_g
-from networkx.generators import cycle_graph, path_graph
+from networkx.generators import cycle_graph
 import shelve
 
 
 _unknown_graph_shelf = '/Users/jackheal/Projects/isocket/isocket_app/unknown_graphs'
 
 
-atlas_graph_list = graph_atlas_g()
-
-
-def list_of_graphs(unknown_graphs=False):
+def list_of_graphs(unknown_graphs=False, cyclics=True, max_cyclic=100):
     """
 
     Parameters
@@ -26,16 +23,13 @@ def list_of_graphs(unknown_graphs=False):
 
     """
     # atlas graphs
-    graph_list = atlas_graph_list
+    graph_list = graph_atlas_g()
     # cycle and path graphs
-    max_n = 100
-    for n in range(8, max_n + 1):
-        c = cycle_graph(n)
-        p = path_graph(n)
-        c.name = 'C{0}'.format(n)
-        p.name = 'P{0}'.format(n)
-        graph_list.append(c)
-        graph_list.append(p)
+    if cyclics:
+        for n in range(8, max_cyclic + 1):
+            c = cycle_graph(n)
+            c.name = 'C{}'.format(n)
+            graph_list.append(c)
     # Add other custom graphs here.
     # If unknown_graphs, append them to the list from shelf.
     if unknown_graphs:
@@ -125,12 +119,17 @@ def get_graph_name(g, graph_list=None):
     if name is None:
         unknown_graph_list = get_unknown_graph_list()
         name = isomorphism_checker(h, graph_list=unknown_graph_list)
-        if name is None:
-            name = 'U{0}'.format(len(unknown_graph_list) + 1)
     return name
 
 
-def _add_graph_to_shelf(g, shelf_name=_unknown_graph_shelf):
+def get_next_unknown_graph_name(shelf_name=_unknown_graph_shelf):
+    with shelve.open(shelf_name, 'r') as shelf:
+        number_of_graphs = len(shelf)
+    name = 'U{}'.format(number_of_graphs + 1)
+    return name
+
+
+def _add_graph_to_shelf(g, name, shelf_name=_unknown_graph_shelf):
     """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
 
     Notes
@@ -153,13 +152,11 @@ def _add_graph_to_shelf(g, shelf_name=_unknown_graph_shelf):
     """
     added = False
     h = graph_to_plain_graph(g)
-    name = get_graph_name(h)
-    if name[0] == 'U':
-        with shelve.open(shelf_name, flag='w') as shelf:
-            if name not in shelf.keys():
-                h.name = name
-                shelf[name] = h
-                added = True
+    with shelve.open(shelf_name, flag='w') as shelf:
+        if name not in shelf.keys():
+            h.name = name
+            shelf[name] = h
+            added = True
     return added
 
 
