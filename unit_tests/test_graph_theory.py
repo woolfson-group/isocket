@@ -1,5 +1,5 @@
 import unittest
-
+import shelve
 import networkx
 import numpy
 from networkx.generators import cycle_graph, complete_graph
@@ -7,6 +7,18 @@ from networkx.generators import cycle_graph, complete_graph
 from isocket_app.graph_theory import AtlasHandler, isomorphism_checker, sorted_connected_components
 
 unknown_graphs_test_shelf = '/Users/jackheal/Projects/isocket/unit_tests/unknown_graphs_test_shelf'
+
+
+class AtlasHandlerTestCase(unittest.TestCase):
+    def setUp(self):
+        self.atlas_handler = AtlasHandler(shelf_name=unknown_graphs_test_shelf)
+
+    def tearDown(self):
+        with shelve.open(unknown_graphs_test_shelf) as shelf:
+            shelf.clear()
+
+    def test_atlas_graphs(self):
+        self.assertEqual(len(self.atlas_handler.atlas_graphs), 1253)
 
 
 class IsomorphismCheckerTestCase(unittest.TestCase):
