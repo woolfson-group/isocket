@@ -26,6 +26,16 @@ class AtlasHandlerTestCase(unittest.TestCase):
     def test_path_graphs(self):
         self.assertEqual(len(self.atlas_handler.path_graphs(max_nodes=88)), 81)
 
+    def test_unkown_graphs(self):
+        g1 = complete_graph(8)
+        g2 = complete_graph(9)
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 0)
+        self.atlas_handler._add_graph_to_shelf(g=g1, name='U1')
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 1)
+        self.atlas_handler._add_graph_to_shelf(g=g2, name='U2')
+        self.assertEqual(len(self.atlas_handler.unknown_graphs), 2)
+
+
 class IsomorphismCheckerTestCase(unittest.TestCase):
     """Tests for isambard.tools.graph_theory.isomorphism_checker"""
     def setUp(self):
