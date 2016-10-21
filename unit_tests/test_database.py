@@ -3,9 +3,10 @@ from flask_testing import TestCase
 
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
-from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, graph_list, add_pdb_code, \
+from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
     remove_pdb_code
 from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
+from isocket_app.graph_theory import list_of_graphs
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 
@@ -26,13 +27,17 @@ class BaseTestCase(TestCase):
 
 class AtlasDBTestCase(BaseTestCase):
 
+    def setUp(self):
+        super().setUp()
+        self.graph_list = list_of_graphs()
+
     def test_first_element_of_graph_list(self):
-        self.assertTrue(graph_list[0].name == 'G0')
+        self.assertTrue(self.graph_list[0].name == 'G0')
 
     def test_add_to_atlas(self):
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 0)
-        g = graph_list[0]
+        g = self.graph_list[0]
         add_to_atlas(graph=g)
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 1)
@@ -40,18 +45,17 @@ class AtlasDBTestCase(BaseTestCase):
     def test_populate_atlas(self):
         c = db.session.query(AtlasDB).count()
         self.assertEqual(c, 0)
-        populate_atlas()
+        populate_atlas(graph_list=self.graph_list)
         c = db.session.query(AtlasDB).count()
-        self.assertEqual(c, len(graph_list))
+        self.assertEqual(c, len(self.graph_list))
 
     def test_populate_atlas_run_multiple_times(self):
-        populate_atlas()
+        populate_atlas(graph_list=self.graph_list)
         c = db.session.query(AtlasDB).count()
-        self.assertEqual(c, len(graph_list))
-        populate_atlas()
+        self.assertEqual(c, len(self.graph_list))
+        populate_atlas(graph_list=self.graph_list)
         c = db.session.query(AtlasDB).count()
-        self.assertEqual(c, len(graph_list))
-
+        self.assertEqual(c, len(self.graph_list))
 
 
 class AddPdbCodeTestCase(BaseTestCase):
