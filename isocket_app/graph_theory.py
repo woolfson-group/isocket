@@ -52,8 +52,8 @@ def graph_to_plain_graph(g):
     return h
 
 
-def get_unknown_graph_list():
-    with shelve.open(_unknown_graph_shelf) as shelf:
+def get_unknown_graph_list(shelf_name=_unknown_graph_shelf):
+    with shelve.open(shelf_name, flag='r') as shelf:
         unknown_graph_list = list(shelf.values())
     return unknown_graph_list
 
@@ -130,7 +130,7 @@ def get_graph_name(g, graph_list=None):
     return name
 
 
-def _add_graph_to_shelf(g):
+def _add_graph_to_shelf(g, shelf_name=_unknown_graph_shelf):
     """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
 
     Notes
@@ -155,7 +155,7 @@ def _add_graph_to_shelf(g):
     h = graph_to_plain_graph(g)
     name = get_graph_name(h)
     if name[0] == 'U':
-        with shelve.open(_unknown_graph_shelf) as shelf:
+        with shelve.open(shelf_name, flag='w') as shelf:
             if name not in shelf.keys():
                 h.name = name
                 shelf[name] = h
