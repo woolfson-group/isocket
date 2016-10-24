@@ -18,7 +18,7 @@ class AtlasHandler:
 
     @property
     def unknown_graphs(self):
-        with shelve.open(self.shelf_name, flag='r') as shelf:
+        with shelve.open(self.shelf_name, flag='c') as shelf:
             graph_list = list(shelf.values())
         return graph_list
 
