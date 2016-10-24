@@ -1,7 +1,7 @@
+import sqlalchemy
 import itertools
 from contextlib import contextmanager
 
-from isambard_dev.databases.general_tools import get_or_create
 from isocket_app.graph_theory import GraphHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
@@ -94,3 +94,50 @@ def remove_pdb_code(code):
         if p is not None:
             session.delete(p)
     return
+
+
+def get_or_create(model, session, **kwargs):
+    """Uses kwargs to get instance of model. If can't get that instance from session, add it to session.
+
+    Notes
+    -----
+    This is an analogue to the Django function get_or_create, written for sqlalchemy.
+    Implements sqlalchemy query function one_or_none(). See:
+        http://docs.sqlalchemy.org/en/latest/orm/query.html#sqlalchemy.orm.query.Query.one_or_none
+    Code adapted from a response to a question on Stack Overflow:
+        http://stackoverflow.com/questions/2546207/does-sqlalchemy-have-an-equivalent-of-djangos-get-or-create
+    Posted by stackoverflow.com user Wolph:
+        http://stackoverflow.com/users/54017/wolph
+
+    Parameters
+    ----------
+    session : session
+        An sqlalchemy session.
+    model : Base
+        An sqlalchemy table.
+    kwargs : dict or specified keyword=value pairs
+        key/value pairs used to instantiate the model.
+
+    Returns
+    -------
+    2-tuple:
+        First element of tuple is instance of model instantiated by **kwargs
+        Second element of tuple is bool:
+            True if instance has been added to session.
+            False is instance was already present.
+
+    Raises
+    ------
+    sqlalchemy.orm.exc.MultipleResultsFound
+        If query selects multiple objects.
+    """
+    instance = session.query(model).filter_by(**kwargs).one_or_none()
+    if instance:
+        return instance, False
+    else:
+        params = dict((k, v) for k, v in kwargs.items() if not isinstance(v, sqlalchemy.sql.expression.ClauseElement))
+        instance = model(**params)
+        session.add(instance)
+        # Need this step to retrieve automatically populated columns, i.e., the assigned id
+        instance = session.query(model).filter_by(**kwargs).one()
+        return instance, True
