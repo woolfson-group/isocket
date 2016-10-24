@@ -3,11 +3,10 @@ import os
 import networkx
 from flask import render_template, flash, redirect, request, url_for, current_app, Blueprint
 from flask_uploads import UploadSet
-from isambard_dev.add_ons.knobs_into_holes import KnobGroup
-from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from networkx.readwrite import json_graph
 from werkzeug.utils import secure_filename
 
+from isocket_app.structure_handler import StructureHandler
 from isocket_app.structure.forms import SocketForm
 from isocket_app.structure import structure_bp
 
@@ -34,8 +33,9 @@ def uploaded_file(filename, scut, kcut):
     kcut = int(kcut)
     uploaded_structures_dest = current_app.config['UPLOADED_STRUCTURES_DEST']
     static_file_path = os.path.join(uploaded_structures_dest, filename)
-    a = convert_pdb_to_ampal(static_file_path, path=True)
-    kg = KnobGroup.from_helices(a, cutoff=scut)
+    # Deal with file extension here (is it cif or pdb)
+    structure = StructureHandler.from_file(filename=static_file_path, path=True)
+    kg = structure.get_knob_group(cutoff=scut)
     g = kg.filter_graph(kg.graph, cutoff=scut, min_kihs=kcut)
     h = networkx.Graph()
     h.add_nodes_from([x.number for x in g.nodes()])
