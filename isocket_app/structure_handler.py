@@ -25,8 +25,13 @@ class StructureHandler:
         if mmol > fs.number_of_mmols:
             mmol = None
         preferred = True if mmol == fs.preferred_mmol else False
+        # Try with cif file, if that fails try with pdb file.
         cif = fs.cifs[mmol]
-        a = convert_cif_to_ampal(cif, assembly_id=code)
+        try:
+            a = convert_cif_to_ampal(cif, assembly_id=code)
+        except ValueError:
+            pdb = fs.mmols[mmol]
+            a = convert_pdb_to_ampal(pdb=pdb, path=True, pdb_id=code)
         if isinstance(a, AmpalContainer):
             a = a[state_selection]
         instance = cls(assembly=a)
