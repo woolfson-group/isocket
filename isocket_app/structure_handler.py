@@ -3,14 +3,66 @@ from collections import namedtuple
 
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
+from isambard_dev.ampal.assembly import AmpalContainer
+from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isocket_app.graph_theory import graph_to_plain_graph, sorted_connected_components
 
 
+class StructureHandler:
+    def __init__(self, assembly):
+        self.assembly = assembly
+        self.is_preferred = False
+        self.code = self.assembly.id
+        self.mmol = None
 
+    @classmethod
+    def from_code(cls, code, mmol=None, state_selection=0):
+        # TODO deal with data directory for pdb codes. Can use loose filesystem functions if needed
+        fs = FileSystem(code=code)
+        if mmol is None:
+            mmol = fs.preferred_mmol
+        if mmol > fs.number_of_mmols:
+            mmol = None
+        preferred = True if mmol == fs.preferred_mmol else False
+        cif = fs.cifs[mmol]
+        a = convert_cif_to_ampal(cif, assembly_id=code)
+        if isinstance(a, AmpalContainer):
+            a = a[state_selection]
+        instance = cls(assembly=a)
+        instance.is_preferred = preferred
+        instance.mmol = mmol
+        return instance
 
+    @classmethod
+    def from_file(cls, filename, path=True, code='', cif=False, state_selection=0):
+        if cif:
+            a = convert_cif_to_ampal(cif=filename, path=path)
+            a.id = code
+        else:
+            a = convert_pdb_to_ampal(pdb=filename, path=path, pdb_id=code)
+        if isinstance(a, AmpalContainer):
+            a = a[state_selection]
+        instance = cls(assembly=a)
+        return instance
 
+    def get_knob_group(self, cutoff=10.0):
+        return KnobGroup.from_helices(self.assembly, cutoff=cutoff)
 
+    def get_knob_graphs(self):
+        kg = self.get_knob_group()
+        scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+        kcuts = list(range(4))
+        g = kg.graph
+        knob_graphs = []
+        for scut, kcut in itertools.product(scuts[::-1], kcuts):
+            h = kg.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
+            h = graph_to_plain_graph(g=h)
+            ccs = sorted_connected_components(h)
+            for cc_num, cc in enumerate(ccs):
+                cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
+                knob_graphs.append(cc)
+        return knob_graphs
 
 
 def get_structure_data(code, preferred=True, mmol=1, cutoff=10.0):
