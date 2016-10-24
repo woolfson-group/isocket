@@ -50,42 +50,19 @@ class StructureHandler:
         return KnobGroup.from_helices(self.assembly, cutoff=cutoff)
 
     def get_knob_graphs(self):
-        kg = self.get_knob_group()
-        scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-        kcuts = list(range(4))
-        g = kg.graph
-        knob_graphs = []
-        for scut, kcut in itertools.product(scuts[::-1], kcuts):
-            h = kg.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
-            h = graph_to_plain_graph(g=h)
-            ccs = sorted_connected_components(h)
-            for cc_num, cc in enumerate(ccs):
-                cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
-                knob_graphs.append(cc)
+        kg = self.get_knob_group(cutoff=10.0)
+        if kg is not None:
+            scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+            kcuts = list(range(4))
+            g = kg.graph
+            knob_graphs = []
+            for scut, kcut in itertools.product(scuts[::-1], kcuts):
+                h = kg.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
+                h = graph_to_plain_graph(g=h)
+                ccs = sorted_connected_components(h)
+                for cc_num, cc in enumerate(ccs):
+                    cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
+                    knob_graphs.append(cc)
+        else:
+            knob_graphs = []
         return knob_graphs
-
-
-def get_structure_data(code, preferred=True, mmol=1, cutoff=10.0):
-    Structure = namedtuple('Structure', ['code', 'mmol', 'preferred', 'knob_group'])
-    fs = FileSystem(code=code)
-    if preferred:
-        mmol = fs.preferred_mmol
-    cif = fs.cifs[mmol]
-    a = convert_cif_to_ampal(cif, assembly_id=code)
-    kg = KnobGroup.from_helices(a, cutoff=cutoff)
-    return Structure(code=code, mmol=mmol, preferred=preferred, knob_group=kg)
-
-
-def get_graphs_from_knob_group(knob_group):
-    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-    kcuts = list(range(4))
-    g = knob_group.graph
-    knob_graphs = []
-    for scut, kcut in itertools.product(scuts[::-1], kcuts):
-        h = knob_group.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
-        h = graph_to_plain_graph(g=h)
-        ccs = sorted_connected_components(h)
-        for cc_num, cc in enumerate(ccs):
-            cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
-            knob_graphs.append(cc)
-    return knob_graphs
