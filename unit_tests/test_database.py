@@ -85,6 +85,12 @@ class AddPdbCodeTestCase(BaseTestCase):
         c = q.filter(AtlasDB.name == 'G163').count()
         self.assertEqual(c, 24)
 
+    def test_10gs(self):
+        code = '10gs'
+        add_pdb_code(code=code)
+        q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
+        self.assertEqual(q.pdb, code)
+
 
 class RemovePdbCodeTestCase(BaseTestCase):
 
