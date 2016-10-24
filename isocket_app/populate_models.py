@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from isambard_dev.databases.general_tools import get_or_create
 from isocket_app.graph_theory import GraphHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
-from isocket_app.structure_handler import get_structure_data, get_graphs_from_knob_group
+from isocket_app.structure_handler import StructureHandler
 
 scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 kcuts = list(range(4))
@@ -70,14 +70,12 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, **kwargs):
-    structure = get_structure_data(code=code, **kwargs)
-    knob_graphs = []
-    if structure.knob_group is not None:
-        knob_graphs = get_graphs_from_knob_group(knob_group=structure.knob_group)
+def add_pdb_code(code, mmol=None):
+    structure = StructureHandler.from_code(code=code, mmol=mmol)
+    knob_graphs = structure.get_knob_graphs()
     with session_scope() as session:
         pdb = PopulateModel(model=PdbDB, pdb=structure.code).go(session=session)
-        pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.preferred, mmol=structure.mmol).go(
+        pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.is_preferred, mmol=structure.mmol).go(
             session=session)
         for g in knob_graphs:
             ah = GraphHandler(graph=g)
