@@ -1,5 +1,4 @@
 import itertools
-from collections import namedtuple
 
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
