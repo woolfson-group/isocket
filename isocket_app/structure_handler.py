@@ -1,5 +1,5 @@
 import itertools
-from networkx import connected_component_subgraphs
+import networkx
 
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
@@ -59,8 +59,14 @@ class StructureHandler:
             for scut, kcut in itertools.product(scuts[::-1], kcuts):
                 h = kg.filter_graph(g=g, cutoff=scut, min_kihs=kcut)
                 h = graph_to_plain_graph(g=h)
-                ccs = sorted(connected_component_subgraphs(h, copy=True),
-                             key=lambda x: len(x.nodes()), reverse=True)
+                # if is null graph
+                if h.number_of_nodes() == 0:
+                    continue
+                if networkx.connected.is_connected(h):
+                    ccs = [h]
+                else:
+                    ccs = sorted(networkx.connected_component_subgraphs(h, copy=True),
+                                 key=lambda x: len(x.nodes()), reverse=True)
                 for cc_num, cc in enumerate(ccs):
                     cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
                     knob_graphs.append(cc)
