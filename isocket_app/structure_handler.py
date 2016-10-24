@@ -51,8 +51,12 @@ class StructureHandler:
         instance = cls(assembly=a)
         return instance
 
-    def get_knob_group(self, cutoff=10.0):
-        return KnobGroup.from_helices(self.assembly, cutoff=cutoff)
+    def get_knob_group(self, cutoff=10.0, state_selection=0):
+        try:
+            knob_group = KnobGroup.from_helices(self.assembly, cutoff=cutoff)
+        except AttributeError:
+            knob_group = KnobGroup.from_helices(self.assembly[state_selection], cutoff=cutoff)
+        return knob_group
 
     def get_knob_graphs(self):
         kg = self.get_knob_group(cutoff=10.0)
