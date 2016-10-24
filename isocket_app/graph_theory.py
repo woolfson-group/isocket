@@ -104,7 +104,8 @@ class GraphHandler(AtlasHandler):
         name = isomorphism_checker(self.graph, graph_list=self.get_graph_list(atlas=True, cyclics=True,
                                                                               paths=True, unknowns=False))
         if name is None:
-            name = isomorphism_checker(self.graph, graph_list=self.unknown_graphs)
+            with shelve.open(self.shelf_name) as shelf:
+                name = isomorphism_checker(self.graph, graph_list=shelf.values())
         return name
 
     def get_unknown_graph_name(self):
