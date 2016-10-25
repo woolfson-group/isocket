@@ -32,12 +32,11 @@ Cython==0.24.1
 cytoolz==0.8.0
 dask==0.10.2
 datashape==0.5.2
-deap==1.0.2
+deap==1.0.1
 decorator==4.0.10
 defusedxml==0.4.1
 dill==0.2.5
 docutils==0.12
-dynd==0.7.3.dev1
 entrypoints==0.2.2
 et-xmlfile==1.0.1
 fastcache==1.0.2
@@ -84,7 +83,6 @@ lxml==3.6.1
 Mako==1.0.4
 MarkupSafe==0.23
 matplotlib==1.5.1
-mdtraj==1.7.2
 mistune==0.7.3
 mpmath==0.19
 multipledispatch==0.4.8
@@ -140,7 +138,6 @@ QtPy==1.1.2
 redis==2.10.5
 requests==2.11.0
 rope-py3k==0.9.4.post1
-ruamel-yaml===-VERSION
 scikit-image==0.12.3
 scikit-learn==0.17.1
 scipy==0.18.0
