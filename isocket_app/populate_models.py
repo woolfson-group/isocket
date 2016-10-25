@@ -71,6 +71,11 @@ def populate_cutoff():
 
 
 def add_pdb_code(code, mmol=None):
+    # If pdb is already in database, exit before doing anything.
+    with session_scope() as session:
+        pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
+        if pdb is not None: 
+            return
     structure = StructureHandler.from_code(code=code, mmol=mmol)
     knob_graphs = structure.get_knob_graphs()
     with session_scope() as session:

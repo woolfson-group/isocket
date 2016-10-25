@@ -34,6 +34,7 @@ class StructureHandler:
         instance = cls(assembly=a)
         instance.is_preferred = preferred
         instance.mmol = mmol
+        instance.code = code
         return instance
 
     @classmethod
