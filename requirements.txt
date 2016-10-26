@@ -1,6 +1,8 @@
 alembic
 bokeh
+bs4
 Cython
+deap
 flask
 Flask-Assets
 Flask-Migrate
@@ -9,9 +11,16 @@ Flask-SQLAlchemy
 Flask-Testing
 Flask-Uploads
 Flask-WTF
+hypothesis
+ipywidgets
+matplotlib
 networkx
 numpy
+numpydoc
 parmed
+recommonmark
+requests
+scipy
 sqlalchemy
 werkzeug
 wtforms
