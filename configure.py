@@ -147,8 +147,8 @@ def optional_install():
 def install_for_circleci(settings_path):
     cci_settings = {
         "unknown_graphs": {
-            "production": "/Users/jackheal/Projects/isocket/isocket_app/unknown_graphs",
-            "testing": "/Users/jackheal/Projects/isocket/unit_tests/unknown_graphs_test_shelf"
+            "production": "/home/ubuntu/isocket/isocket_app/unknown_graphs",
+            "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_test_shelf"
         },
         "structural_database": {"path": ""}
         }
