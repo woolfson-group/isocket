@@ -1,4 +1,6 @@
 alembic
+bokeh
+flask
 Flask-Assets
 Flask-Migrate
 Flask-Script
@@ -6,3 +8,8 @@ Flask-SQLAlchemy
 Flask-Testing
 Flask-Uploads
 Flask-WTF
+networkx
+numpy
+sqlalchemy
+werkzeug
+wtforms
