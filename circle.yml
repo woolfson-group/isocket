@@ -27,4 +27,5 @@ test:
   override:
     - cd /home/ubuntu/isocket
     - python configure.py -C
+    - mv dssp-2.0.4 /home/ubuntu/isambard_dev/
     - python -m unittest discover unit_tests/. -v
