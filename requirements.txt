@@ -1,5 +1,6 @@
 alembic
 bokeh
+Cython
 flask
 Flask-Assets
 Flask-Migrate
@@ -10,6 +11,7 @@ Flask-Uploads
 Flask-WTF
 networkx
 numpy
+parmed
 sqlalchemy
 werkzeug
 wtforms
