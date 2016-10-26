@@ -6,6 +6,7 @@ machine:
 dependencies:
   pre:
     # isambard
+    - pip install --upgrade pip
     - cd /home/ubuntu/
     - git clone https://github.com/woolfson-group/isambard_dev.git
     - mv isambard_dev /home/ubuntu/
