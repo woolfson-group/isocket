@@ -11,21 +11,20 @@ log_folder = os.path.join(structural_database, 'isocket_logs')
 class CodeList:
     def __init__(self, data_dir=structural_database):
         self.data_dir = data_dir
-        self.to_add = self.get_codes_to_add()
-        self.to_remove = self.get_codes_to_remove()
 
     @property
     def local_codes(self):
         return local_pdb_codes(data_dir=self.data_dir)
 
-    def get_codes_to_add(self):
+    @property
+    def to_add(self):
         current_codes = current_codes_from_pdb()
-        return list(set(current_codes) - set(self.local_codes))
+        return set(current_codes) - set(self.local_codes)
 
-    def get_codes_to_remove(self):
+    @property
+    def to_remove(self):
         obsolete_codes = obsolete_codes_from_pdb()
-        return list(set(self.local_codes).intersection(obsolete_codes))
-
+        return set(self.local_codes).intersection(set(obsolete_codes))
 
 
 class UpdateSet:
@@ -33,7 +32,6 @@ class UpdateSet:
         #TODO configure logging
         self.add_codes = add_codes
         self.remove_codes = remove_codes
-
 
 
 # TODO Add code for checking db integrity. As a test? in here, or populate_models? Best way to do this?
