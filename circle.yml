@@ -25,4 +25,5 @@ dependencies:
 test:
   override:
     - cd /home/ubuntu/isocket
+    - python configure.py -C
     - python -m unittest discover unit_tests/. -v
