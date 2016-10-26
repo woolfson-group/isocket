@@ -1,9 +1,10 @@
 import unittest
 import os
 
+from isocket_settings import global_settings
 from isocket_app.structure_handler import StructureHandler
 
-install_folder = '/Users/jackheal/Projects/isocket/'
+install_folder = global_settings['package_path']
 
 
 class StructureHandlerTestCase(unittest.TestCase):

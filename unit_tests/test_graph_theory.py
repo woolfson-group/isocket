@@ -4,9 +4,10 @@ import networkx
 import numpy
 from networkx.generators import cycle_graph, complete_graph
 
+from isocket_settings import global_settings
 from isocket_app.graph_theory import AtlasHandler, GraphHandler, isomorphism_checker, sorted_connected_components
 
-unknown_graphs_test_shelf = '/Users/jackheal/Projects/isocket/unit_tests/unknown_graphs_test_shelf'
+unknown_graphs_test_shelf = global_settings['unknown_graphs']['testing']
 
 
 class AtlasHandlerTestCase(unittest.TestCase):

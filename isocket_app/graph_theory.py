@@ -4,7 +4,10 @@ from networkx.generators import cycle_graph, path_graph
 import shelve
 
 
-_unknown_graph_shelf = '/Users/jackheal/Projects/isocket/isocket_app/unknown_graphs'
+from isocket_settings import global_settings
+
+print(global_settings)
+_unknown_graph_shelf = global_settings['unknown_graphs']['production']
 
 
 class AtlasHandler:
