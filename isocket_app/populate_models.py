@@ -83,10 +83,11 @@ def add_pdb_code(code, mmol=None):
         pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.is_preferred, mmol=structure.mmol).go(
             session=session)
         for g in knob_graphs:
-            ah = GraphHandler(graph=g)
             cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
                                                     CutoffDB.kcut == g.graph['kcut']).one()
-            atlas = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
+            ah = GraphHandler(graph=g)
+            params = ah.graph_parameters()
+            atlas = PopulateModel(AtlasDB, **params).go(session)
             PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
                 session=session)
     return

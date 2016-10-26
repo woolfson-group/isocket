@@ -9,3 +9,4 @@ isocket_app/static/css/lib
 isocket_app/static/uploads
 unit_tests/tests.db
 .gitignore
+settings.json
