@@ -2,6 +2,7 @@ import os
 import shelve
 import datetime
 import logging
+import signal
 
 from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb, \
     make_code_obsolete
@@ -11,6 +12,18 @@ from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
 problem_code_shelf = os.path.join(global_settings['package_path'], 'isocket_app', 'problem_codes')
+
+
+class TimeoutException(Exception):   # Custom exception class
+    pass
+
+
+def timeout_handler(signum, frame):   # Custom signal handler
+    raise TimeoutException
+
+# Change the behavior of SIGALRM
+signal.signal(signal.SIGALRM, timeout_handler)
+
 
 class CodeList:
     def __init__(self, data_dir=structural_database):
@@ -59,10 +72,10 @@ class UpdateSet:
         self.add_codes = add_codes
         self.remove_codes = remove_codes
 
-    def run_update(self):
+    def run_update(self, timeout=120):
         if self.add_codes is not None:
             for code in self.add_codes:
-                UpdateCode(code=code, logger=self.logger).add()
+                UpdateCode(code=code, logger=self.logger).add(timeout=timeout)
             if not datasets_are_valid():
                 for code in self.add_codes:
                     UpdateCode(code=code, logger=self.logger).remove()
@@ -78,8 +91,10 @@ class UpdateCode:
         self.logger = logger
         self.log_shelf = log_shelf
 
-    def add(self):
+    def add(self, timeout=None):
         try:
+            if timeout is not None:
+                signal.alarm(timeout)
             add_pdb_code(code=self.code)
             if self.logger is not None:
                 self.logger.info('Added code {0}'.format(self.code))
@@ -91,6 +106,9 @@ class UpdateCode:
                     shelf[self.code] = e
             else:
                 raise e
+        else:
+            if timeout is not None:
+                signal.alarm(0)
         return
 
     def remove(self):
