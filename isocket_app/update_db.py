@@ -58,8 +58,16 @@ class UpdateSet:
         self.add_codes = add_codes
         self.remove_codes = remove_codes
 
+    def run_update(self):
+        if self.add_codes is not None:
+            for code in self.add_codes:
+                UpdateCode(code=code, logger=self.logger).add()
+            # valid_data_sets. If not valid, clean-up.
+        if self.remove_codes is not None:
+            for code in self.remove_codes:
+                UpdateCode(code=code, logger=self.logger).remove()
+        return
 
-# TODO Add code for checking db integrity. As a test? in here, or populate_models? Best way to do this?
 
 class UpdateCode:
     def __init__(self, code, logger=None, log_shelf=problem_code_shelf):
