@@ -45,13 +45,13 @@ class CodeList:
 
     def problem_codes(self):
         with shelve.open(problem_code_shelf) as shelf:
-            codes = list(shelf.keys())
+            codes = set(shelf.keys())
         return codes
 
 
 def set_up_logger():
     today = datetime.date.today()
-    year_folder = os.path.join(log_folder, today.year)
+    year_folder = os.path.join(log_folder, str(today.year))
     if not os.path.exists(year_folder):
         os.mkdir(year_folder)
     log_file = os.path.join(year_folder, '{}.log'.format(today.isoformat()))
