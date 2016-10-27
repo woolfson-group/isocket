@@ -1,7 +1,9 @@
 import sqlalchemy
 import itertools
 from contextlib import contextmanager
+import shelve
 
+from isocket_settings import global_settings
 from isocket_app.graph_theory import GraphHandler
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
@@ -100,6 +102,19 @@ def remove_pdb_code(code):
         if p is not None:
             session.delete(p)
     return
+
+
+def datasets_are_valid():
+    valid = False
+    with session_scope() as session:
+        adbs = set([x[0] for x in session.query(AtlasDB.name).filter(AtlasDB.name.startswith('U')).all()])
+    with shelve.open(global_settings['unknown_graphs']['production'], 'r') as shelf:
+        unks = set(shelf.keys())
+    if len(adbs - unks) == 0:
+        valid = True
+    # run checks and return True if they pass.
+    # Checks: is db consistent with shelf? Check graph properties and names.
+    return valid
 
 
 def get_or_create(model, session, **kwargs):

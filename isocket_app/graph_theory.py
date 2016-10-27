@@ -6,7 +6,6 @@ import shelve
 
 from isocket_settings import global_settings
 
-print(global_settings)
 _unknown_graph_shelf = global_settings['unknown_graphs']['production']
 
 
