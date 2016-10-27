@@ -54,6 +54,7 @@ def set_up_logger():
 
 class UpdateSet:
     def __init__(self, add_codes=None, remove_codes=None):
+        assert(datasets_are_valid())
         self.logger = set_up_logger()
         self.add_codes = add_codes
         self.remove_codes = remove_codes
@@ -62,7 +63,9 @@ class UpdateSet:
         if self.add_codes is not None:
             for code in self.add_codes:
                 UpdateCode(code=code, logger=self.logger).add()
-            # valid_data_sets. If not valid, clean-up.
+            if not datasets_are_valid():
+                for code in self.add_codes:
+                    UpdateCode(code=code, logger=self.logger).remove()
         if self.remove_codes is not None:
             for code in self.remove_codes:
                 UpdateCode(code=code, logger=self.logger).remove()
