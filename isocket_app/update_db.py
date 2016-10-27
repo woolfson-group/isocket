@@ -62,21 +62,19 @@ class UpdateSet:
 # TODO Add code for checking db integrity. As a test? in here, or populate_models? Best way to do this?
 
 class UpdateCode:
-    def __init__(self, code, log=None, log_shelf=problem_code_shelf):
+    def __init__(self, code, logger=None, log_shelf=problem_code_shelf):
         self.code = code
-        self.log = log
+        self.logger = logger
         self.log_shelf = log_shelf
 
     def add(self):
         try:
             add_pdb_code(code=self.code)
-            # validate database
-            #if not datasets_are_valid():
-            #    remove_pdb_code(code=self.code)
+            if self.logger is not None:
+                self.logger.info('Added code {0}'.format(self.code))
         except Exception as e:
-            if self.log is not None:
-                # process log message
-                pass
+            if self.logger is not None:
+                self.logger.debug('Error adding code {0}\n{1}'.format(self.code, e))
             if self.log_shelf is not None:
                 with shelve.open(self.log_shelf) as shelf:
                     shelf[self.code] = e
@@ -84,6 +82,17 @@ class UpdateCode:
                 raise e
         return
 
+    def remove(self):
+        try:
+            remove_pdb_code(code=self.code)
+            if self.logger is not None:
+                self.logger.info('Removed code {0}'.format(self.code))
+        except Exception as e:
+            if self.logger is not None:
+                self.logger.debug('Error removing code {0}\n{1}'.format(self.code, e))
+            else:
+                raise e
+        return
 
 
 
