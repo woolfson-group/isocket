@@ -1,4 +1,7 @@
 import os
+import shelve
+import datetime
+import logging
 
 from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb, \
     make_code_obsolete
@@ -7,7 +10,7 @@ from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_
 
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
-
+problem_code_shelf = os.path.join(global_settings['package_path'], 'isocket_app', 'problem_codes')
 
 class CodeList:
     def __init__(self, data_dir=structural_database):
@@ -20,17 +23,38 @@ class CodeList:
     @property
     def to_add(self):
         current_codes = current_codes_from_pdb()
-        return set(current_codes) - set(self.local_codes)
+        return set(current_codes) - set(self.local_codes) - self.problem_codes()
 
     @property
     def to_remove(self):
         obsolete_codes = obsolete_codes_from_pdb()
         return set(self.local_codes).intersection(set(obsolete_codes))
 
+    def problem_codes(self):
+        with shelve.open(problem_code_shelf) as shelf:
+            codes = list(shelf.keys())
+        return codes
+
+
+def set_up_logger():
+    today = datetime.date.today()
+    year_folder = os.path.join(log_folder, today.year)
+    if not os.path.exists(year_folder):
+        os.mkdir(year_folder)
+    log_file = os.path.join(year_folder, '{}.log'.format(today.isoformat()))
+    logger = logging.getLogger(name=__name__)
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(log_file)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    return logger
+
+
 
 class UpdateSet:
     def __init__(self, add_codes=None, remove_codes=None):
-        #TODO configure logging
+        self.logger = set_up_logger()
         self.add_codes = add_codes
         self.remove_codes = remove_codes
 
@@ -38,7 +62,7 @@ class UpdateSet:
 # TODO Add code for checking db integrity. As a test? in here, or populate_models? Best way to do this?
 
 class UpdateCode:
-    def __init__(self, code, log=None, log_shelf=None):
+    def __init__(self, code, log=None, log_shelf=problem_code_shelf):
         self.code = code
         self.log = log
         self.log_shelf = log_shelf
@@ -47,15 +71,15 @@ class UpdateCode:
         try:
             add_pdb_code(code=self.code)
             # validate database
-            if not datasets_are_valid():
-                remove_pdb_code(code=self.code)
+            #if not datasets_are_valid():
+            #    remove_pdb_code(code=self.code)
         except Exception as e:
             if self.log is not None:
                 # process log message
                 pass
             if self.log_shelf is not None:
-                # add code and error to shelf
-                pass
+                with shelve.open(self.log_shelf) as shelf:
+                    shelf[self.code] = e
             else:
                 raise e
         return
