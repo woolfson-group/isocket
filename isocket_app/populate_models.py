@@ -102,6 +102,13 @@ def remove_pdb_code(code):
     return
 
 
+def datasets_are_valid():
+    valid = False
+    # run checks and return True if they pass.
+    # Checks: is db consistent with shelf? Check graph properties and names.
+    return valid
+
+
 def get_or_create(model, session, **kwargs):
     """Uses kwargs to get instance of model. If can't get that instance from session, add it to session.
 
