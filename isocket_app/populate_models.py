@@ -72,7 +72,7 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, mmol=None):
+def add_pdb_code(code, mmol=None, shelf_mode='production'):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
@@ -87,7 +87,7 @@ def add_pdb_code(code, mmol=None):
         for g in knob_graphs:
             cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
                                                     CutoffDB.kcut == g.graph['kcut']).one()
-            ah = GraphHandler(graph=g)
+            ah = GraphHandler(g=g, shelf_mode=shelf_mode)
             params = ah.graph_parameters()
             atlas = PopulateModel(AtlasDB, **params).go(session)
             PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(

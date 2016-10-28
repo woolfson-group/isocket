@@ -6,12 +6,10 @@ import shelve
 
 from isocket_settings import global_settings
 
-_unknown_graph_shelf = global_settings['unknown_graphs']['production']
-
 
 class AtlasHandler:
-    def __init__(self, shelf_name=_unknown_graph_shelf):
-        self.shelf_name = shelf_name
+    def __init__(self, shelf_mode='production'):
+        self.shelf_mode = shelf_mode
 
     @property
     def atlas_graphs(self):
@@ -20,7 +18,8 @@ class AtlasHandler:
 
     @property
     def unknown_graphs(self):
-        with shelve.open(self.shelf_name, flag='c') as shelf:
+        shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
+        with shelve.open(shelf_name) as shelf:
             graph_list = list(shelf.values())
         return graph_list
 
@@ -52,75 +51,35 @@ class AtlasHandler:
             graph_list += self.unknown_graphs
         return graph_list
 
-    def get_next_unknown_graph_name(self):
-        with shelve.open(self.shelf_name, 'r') as shelf:
-            number_of_graphs = len(shelf)
-        name = 'U{}'.format(number_of_graphs + 1)
-        return name
-
-    def _add_graph_to_shelf(self, g, name):
-        """ Runs isomorphism checker against stored dictionary of non-Atlas graphs.
-
-        Notes
-        -----
-        The dictionary of non-Atlas graphs is stored as a .db (output from shelve) file.
-            Keys are unknown graph names.
-            Values are dictionaries storing the unknown graphs themselves as well as some basic properties of the graphs.
-        If graph is not in Atlas, nor in this dictionary of non-Atlas graphs, then it is added to this dictionary.
-        Unknown graphs are named 'Un', where n is the order in which they have been encountered.
-        The number n does not tell you anything about the properties of the graph.
-
-        Parameters
-        ----------
-        g : A networkx Graph.
-
-        Returns
-        -------
-        added : bool
-            True if graph was added to shelf
-        """
-        added = False
-        h = graph_to_plain_graph(g)
-        with shelve.open(self.shelf_name, flag='w') as shelf:
-            if name not in shelf.keys():
-                h.name = name
-                shelf[name] = h
-                added = True
-        return added
-
 
 class GraphHandler(AtlasHandler):
-    def __init__(self, graph, shelf_name=_unknown_graph_shelf):
-        super().__init__(shelf_name=shelf_name)
-        self.graph = graph_to_plain_graph(graph)
-        self.graph.name = self.name
-
-    @property
-    def name(self):
-        name = self.get_graph_name()
-        if name is None:
-            name = self.get_unknown_graph_name()
-        return name
+    def __init__(self, g, shelf_mode='production'):
+        super().__init__(shelf_mode=shelf_mode)
+        self.g = graph_to_plain_graph(g)
+        self.name = self.get_graph_name()
 
     def get_graph_name(self):
-        name = isomorphism_checker(self.graph, graph_list=self.get_graph_list(atlas=True, cyclics=True,
-                                                                              paths=True, unknowns=False))
-        if name is None:
-            with shelve.open(self.shelf_name) as shelf:
-                name = isomorphism_checker(self.graph, graph_list=shelf.values())
-        return name
+        if self.g.graph['name'] == 'unnamed':
+            name = isomorphism_checker(self.g, graph_list=self.get_graph_list(atlas=True, cyclics=True,
+                                                                          paths=True, unknowns=False))
 
-    def get_unknown_graph_name(self):
-        name = self.get_graph_name()
-        if name is None:
-            # process new unknown graph.
-            name = self.get_next_unknown_graph_name()
-            # TODO namedtuple to return item, created.
-            self._add_graph_to_shelf(g=self.graph, name=name)
+            if name is None:
+                name = isomorphism_checker(self.g, graph_list=self.unknown_graphs)
+                if name is None:
+                    shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
+                    with shelve.open(shelf_name, writeback=True) as shelf:
+                        name = 'U{}'.format(len(shelf) + 1)
+                        assert name not in shelf
+                        self.g.graph['name'] = name
+                        shelf[name] = self.g.copy()
+                        shelf.sync()
+            self.g.graph['name'] = name
+        else:
+            name = self.g.graph['name']
         return name
 
     def graph_parameters(self):
-        return dict(name=self.name, nodes=self.graph.number_of_nodes(), edges=self.graph.number_of_edges())
+        return dict(name=self.name, nodes=self.g.number_of_nodes(), edges=self.g.number_of_edges())
 
 
 def graph_to_plain_graph(g):
@@ -129,6 +88,7 @@ def graph_to_plain_graph(g):
     h.add_nodes_from(range(len(g.nodes())))
     edges = [(g.nodes().index(e1), g.nodes().index(e2)) for e1, e2 in g.edges()]
     h.add_edges_from(edges)
+    h.graph['name'] = 'unnamed'
     return h
 
 
