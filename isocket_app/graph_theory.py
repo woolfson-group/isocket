@@ -19,7 +19,7 @@ class AtlasHandler:
     @property
     def unknown_graphs(self):
         shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
-        with shelve.open(shelf_name, flag='r') as shelf:
+        with shelve.open(shelf_name) as shelf:
             graph_list = list(shelf.values())
         return graph_list
 
