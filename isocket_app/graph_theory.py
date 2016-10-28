@@ -64,15 +64,17 @@ class GraphHandler(AtlasHandler):
                                                                           paths=True, unknowns=False))
 
             if name is None:
-                name = isomorphism_checker(self.g, graph_list=self.unknown_graphs)
+                shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
+                with shelve.open(shelf_name) as shelf:
+                    d = dict(shelf)
+                name = isomorphism_checker(self.g, d.values())
                 if name is None:
-                    shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
-                    with shelve.open(shelf_name, writeback=True) as shelf:
-                        name = 'U{}'.format(len(shelf) + 1)
-                        assert name not in shelf
-                        self.g.graph['name'] = name
-                        shelf[name] = self.g.copy()
-                        shelf.sync()
+                    name = 'U{}'.format(len(d) + 1)
+                    self.g.graph['name'] = name
+                    d[name] = self.g.copy()
+                    assert name in d
+                with shelve.open(shelf_name) as shelf:
+                    shelf.update(d)
             self.g.graph['name'] = name
         else:
             name = self.g.graph['name']
