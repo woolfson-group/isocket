@@ -1,6 +1,7 @@
 import os
 from flask_testing import TestCase
 
+from isocket_settings import global_settings
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
 from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
@@ -9,7 +10,7 @@ from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket_app.graph_theory import AtlasHandler
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
-
+test_shelf = global_settings['unknown_graphs']['testing']
 
 class BaseTestCase(TestCase):
 
@@ -29,7 +30,7 @@ class AtlasDBTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.graph_list = AtlasHandler().atlas_graphs
+        self.graph_list = AtlasHandler(shelf_name=test_shelf).atlas_graphs
 
     def test_first_element_of_graph_list(self):
         self.assertTrue(self.graph_list[0].name == 'G0')
@@ -63,7 +64,7 @@ class AddPdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
+        populate_atlas(graph_list=AtlasHandler(shelf_name=test_shelf).atlas_graphs)
         self.code = '2ebo'
         add_pdb_code(code=self.code)
 
@@ -87,7 +88,7 @@ class AddPdbCodeTestCase(BaseTestCase):
 
     def test_10gs(self):
         code = '10gs'
-        add_pdb_code(code=code)
+        add_pdb_code(code=code, shelf_name=test_shelf)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
 
@@ -97,9 +98,9 @@ class RemovePdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
+        populate_atlas(graph_list=AtlasHandler(shelf_name=test_shelf).atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code(code=self.code)
+        add_pdb_code(code=self.code, shelf_name=test_shelf)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):

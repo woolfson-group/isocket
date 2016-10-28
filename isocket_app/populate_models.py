@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import shelve
 
 from isocket_settings import global_settings
-from isocket_app.graph_theory import GraphHandler
+from isocket_app.graph_theory import GraphHandler, _unknown_graph_shelf
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
 
@@ -72,7 +72,7 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, mmol=None):
+def add_pdb_code(code, mmol=None, shelf_name=_unknown_graph_shelf):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
@@ -87,7 +87,7 @@ def add_pdb_code(code, mmol=None):
         for g in knob_graphs:
             cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
                                                     CutoffDB.kcut == g.graph['kcut']).one()
-            ah = GraphHandler(graph=g)
+            ah = GraphHandler(graph=g, shelf_name=shelf_name)
             params = ah.graph_parameters()
             atlas = PopulateModel(AtlasDB, **params).go(session)
             PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
