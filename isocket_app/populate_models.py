@@ -8,8 +8,6 @@ from isocket_app.graph_theory import GraphHandler, isomorphism_checker
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
 
-scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
-kcuts = list(range(4))
 
 holding_unknowns = global_settings["holding_unknowns"]["production"]
 unknown_graphs = global_settings["unknown_graphs"]["production"]
@@ -70,6 +68,8 @@ def populate_cutoff():
     True if new values added to database
     False otherwise
     """
+    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    kcuts = list(range(4))
     with session_scope() as session:
         for kcut, scut in itertools.product(kcuts, scuts):
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
