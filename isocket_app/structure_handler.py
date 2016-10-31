@@ -1,5 +1,6 @@
 import itertools
 import networkx
+import numpy
 
 from isocket_settings import global_settings
 from isambard_dev.add_ons.filesystem import FileSystem
@@ -57,10 +58,10 @@ class StructureHandler:
             knob_group = KnobGroup.from_helices(self.assembly[state_selection], cutoff=cutoff)
         return knob_group
 
-    def get_knob_graphs(self):
+    def get_knob_graphs(self, min_scut=7.0, max_scut=10.0, scut_increment=0.5):
         kg = self.get_knob_group(cutoff=10.0)
         if kg is not None:
-            scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+            scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
             kcuts = list(range(4))
             g = kg.graph
             knob_graphs = []
