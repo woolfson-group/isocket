@@ -7,7 +7,7 @@ import signal
 from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb, \
     make_code_obsolete
 from isocket_settings import global_settings
-from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid
+from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid, process_holding_pickle
 
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
@@ -82,7 +82,11 @@ class UpdateSet:
         if self.remove_codes is not None:
             for code in self.remove_codes:
                 UpdateCode(code=code, logger=self.logger).remove()
+        self.clear_up_and_assert()
         return
+
+    def clear_up_and_assert(self):
+        process_holding_pickle(mode=self.mode)
 
 
 class UpdateCode:
