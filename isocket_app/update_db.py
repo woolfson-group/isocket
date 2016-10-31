@@ -64,7 +64,6 @@ def set_up_logger():
     return logger
 
 
-
 class UpdateSet:
     def __init__(self, add_codes=None, remove_codes=None):
         assert(datasets_are_valid())
