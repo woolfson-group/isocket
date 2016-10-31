@@ -20,7 +20,10 @@ class AtlasHandler:
     @property
     def unknown_graphs(self):
         unknown_pickle = global_settings["unknown_graphs"][self.mode]
-        graph_list = pickle.load(open(unknown_pickle, 'rb'))
+        try:
+            graph_list = pickle.load(open(unknown_pickle, 'rb'))
+        except (FileNotFoundError, EOFError):
+            graph_list = []
         return graph_list
 
     def cyclic_graphs(self, max_nodes):
