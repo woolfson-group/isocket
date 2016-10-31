@@ -11,8 +11,6 @@ from isocket_app.graph_theory import AtlasHandler
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 _mode = 'testing'
-holding_unknowns_test = global_settings["holding_unknowns"][_mode]
-unknown_graphs = global_settings["unknown_graphs"][_mode]
 
 
 class BaseTestCase(TestCase):
@@ -69,7 +67,7 @@ class AddPdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code, holding_pickle=holding_unknowns_test, mode=_mode)
+        add_pdb_code_2(code=self.code, mode=_mode)
 
     def test_pdb_code_exists(self):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
@@ -91,7 +89,7 @@ class AddPdbCodeTestCase(BaseTestCase):
 
     def test_10gs(self):
         code = '10gs'
-        add_pdb_code_2(code=code, holding_pickle=holding_unknowns_test, mode=_mode)
+        add_pdb_code_2(code=code, mode=_mode)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
 
@@ -103,7 +101,7 @@ class RemovePdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code, holding_pickle=holding_unknowns_test, mode=_mode)
+        add_pdb_code_2(code=self.code, mode=_mode)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):
