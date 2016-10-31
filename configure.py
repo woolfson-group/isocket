@@ -150,6 +150,10 @@ def install_for_circleci(settings_path):
             "production": "/home/ubuntu/isocket/isocket_app/unknown_graphs",
             "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_test_shelf"
         },
+        "holding_unknowns": {
+            "production": "/home/ubuntu/isocket/isocket_app/holding_unknowns.p",
+            "testing": "/home/ubuntu/isocket/unit_tests/holding_unknowns_tests.p"
+        },
         "structural_database": {"path": ""}
         }
     with open(str(settings_path), 'w') as outf:
