@@ -1,15 +1,18 @@
 import sqlalchemy
 import itertools
 from contextlib import contextmanager
-import shelve
+import pickle
 
 from isocket_settings import global_settings
-from isocket_app.graph_theory import GraphHandler
+from isocket_app.graph_theory import GraphHandler, isomorphism_checker
 from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
 
 scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
 kcuts = list(range(4))
+
+holding_unknowns = global_settings["holding_unknowns"]["production"]
+unknown_graphs = global_settings["unknown_graphs"]["production"]
 
 
 @contextmanager
@@ -72,7 +75,7 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, mmol=None, shelf_mode='production'):
+def add_pdb_code(code, mmol=None):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
@@ -87,11 +90,81 @@ def add_pdb_code(code, mmol=None, shelf_mode='production'):
         for g in knob_graphs:
             cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
                                                     CutoffDB.kcut == g.graph['kcut']).one()
-            ah = GraphHandler(g=g, shelf_mode=shelf_mode)
+            ah = GraphHandler(g=g)
             params = ah.graph_parameters()
-            atlas = PopulateModel(AtlasDB, **params).go(session)
-            PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
-                session=session)
+            if ah.name is not None:
+                atlas = PopulateModel(AtlasDB, **params).go(session)
+                PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
+                    session=session)
+    return
+
+
+def add_pdb_code_2(code, mmol=None, holding_pickle=holding_unknowns):
+    # If pdb is already in database, exit before doing anything.
+    with session_scope() as session:
+        pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
+        if pdb is not None:
+            return
+    structure = StructureHandler.from_code(code=code, mmol=mmol)
+    atlas_graphs = structure.get_atlas_graphs()
+    for ag in atlas_graphs:
+        if ag.name is None:
+            # add to holding list
+            add_g_to_holding_pickle(g=ag, holding_pickle=holding_pickle)
+        else:
+            add_graph_to_db(**ag.graph)
+    return
+
+
+def add_g_to_holding_pickle(g, holding_pickle=holding_unknowns):
+    try:
+        hp = pickle.load(open(holding_pickle, 'rb'))
+    except EOFError:
+        hp = []
+    hp.append(g)
+    pickle.dump(hp, open(holding_pickle, 'wb'))
+    return
+
+
+def process_holding_pickle(unknown_pickle=unknown_graphs, holding_pickle=holding_unknowns):
+    try:
+        unknown_pickle_list = pickle.load(open(unknown_pickle, 'rb'))
+    except EOFError:
+        unknown_pickle_list = []
+    try:
+        holding_pickle_list = pickle.load(open(holding_pickle, 'rb'))
+    except EOFError:
+        holding_pickle_list = []
+    next_number_to_add = max([int(x.name[1:]) for x in unknown_pickle_list]) + 1
+    to_add_to_atlas = []
+    for i, g in enumerate(holding_pickle_list):
+        n = isomorphism_checker(g, graph_list=holding_pickle_list[:i])
+        if n is None:
+            g.name = 'U{}'.format(next_number_to_add)
+            to_add_to_atlas.append(g)
+            next_number_to_add += 1
+        else:
+            g.name = n
+    unknown_pickle_list += to_add_to_atlas
+    pickle.dump(unknown_pickle_list, open(unknown_pickle, 'wb'))
+    populate_atlas(graph_list=to_add_to_atlas)
+    for g in holding_pickle_list:
+        add_graph_to_db(**g.graph)
+        holding_pickle_list.remove(g)
+    pickle.dump(holding_pickle_list, open(holding_pickle, 'wb'))
+    return
+
+
+def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edges):
+    with session_scope() as session:
+        pdb = PopulateModel(model=PdbDB, pdb=code).go(session=session)
+        pdbe = PopulateModel(model=PdbeDB, pdb_id=pdb.id, preferred=preferred, mmol=mmol).go(
+            session=session)
+        cutoff = session.query(CutoffDB).filter(CutoffDB.scut == scut,
+                                                CutoffDB.kcut == kcut).one()
+        atlas = PopulateModel(AtlasDB, name=name, nodes=nodes, edges=edges).go(session)
+        PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=cc_num).go(
+            session=session)
     return
 
 
@@ -108,8 +181,7 @@ def datasets_are_valid():
     valid = False
     with session_scope() as session:
         adbs = set([x[0] for x in session.query(AtlasDB.name).filter(AtlasDB.name.startswith('U')).all()])
-    with shelve.open(global_settings['unknown_graphs']['production'], 'r') as shelf:
-        unks = set(shelf.keys())
+    unks = {x.name for x in pickle.load(open(unknown_graphs, 'rb'))}
     if len(adbs - unks) == 0:
         valid = True
     # run checks and return True if they pass.
