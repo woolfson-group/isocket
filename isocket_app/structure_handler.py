@@ -6,7 +6,7 @@ from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
-from isocket_app.graph_theory import graph_to_plain_graph
+from isocket_app.graph_theory import graph_to_plain_graph, GraphHandler
 
 data_dir = global_settings['structural_database']['path']
 
@@ -81,3 +81,15 @@ class StructureHandler:
         else:
             knob_graphs = []
         return knob_graphs
+
+    def get_atlas_graphs(self):
+        knob_graphs = self.get_knob_graphs()
+        atlas_graphs = []
+        for g in knob_graphs:
+            gh = GraphHandler(g)
+            d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
+                     mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,
+                     nodes=g.number_of_nodes(), edges=g.number_of_edges())
+            gh.g.graph.update(d)
+            atlas_graphs.append(gh.g)
+        return atlas_graphs
