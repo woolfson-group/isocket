@@ -1,15 +1,16 @@
 import networkx
 from networkx.generators.atlas import graph_atlas_g
 from networkx.generators import cycle_graph, path_graph
-import shelve
+import pickle
 
 
 from isocket_settings import global_settings
 
 
 class AtlasHandler:
-    def __init__(self, shelf_mode='production'):
-        self.shelf_mode = shelf_mode
+    def __init__(self, mode='production'):
+        self.mode = mode
+        return
 
     @property
     def atlas_graphs(self):
@@ -18,9 +19,8 @@ class AtlasHandler:
 
     @property
     def unknown_graphs(self):
-        shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
-        with shelve.open(shelf_name) as shelf:
-            graph_list = list(shelf.values())
+        unknown_pickle = global_settings["unknown_graphs"][self.mode]
+        graph_list = pickle.load(open(unknown_pickle, 'rb'))
         return graph_list
 
     def cyclic_graphs(self, max_nodes):
@@ -53,8 +53,8 @@ class AtlasHandler:
 
 
 class GraphHandler(AtlasHandler):
-    def __init__(self, g, shelf_mode='production'):
-        super().__init__(shelf_mode=shelf_mode)
+    def __init__(self, g, mode='production'):
+        super().__init__(mode=mode)
         self.g = graph_to_plain_graph(g)
         self.name = self.get_graph_name()
 
@@ -64,17 +64,7 @@ class GraphHandler(AtlasHandler):
                                                                           paths=True, unknowns=False))
 
             if name is None:
-                shelf_name = global_settings['unknown_graphs'][self.shelf_mode]
-                with shelve.open(shelf_name) as shelf:
-                    d = dict(shelf)
-                name = isomorphism_checker(self.g, d.values())
-                if name is None:
-                    name = 'U{}'.format(len(d) + 1)
-                    self.g.graph['name'] = name
-                    d[name] = self.g.copy()
-                    assert name in d
-                with shelve.open(shelf_name) as shelf:
-                    shelf.update(d)
+                name = isomorphism_checker(self.g, self.unknown_graphs)
             self.g.graph['name'] = name
         else:
             name = self.g.graph['name']
