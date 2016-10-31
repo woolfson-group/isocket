@@ -101,7 +101,7 @@ def add_g_to_holding_pickle(g, mode='production'):
 
 def process_holding_pickle(mode='production'):
     holding_pickle = global_settings["holding_unknowns"][mode]
-    unknown_pickle = global_settings["holding_unknowns"][mode]
+    unknown_pickle = global_settings["unknown_graphs"][mode]
     try:
         unknown_pickle_list = pickle.load(open(unknown_pickle, 'rb'))
     except EOFError:
@@ -152,11 +152,12 @@ def remove_pdb_code(code):
     return
 
 
-def datasets_are_valid():
+def datasets_are_valid(mode='production'):
     valid = False
     with session_scope() as session:
         adbs = set([x[0] for x in session.query(AtlasDB.name).filter(AtlasDB.name.startswith('U')).all()])
-    unks = {x.name for x in pickle.load(open(unknown_graphs, 'rb'))}
+    unknown_pickle = global_settings["unknown_graphs"][mode]
+    unks = {x.name for x in pickle.load(open(unknown_pickle, 'rb'))}
     if len(adbs - unks) == 0:
         valid = True
     # run checks and return True if they pass.
