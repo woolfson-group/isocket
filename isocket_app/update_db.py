@@ -65,16 +65,17 @@ def set_up_logger():
 
 
 class UpdateSet:
-    def __init__(self, add_codes=None, remove_codes=None):
+    def __init__(self, add_codes=None, remove_codes=None, mode='production'):
         assert(datasets_are_valid())
         self.logger = set_up_logger()
         self.add_codes = add_codes
         self.remove_codes = remove_codes
+        self.mode = mode
 
     def run_update(self, timeout=120):
         if self.add_codes is not None:
             for code in self.add_codes:
-                UpdateCode(code=code, logger=self.logger).add(timeout=timeout)
+                UpdateCode(code=code, logger=self.logger).add(timeout=timeout, mode=self.mode)
             if not datasets_are_valid():
                 for code in self.add_codes:
                     UpdateCode(code=code, logger=self.logger).remove()
@@ -90,11 +91,11 @@ class UpdateCode:
         self.logger = logger
         self.log_shelf = log_shelf
 
-    def add(self, timeout=None):
+    def add(self, timeout=None, mode='production'):
         try:
             if timeout is not None:
                 signal.alarm(timeout)
-            add_pdb_code(code=self.code)
+            add_pdb_code(code=self.code, mode=mode)
             if self.logger is not None:
                 self.logger.info('Added code {0}'.format(self.code))
         except Exception as e:
