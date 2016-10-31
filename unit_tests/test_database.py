@@ -4,7 +4,7 @@ from flask_testing import TestCase
 from isocket_settings import global_settings
 from isocket_app.factory import create_app
 from isocket_app.extensions import db
-from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code_2, \
+from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
     remove_pdb_code
 from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket_app.graph_theory import AtlasHandler
@@ -67,7 +67,7 @@ class AddPdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code, mode=_mode)
+        add_pdb_code(code=self.code, mode=_mode)
 
     def test_pdb_code_exists(self):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
@@ -89,7 +89,7 @@ class AddPdbCodeTestCase(BaseTestCase):
 
     def test_10gs(self):
         code = '10gs'
-        add_pdb_code_2(code=code, mode=_mode)
+        add_pdb_code(code=code, mode=_mode)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
 
@@ -101,7 +101,7 @@ class RemovePdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code, mode=_mode)
+        add_pdb_code(code=self.code, mode=_mode)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):

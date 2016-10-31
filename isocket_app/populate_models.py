@@ -71,31 +71,7 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, mmol=None):
-    # If pdb is already in database, exit before doing anything.
-    with session_scope() as session:
-        pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
-        if pdb is not None: 
-            return
-    structure = StructureHandler.from_code(code=code, mmol=mmol)
-    knob_graphs = structure.get_knob_graphs()
-    with session_scope() as session:
-        pdb = PopulateModel(model=PdbDB, pdb=structure.code).go(session=session)
-        pdbe = PopulateModel(model=PdbeDB, pdb=pdb, preferred=structure.is_preferred, mmol=structure.mmol).go(
-            session=session)
-        for g in knob_graphs:
-            cutoff = session.query(CutoffDB).filter(CutoffDB.scut == g.graph['scut'],
-                                                    CutoffDB.kcut == g.graph['kcut']).one()
-            ah = GraphHandler(g=g)
-            params = ah.graph_parameters()
-            if ah.name is not None:
-                atlas = PopulateModel(AtlasDB, **params).go(session)
-                PopulateModel(GraphDB, pdbe=pdbe, atlas=atlas, cutoff=cutoff, connected_component=g.graph['cc_num']).go(
-                    session=session)
-    return
-
-
-def add_pdb_code_2(code, mmol=None, mode='production'):
+def add_pdb_code(code, mmol=None, mode='production'):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
