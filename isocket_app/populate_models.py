@@ -9,10 +9,6 @@ from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 from isocket_app.structure_handler import StructureHandler
 
 
-holding_unknowns = global_settings["holding_unknowns"]["production"]
-unknown_graphs = global_settings["unknown_graphs"]["production"]
-
-
 @contextmanager
 def session_scope():
     """Provide a transactional scope around a series of operations."""
@@ -99,7 +95,7 @@ def add_pdb_code(code, mmol=None):
     return
 
 
-def add_pdb_code_2(code, mmol=None, holding_pickle=holding_unknowns, mode='production'):
+def add_pdb_code_2(code, mmol=None, mode='production'):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
@@ -110,13 +106,14 @@ def add_pdb_code_2(code, mmol=None, holding_pickle=holding_unknowns, mode='produ
     for ag in atlas_graphs:
         if ag.name is None:
             # add to holding list
-            add_g_to_holding_pickle(g=ag, holding_pickle=holding_pickle)
+            add_g_to_holding_pickle(g=ag, mode=mode)
         else:
             add_graph_to_db(**ag.graph)
     return
 
 
-def add_g_to_holding_pickle(g, holding_pickle=holding_unknowns):
+def add_g_to_holding_pickle(g, mode='production'):
+    holding_pickle = global_settings["holding_unknowns"][mode]
     try:
         hp = pickle.load(open(holding_pickle, 'rb'))
     except EOFError:
@@ -126,7 +123,9 @@ def add_g_to_holding_pickle(g, holding_pickle=holding_unknowns):
     return
 
 
-def process_holding_pickle(unknown_pickle=unknown_graphs, holding_pickle=holding_unknowns):
+def process_holding_pickle(mode='production'):
+    holding_pickle = global_settings["holding_unknowns"][mode]
+    unknown_pickle = global_settings["holding_unknowns"][mode]
     try:
         unknown_pickle_list = pickle.load(open(unknown_pickle, 'rb'))
     except EOFError:
