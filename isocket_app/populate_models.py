@@ -99,14 +99,14 @@ def add_pdb_code(code, mmol=None):
     return
 
 
-def add_pdb_code_2(code, mmol=None, holding_pickle=holding_unknowns):
+def add_pdb_code_2(code, mmol=None, holding_pickle=holding_unknowns, mode='production'):
     # If pdb is already in database, exit before doing anything.
     with session_scope() as session:
         pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
         if pdb is not None:
             return
     structure = StructureHandler.from_code(code=code, mmol=mmol)
-    atlas_graphs = structure.get_atlas_graphs()
+    atlas_graphs = structure.get_atlas_graphs(mode=mode)
     for ag in atlas_graphs:
         if ag.name is None:
             # add to holding list
