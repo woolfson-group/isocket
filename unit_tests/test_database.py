@@ -68,7 +68,7 @@ class AddPdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code)
+        add_pdb_code_2(code=self.code, holding_pickle=holding_unknowns)
 
     def test_pdb_code_exists(self):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
@@ -90,7 +90,7 @@ class AddPdbCodeTestCase(BaseTestCase):
 
     def test_10gs(self):
         code = '10gs'
-        add_pdb_code_2(code=code)
+        add_pdb_code_2(code=code, holding_pickle=holding_unknowns)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
 
@@ -102,7 +102,7 @@ class RemovePdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code_2(code=self.code)
+        add_pdb_code_2(code=self.code, holding_pickle=holding_unknowns)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):
