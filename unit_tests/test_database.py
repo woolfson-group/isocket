@@ -10,7 +10,8 @@ from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket_app.graph_theory import AtlasHandler
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
-shelf_mode = 'testing'
+_mode = 'testing'
+
 
 class BaseTestCase(TestCase):
 
@@ -30,7 +31,7 @@ class AtlasDBTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.graph_list = AtlasHandler(shelf_mode=shelf_mode).atlas_graphs
+        self.graph_list = AtlasHandler().atlas_graphs
 
     def test_first_element_of_graph_list(self):
         self.assertTrue(self.graph_list[0].name == 'G0')
@@ -64,9 +65,9 @@ class AddPdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas(graph_list=AtlasHandler(shelf_mode=shelf_mode).atlas_graphs)
+        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code(code=self.code)
+        add_pdb_code(code=self.code, mode=_mode)
 
     def test_pdb_code_exists(self):
         q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
@@ -88,7 +89,7 @@ class AddPdbCodeTestCase(BaseTestCase):
 
     def test_10gs(self):
         code = '10gs'
-        add_pdb_code(code=code, shelf_mode=shelf_mode)
+        add_pdb_code(code=code, mode=_mode)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
 
@@ -98,9 +99,9 @@ class RemovePdbCodeTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
-        populate_atlas(graph_list=AtlasHandler(shelf_mode=shelf_mode).atlas_graphs)
+        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code(code=self.code, shelf_mode=shelf_mode)
+        add_pdb_code(code=self.code, mode=_mode)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):

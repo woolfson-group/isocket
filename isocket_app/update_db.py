@@ -1,5 +1,5 @@
 import os
-import shelve
+import pickle
 import datetime
 import logging
 import signal
@@ -7,11 +7,11 @@ import signal
 from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb, \
     make_code_obsolete
 from isocket_settings import global_settings
-from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid
+from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid, process_holding_pickle
 
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
-problem_code_shelf = os.path.join(global_settings['package_path'], 'isocket_app', 'problem_codes')
+problem_codes = os.path.join(global_settings['package_path'], 'isocket_app', 'problem_codes.p')
 
 
 class TimeoutException(Exception):   # Custom exception class
@@ -64,48 +64,55 @@ def set_up_logger():
     return logger
 
 
-
 class UpdateSet:
-    def __init__(self, add_codes=None, remove_codes=None):
+    def __init__(self, add_codes=None, remove_codes=None, mode='production'):
         assert(datasets_are_valid())
         self.logger = set_up_logger()
         self.add_codes = add_codes
         self.remove_codes = remove_codes
+        self.mode = mode
+        self.errors = []
 
     def run_update(self, timeout=120):
         if self.add_codes is not None:
             for code in self.add_codes:
-                UpdateCode(code=code, logger=self.logger).add(timeout=timeout)
-            if not datasets_are_valid():
-                for code in self.add_codes:
-                    UpdateCode(code=code, logger=self.logger).remove()
+                try:
+                    UpdateCode(code=code, logger=self.logger).add(timeout=timeout, mode=self.mode)
+                except Exception as e:
+                    self.errors.append((code, e))
         if self.remove_codes is not None:
             for code in self.remove_codes:
                 UpdateCode(code=code, logger=self.logger).remove()
+        self.clear_up_and_assert()
         return
+
+    def clear_up_and_assert(self, error_report=problem_codes):
+        process_holding_pickle(mode=self.mode)
+        try:
+            errors = pickle.load(open(error_report, 'rb'))
+        except (FileNotFoundError, EOFError):
+            errors = []
+        errors += self.errors
+        pickle.dump(errors, open(error_report, 'wb'))
+        # assertions to be added!
 
 
 class UpdateCode:
-    def __init__(self, code, logger=None, log_shelf=problem_code_shelf):
+    def __init__(self, code, logger=None, problem_code_pickle=problem_codes):
         self.code = code
         self.logger = logger
-        self.log_shelf = log_shelf
 
-    def add(self, timeout=None):
+    def add(self, timeout=None, mode='production'):
         try:
             if timeout is not None:
                 signal.alarm(timeout)
-            add_pdb_code(code=self.code)
+            add_pdb_code(code=self.code, mode=mode)
             if self.logger is not None:
                 self.logger.info('Added code {0}'.format(self.code))
         except Exception as e:
             if self.logger is not None:
                 self.logger.debug('Error adding code {0}\n{1}'.format(self.code, e))
-            if self.log_shelf is not None:
-                with shelve.open(self.log_shelf) as shelf:
-                    shelf[self.code] = e
-            else:
-                raise e
+            raise e
         else:
             if timeout is not None:
                 signal.alarm(0)

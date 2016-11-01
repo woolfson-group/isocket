@@ -1,12 +1,13 @@
 import itertools
 import networkx
+import numpy
 
 from isocket_settings import global_settings
 from isambard_dev.add_ons.filesystem import FileSystem
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
-from isocket_app.graph_theory import graph_to_plain_graph
+from isocket_app.graph_theory import graph_to_plain_graph, GraphHandler
 
 data_dir = global_settings['structural_database']['path']
 
@@ -57,10 +58,10 @@ class StructureHandler:
             knob_group = KnobGroup.from_helices(self.assembly[state_selection], cutoff=cutoff)
         return knob_group
 
-    def get_knob_graphs(self):
+    def get_knob_graphs(self, min_scut=7.0, max_scut=10.0, scut_increment=0.5):
         kg = self.get_knob_group(cutoff=10.0)
         if kg is not None:
-            scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+            scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
             kcuts = list(range(4))
             g = kg.graph
             knob_graphs = []
@@ -81,3 +82,15 @@ class StructureHandler:
         else:
             knob_graphs = []
         return knob_graphs
+
+    def get_atlas_graphs(self, mode='production'):
+        knob_graphs = self.get_knob_graphs()
+        atlas_graphs = []
+        for g in knob_graphs:
+            gh = GraphHandler(g, mode=mode)
+            d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
+                     mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,
+                     nodes=g.number_of_nodes(), edges=g.number_of_edges())
+            gh.g.graph.update(d)
+            atlas_graphs.append(gh.g)
+        return atlas_graphs
