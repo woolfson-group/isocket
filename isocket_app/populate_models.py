@@ -110,7 +110,10 @@ def process_holding_pickle(mode='production'):
         holding_pickle_list = pickle.load(open(holding_pickle, 'rb'))
     except EOFError:
         holding_pickle_list = []
-    next_number_to_add = max([int(x.name[1:]) for x in unknown_pickle_list]) + 1
+    if len(unknown_pickle_list) > 0:
+        next_number_to_add = max([int(x.name[1:]) for x in unknown_pickle_list]) + 1
+    else:
+        next_number_to_add = 0
     to_add_to_atlas = []
     for i, g in enumerate(holding_pickle_list):
         n = isomorphism_checker(g, graph_list=holding_pickle_list[:i])
@@ -125,8 +128,8 @@ def process_holding_pickle(mode='production'):
     populate_atlas(graph_list=to_add_to_atlas)
     for g in holding_pickle_list:
         add_graph_to_db(**g.graph)
-        holding_pickle_list.remove(g)
-    pickle.dump(holding_pickle_list, open(holding_pickle, 'wb'))
+    # clear holding list
+    pickle.dump([], open(holding_pickle, 'wb'))
     return
 
 
