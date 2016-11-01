@@ -104,14 +104,16 @@ def add_g_to_holding_pickle(g, mode='production'):
 def process_holding_pickle(mode='production'):
     holding_pickle = global_settings["holding_unknowns"][mode]
     unknown_pickle = global_settings["unknown_graphs"][mode]
-    try:
-        unknown_pickle_list = pickle.load(open(unknown_pickle, 'rb'))
-    except EOFError:
-        unknown_pickle_list = []
-    try:
-        holding_pickle_list = pickle.load(open(holding_pickle, 'rb'))
-    except EOFError:
-        holding_pickle_list = []
+    with open(unknown_pickle, 'rb') as foo:
+        try:
+            unknown_pickle_list = pickle.load(foo)
+        except EOFError:
+            unknown_pickle_list = []
+    with open(holding_pickle, 'rb') as foo:
+        try:
+            holding_pickle_list = pickle.load(foo)
+        except EOFError:
+            holding_pickle_list = []
     if len(unknown_pickle_list) > 0:
         next_number_to_add = max([int(x.name[1:]) for x in unknown_pickle_list]) + 1
     else:
@@ -126,12 +128,14 @@ def process_holding_pickle(mode='production'):
         else:
             g.name = n
     unknown_pickle_list += to_add_to_atlas
-    pickle.dump(unknown_pickle_list, open(unknown_pickle, 'wb'))
+    with open(unknown_pickle, 'wb') as foo:
+        pickle.dump(unknown_pickle_list, foo)
     populate_atlas(graph_list=to_add_to_atlas)
     for g in holding_pickle_list:
         add_graph_to_db(**g.graph)
     # clear holding list
-    pickle.dump([], open(holding_pickle, 'wb'))
+    with open(holding_pickle, 'wb') as foo:
+        pickle.dump([], foo)
     return
 
 
