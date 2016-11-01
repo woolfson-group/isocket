@@ -166,7 +166,8 @@ def datasets_are_valid(mode='production'):
     with session_scope() as session:
         adbs = set([x[0] for x in session.query(AtlasDB.name).filter(AtlasDB.name.startswith('U')).all()])
     unknown_pickle = global_settings["unknown_graphs"][mode]
-    unks = {x.name for x in pickle.load(open(unknown_pickle, 'rb'))}
+    with open(unknown_pickle, 'rb') as foo:
+        unks = {x.name for x in pickle.load(foo)}
     if len(adbs - unks) == 0:
         valid = True
     # run checks and return True if they pass.
