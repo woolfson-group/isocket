@@ -90,12 +90,14 @@ def add_pdb_code(code, mmol=None, mode='production'):
 
 def add_g_to_holding_pickle(g, mode='production'):
     holding_pickle = global_settings["holding_unknowns"][mode]
-    try:
-        hp = pickle.load(open(holding_pickle, 'rb'))
-    except EOFError:
-        hp = []
+    with open(holding_pickle, 'rb') as foo:
+        try:
+            hp = pickle.load(foo)
+        except EOFError:
+            hp = []
     hp.append(g)
-    pickle.dump(hp, open(holding_pickle, 'wb'))
+    with open(holding_pickle, 'wb') as foo:
+        pickle.dump(hp, foo)
     return
 
 
