@@ -97,7 +97,7 @@ class UpdateSet:
 
 
 class UpdateCode:
-    def __init__(self, code, logger=None, problem_code_pickle=problem_codes):
+    def __init__(self, code, logger=None):
         self.code = code
         self.logger = logger
 
