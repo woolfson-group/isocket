@@ -4,8 +4,7 @@ import datetime
 import logging
 import signal
 
-from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb, \
-    make_code_obsolete
+from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb
 from isocket_settings import global_settings
 from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid, process_holding_pickle
 
@@ -44,8 +43,8 @@ class CodeList:
         return set(self.local_codes).intersection(set(obsolete_codes))
 
     def problem_codes(self):
-        with shelve.open(problem_code_shelf) as shelf:
-            codes = set(shelf.keys())
+        with open(problem_codes, 'rb') as foo:
+            codes = {x[0] for x in pickle.load(foo)}
         return codes
 
 
@@ -98,7 +97,7 @@ class UpdateSet:
 
 
 class UpdateCode:
-    def __init__(self, code, logger=None, problem_code_pickle=problem_codes):
+    def __init__(self, code, logger=None):
         self.code = code
         self.logger = logger
 

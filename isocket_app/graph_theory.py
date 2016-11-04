@@ -21,7 +21,8 @@ class AtlasHandler:
     def unknown_graphs(self):
         unknown_pickle = global_settings["unknown_graphs"][self.mode]
         try:
-            graph_list = pickle.load(open(unknown_pickle, 'rb'))
+            with open(unknown_pickle, 'rb') as foo:
+                graph_list = pickle.load(foo)
         except (FileNotFoundError, EOFError):
             graph_list = []
         return graph_list
