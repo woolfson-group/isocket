@@ -1,11 +1,11 @@
 from flask import Blueprint
 
-structure_bp = Blueprint(
-    'structure_bp',
+home_bp = Blueprint(
+    'home_bp',
     __name__,
     template_folder='templates',
     static_folder='static',
     static_url_path='/{}'.format(__name__)
 )
 
-from isocket_app.structure import views
+from isocket.home import views

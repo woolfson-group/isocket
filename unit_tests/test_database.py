@@ -2,12 +2,12 @@ import os
 from flask_testing import TestCase
 
 from isocket_settings import global_settings
-from isocket_app.factory import create_app
-from isocket_app.extensions import db
-from isocket_app.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
+from isocket.factory import create_app
+from isocket.extensions import db
+from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
     remove_pdb_code
-from isocket_app.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
-from isocket_app.graph_theory import AtlasHandler
+from isocket.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
+from isocket.graph_theory import AtlasHandler
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 _mode = 'testing'

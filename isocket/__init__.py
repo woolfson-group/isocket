@@ -8,8 +8,8 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
-from isocket_app.home import views
-from isocket_app.atlas import views
-from isocket_app.structure import views
-from isocket_app import models, populate_models
+from isocket.home import views
+from isocket.atlas import views
+from isocket.structure import views
+from isocket import models, populate_models
 from .util import assets

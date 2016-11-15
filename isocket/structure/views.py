@@ -6,9 +6,9 @@ from flask_uploads import UploadSet
 from networkx.readwrite import json_graph
 from werkzeug.utils import secure_filename
 
-from isocket_app.structure_handler import StructureHandler
-from isocket_app.structure.forms import SocketForm
-from isocket_app.structure import structure_bp
+from isocket.structure_handler import StructureHandler
+from isocket.structure.forms import SocketForm
+from isocket.structure import structure_bp
 
 
 @structure_bp.route('/upload', methods=['GET', 'POST'])

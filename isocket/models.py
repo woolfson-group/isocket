@@ -1,7 +1,7 @@
 from decimal import Decimal as D
 import sqlalchemy.types as types
 
-from isocket_app.extensions import db
+from isocket.extensions import db
 
 
 # For converting numeric types for sqlite. Code taken from:
