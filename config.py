@@ -10,7 +10,7 @@ class BaseConfig(object):
     # sqlite :memory: identifier is the default if no filepath is present
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     # Uploads folders for flask-uploads
-    STATIC_FOLDER = os.path.join(basedir, 'isocket_app', 'static')
+    STATIC_FOLDER = os.path.join(basedir, 'isocket', 'static')
     UPLOADS_DEFAULT_DEST = os.path.join(STATIC_FOLDER, 'uploads')
     UPLOADED_STRUCTURES_DEST = os.path.join(UPLOADS_DEFAULT_DEST, 'structures')
     TEMP_FOLDER = os.path.join(basedir, 'tmp')
@@ -21,7 +21,7 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/jackheal/Projects/isocket/isocket_app/atlas.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/jackheal/Projects/isocket/isocket/atlas.db'
 
 
 class TestingConfig(BaseConfig):
@@ -31,9 +31,9 @@ class TestingConfig(BaseConfig):
 
 
 config = {
-    "development": "isocket.config.DevelopmentConfig",
-    "testing": "isocket.config.TestingConfig",
-    "default": "isocket.config.DevelopmentConfig"
+    "development": "config.DevelopmentConfig",
+    "testing": "config.TestingConfig",
+    "default": "config.DevelopmentConfig"
 }
 
 

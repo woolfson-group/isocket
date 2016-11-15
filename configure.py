@@ -147,11 +147,11 @@ def optional_install():
 def install_for_circleci(settings_path):
     cci_settings = {
         "unknown_graphs": {
-            "production": "/home/ubuntu/isocket/isocket_app/unknown_graphs",
+            "production": "/home/ubuntu/isocket/isocket/unknown_graphs",
             "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_test_shelf"
         },
         "holding_unknowns": {
-            "production": "/home/ubuntu/isocket/isocket_app/holding_unknowns.p",
+            "production": "/home/ubuntu/isocket/isocket/holding_unknowns.p",
             "testing": "/home/ubuntu/isocket/unit_tests/holding_unknowns_tests.p"
         },
         "structural_database": {"path": ""}

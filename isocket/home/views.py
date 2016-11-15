@@ -1,5 +1,5 @@
 from flask import render_template
-from isocket_app.home import home_bp
+from isocket.home import home_bp
 
 
 @home_bp.route('/')

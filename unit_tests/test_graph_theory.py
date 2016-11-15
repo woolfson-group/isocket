@@ -5,7 +5,7 @@ import numpy
 from networkx.generators import cycle_graph, complete_graph
 
 from isocket_settings import global_settings
-from isocket_app.graph_theory import AtlasHandler, GraphHandler, isomorphism_checker, sorted_connected_components
+from isocket.graph_theory import AtlasHandler, GraphHandler, isomorphism_checker, sorted_connected_components
 
 mode = 'testing'
 unknown_graphs = global_settings["unknown_graphs"][mode]

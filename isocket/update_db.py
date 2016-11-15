@@ -6,11 +6,11 @@ import signal
 
 from isambard_dev.add_ons.filesystem import obsolete_codes_from_pdb, local_pdb_codes, current_codes_from_pdb
 from isocket_settings import global_settings
-from isocket_app.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid, process_holding_pickle
+from isocket.populate_models import add_pdb_code, remove_pdb_code, datasets_are_valid, process_holding_pickle
 
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
-problem_codes = os.path.join(global_settings['package_path'], 'isocket_app', 'problem_codes.p')
+problem_codes = os.path.join(global_settings['package_path'], 'isocket', 'problem_codes.p')
 
 
 class TimeoutException(Exception):   # Custom exception class

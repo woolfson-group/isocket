@@ -4,9 +4,9 @@ from contextlib import contextmanager
 import pickle
 
 from isocket_settings import global_settings
-from isocket_app.graph_theory import GraphHandler, isomorphism_checker
-from isocket_app.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
-from isocket_app.structure_handler import StructureHandler
+from isocket.graph_theory import GraphHandler, isomorphism_checker
+from isocket.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket.structure_handler import StructureHandler
 
 
 @contextmanager
