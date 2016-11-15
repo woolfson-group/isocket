@@ -36,8 +36,12 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
 
 
 # Get graphs and format plot accordingly
-gag = graph_atlas_g()
+from isocket.graph_theory import AtlasHandler
+gag = AtlasHandler().get_graph_list(cyclics=True)
+#gag = graph_atlas_g()
+max_nodes = 8
 gag = [g for g in gag if g.number_of_nodes() >= 2]
+gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
 gag = [g for g in gag if nx.connected.is_connected(g) and max(g.degree().values()) <=4]
 nrows = int(numpy.floor(numpy.sqrt(len(gag))))
 ncols = int(numpy.ceil(len(gag)/float(nrows)))
@@ -67,7 +71,6 @@ p.outline_line_color = "Black"
 
 #
 #max_nodes = max([g.number_of_nodes() for g in gag])
-max_nodes = 7
 circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
 all_circles = []
 all_xs = []
@@ -205,7 +208,6 @@ def input_change(attrname, old, new):
         """
     update_data()
 
-redundancy.on_change('value', input_change)
 
 for w in [scut, kcut]:
     w.on_change('value', input_change)
