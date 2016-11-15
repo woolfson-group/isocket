@@ -3,10 +3,10 @@ venv/
 .idea/
 __pycache__/
 instance/
-isocket_app/static/.webassets-cache/
-isocket_app/static/js/lib
-isocket_app/static/css/lib
-isocket_app/static/uploads
+isocket/static/.webassets-cache/
+isocket/static/js/lib
+isocket/static/css/lib
+isocket/static/uploads
 unit_tests/tests.db
 .gitignore
 settings.json
