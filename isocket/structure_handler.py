@@ -59,7 +59,7 @@ class StructureHandler:
         return knob_group
 
     def get_knob_graphs(self, min_scut=7.0, max_scut=10.0, scut_increment=0.5):
-        kg = self.get_knob_group(cutoff=10.0)
+        kg = self.get_knob_group(cutoff=max_scut)
         if kg is not None:
             scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
             kcuts = list(range(4))
