@@ -83,8 +83,9 @@ class StructureHandler:
             knob_graphs = []
         return knob_graphs
 
-    def get_atlas_graphs(self, mode='production'):
-        knob_graphs = self.get_knob_graphs()
+    def get_atlas_graphs(self, mode='production', knob_graphs=None):
+        if knob_graphs is None:
+            knob_graphs = self.get_knob_graphs()
         atlas_graphs = []
         for g in knob_graphs:
             gh = GraphHandler(g, mode=mode)
