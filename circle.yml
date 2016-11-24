@@ -11,11 +11,6 @@ dependencies:
     - git clone https://github.com/woolfson-group/isambard_dev.git
     - mv isambard_dev /home/ubuntu/
     - git clone git@github.com:woolfson-group/dependencies_for_isambard.git
-    # Scwrl
-    - chmod +x /home/ubuntu/isambard_dev/dependencies_for_isambard/scwrl/install_Scwrl4_Linux
-    - /home/ubuntu/isambard_dev/dependencies_for_isambard/scwrl/install_Scwrl4_Linux < /home/ubuntu/isambard_dev/dependencies_for_isambard/scwrl/scwrl_install.txt
-    # Reduce
-    - chmod +x /home/ubuntu/isambard_dev/dependencies_for_isambard/reduce/reduce.3.23.130521.linuxi386
     # DSSP
     - chmod +x /home/ubuntu/isambard_dev/dependencies_for_isambard/dssp/dssp-2.0.4
     - python /home/ubuntu/isambard_dev/isambard_dev/configure.py -C
