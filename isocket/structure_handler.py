@@ -88,6 +88,7 @@ class StructureHandler:
             knob_graphs = self.get_knob_graphs()
         atlas_graphs = []
         for g in knob_graphs:
+            # instantiated as GraphHandler object so it has the .name attribute.
             gh = GraphHandler(g, mode=mode)
             d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
                      mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,
