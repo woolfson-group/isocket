@@ -59,7 +59,7 @@ class StructureHandler:
         return knob_group
 
     def get_knob_graphs(self, min_scut=7.0, max_scut=10.0, scut_increment=0.5):
-        kg = self.get_knob_group(cutoff=10.0)
+        kg = self.get_knob_group(cutoff=max_scut)
         if kg is not None:
             scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
             kcuts = list(range(4))
@@ -83,10 +83,12 @@ class StructureHandler:
             knob_graphs = []
         return knob_graphs
 
-    def get_atlas_graphs(self, mode='production'):
-        knob_graphs = self.get_knob_graphs()
+    def get_atlas_graphs(self, mode='production', knob_graphs=None):
+        if knob_graphs is None:
+            knob_graphs = self.get_knob_graphs()
         atlas_graphs = []
         for g in knob_graphs:
+            # instantiated as GraphHandler object so it has the .name attribute.
             gh = GraphHandler(g, mode=mode)
             d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
                      mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,

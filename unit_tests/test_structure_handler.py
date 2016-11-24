@@ -14,12 +14,6 @@ class StructureHandlerTestCase(unittest.TestCase):
         self.test_files = [os.path.join(install_folder, 'unit_tests', 'testing_files', '{}.pdb'.format(x))
                            for x in self.test_codes]
 
-    def test_from_code_classmethod(self):
-        for code in self.test_codes:
-            sh = StructureHandler.from_code(code=code)
-            self.assertTrue(sh.is_preferred)
-            self.assertEqual(code, sh.code)
-
     def test_from_file_classmethod(self):
         for file in self.test_files:
             sh = StructureHandler.from_file(filename=file, path=True)
