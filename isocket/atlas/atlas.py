@@ -92,9 +92,10 @@ circle_xys = numpy.concatenate(all_circles)
 p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
 p.multi_line(xs=all_xs, ys=all_ys)
 
-filename = 'data/atlas_cc_data.h5'
+#filename = 'data/atlas_cc_data.h5'
+filename = 'data/2016-11-23_cc_plus_graph_names.h5'
 df = pandas.read_hdf(filename, 'graph_names')
-cddf = pandas.read_hdf(filename, 'cdhit')
+#cddf = pandas.read_hdf(filename, 'cdhit')
 
 scut = Slider(
     title="scut", name='scut',
@@ -141,10 +142,12 @@ def update_data():
     r = redundancy.value
 
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
+    '''
     if r != "No filter":
         rstring = "c{0}".format(r)
         pdbs = cddf[cddf[rstring] == True].pdb.values
         filtered_df = filtered_df[filtered_df['pdb'].isin(pdbs)]
+    '''
     gb = filtered_df.groupby(df['gname'])
     rgs = gb.count().gname
 
@@ -157,14 +160,14 @@ def update_data():
     gnames = []
     counts = []
     cm = [x for x in reversed(Reds9)]
-    for i, g in numpy.ndenumerate(sq_gag):
+    for j, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
                 counts.append(rgs[g.name])
                 rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
                 rel_freqs.append(rel_freq)
-                r_xs.append(i[0])
-                r_ys.append(i[1])
+                r_xs.append(j[0])
+                r_ys.append(j[1])
                 gnames.append(g.name)
                 color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
                 r_colors.append(cm[color_index])
