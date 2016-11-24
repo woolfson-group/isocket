@@ -42,14 +42,14 @@ def complete(text, state):
 def install_for_circleci(settings_path):
     cci_settings = {
         "unknown_graphs": {
-            "production": "/home/ubuntu/isocket/isocket/unknown_graphs",
-            "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_test_shelf"
+            "production": "/home/ubuntu/isocket/isocket/unknown_graphs.p",
+            "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_tests.p"
         },
         "holding_unknowns": {
             "production": "/home/ubuntu/isocket/isocket/holding_unknowns.p",
             "testing": "/home/ubuntu/isocket/unit_tests/holding_unknowns_tests.p"
         },
-        "structural_database": {"path": ""}
+        "structural_database": {"path": "."}
         }
     with open(str(settings_path), 'w') as outf:
         outf.write(json.dumps(cci_settings, sort_keys=True, indent=4, separators=(',', ':')))
