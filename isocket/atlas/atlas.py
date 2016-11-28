@@ -36,8 +36,12 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
 
 
 # Get graphs and format plot accordingly
-gag = graph_atlas_g()
+from isocket.graph_theory import AtlasHandler
+gag = AtlasHandler().get_graph_list(cyclics=True)
+#gag = graph_atlas_g()
+max_nodes = 8
 gag = [g for g in gag if g.number_of_nodes() >= 2]
+gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
 gag = [g for g in gag if nx.connected.is_connected(g) and max(g.degree().values()) <=4]
 nrows = int(numpy.floor(numpy.sqrt(len(gag))))
 ncols = int(numpy.ceil(len(gag)/float(nrows)))
@@ -51,8 +55,8 @@ sq_gag = numpy.reshape(sq_gag, (ncols, nrows))
 tools = "pan,wheel_zoom,box_zoom,reset,resize"
 # Define the figure.
 p = Figure(
-    plot_height= 1000,
-    plot_width= 1000,
+    plot_height=1000,
+    plot_width=1000,
     webgl=True,
     x_range=(-1, sq_gag.shape[0]),
     y_range=(sq_gag.shape[1], -1),
@@ -66,8 +70,7 @@ p.outline_line_width = 5
 p.outline_line_color = "Black"
 
 #
-max_nodes = max([g.number_of_nodes() for g in gag])
-max_nodes = 7
+#max_nodes = max([g.number_of_nodes() for g in gag])
 circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
 all_circles = []
 all_xs = []
@@ -92,10 +95,8 @@ circle_xys = numpy.concatenate(all_circles)
 p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
 p.multi_line(xs=all_xs, ys=all_ys)
 
-#filename = 'data/atlas_cc_data.h5'
-filename = 'data/2016-11-23_cc_plus_graph_names.h5'
+filename = 'data/2016-11-15_graph_names.h5'
 df = pandas.read_hdf(filename, 'graph_names')
-#cddf = pandas.read_hdf(filename, 'cdhit')
 
 scut = Slider(
     title="scut", name='scut',
@@ -106,11 +107,10 @@ kcut = Slider(
     title="kcut", name='kcut',
     value=0, start=0, end=3, step=1)
 
-redundancy = Select(title="Redundancy filter:", value="No filter", options=["No filter", "90", "80", "70", "60"])
 
 inputs = WidgetBox(
     children=[
-        scut, kcut, redundancy
+        scut, kcut
     ]
 )
 hbox = HBox(children=[inputs, p])
@@ -135,14 +135,12 @@ def update_data():
         sliders. This is stored as two numpy arrays in a dict into the app's
         data source property.
         """
-
     # Get the current slider values
     s = scut.value
     k = kcut.value
-    r = redundancy.value
-
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
     '''
+    r = redundancy.value
     if r != "No filter":
         rstring = "c{0}".format(r)
         pdbs = cddf[cddf[rstring] == True].pdb.values
@@ -150,7 +148,6 @@ def update_data():
     '''
     gb = filtered_df.groupby(df['gname'])
     rgs = gb.count().gname
-
     # From the graph counts, get the lists of rectangle positions and frequencies for the hover labels.
     total_graphs = sum(rgs.values)
     rel_freqs = []
@@ -160,14 +157,14 @@ def update_data():
     gnames = []
     counts = []
     cm = [x for x in reversed(Reds9)]
-    for j, g in numpy.ndenumerate(sq_gag):
+    for i, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
                 counts.append(rgs[g.name])
                 rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
                 rel_freqs.append(rel_freq)
-                r_xs.append(j[0])
-                r_ys.append(j[1])
+                r_xs.append(i[0])
+                r_ys.append(i[1])
                 gnames.append(g.name)
                 color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
                 r_colors.append(cm[color_index])
@@ -198,8 +195,7 @@ hover.tooltips = OrderedDict([
 ])
 p.rect(x='r_xs', y='r_ys', width=1, height=1,
        width_units="data", height_units="data",
-      color='r_colors', alpha=0.5,
-      source=source)
+       color='r_colors', alpha=0.5, source=source)
 
 
 def input_change(attrname, old, new):
@@ -212,7 +208,6 @@ def input_change(attrname, old, new):
         """
     update_data()
 
-redundancy.on_change('value', input_change)
 
 for w in [scut, kcut]:
     w.on_change('value', input_change)
