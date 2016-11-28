@@ -10,7 +10,7 @@ from isocket.populate_models import add_pdb_code, remove_pdb_code, datasets_are_
 
 structural_database = global_settings["structural_database"]["path"]
 log_folder = os.path.join(structural_database, 'isocket_logs')
-problem_codes = os.path.join(global_settings['package_path'], 'isocket', 'problem_codes.p')
+problem_codes = os.path.join(global_settings['package_path'], 'isocket', 'data', 'problem_codes.p')
 
 
 class TimeoutException(Exception):   # Custom exception class
