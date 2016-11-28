@@ -20,7 +20,8 @@ class AtlasHandlerTestCase(unittest.TestCase):
         self.g2_name = 'jack_test_graph'
 
     def clear_unknown_graphs(self):
-        pickle.dump([], open(unknown_graphs, 'wb'))
+        with open(unknown_graphs, 'wb') as foo:
+            pickle.dump([], foo)
 
     def tearDown(self):
         self.clear_unknown_graphs()
@@ -43,7 +44,8 @@ class GraphHandlerTestCase(unittest.TestCase):
         self.g2_name = 'jack_test_graph'
 
     def clear_unknown_graphs(self):
-        pickle.dump([], open(unknown_graphs, 'wb'))
+        with open(unknown_graphs, 'wb') as foo:
+            pickle.dump([], foo)
 
     def tearDown(self):
         self.clear_unknown_graphs()
