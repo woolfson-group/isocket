@@ -11,7 +11,7 @@ from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
 
 from isocket_settings import global_settings
-filename = os.path.join(global_settings['package_path'], 'isocket', 'data', '2016-11-15_graph_names.h5')
+filename = os.path.join(global_settings['package_path'], 'isocket', 'data', '2016-11-29_graph_names.h5')
 
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
