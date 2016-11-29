@@ -1,6 +1,7 @@
 import pandas
 import numpy
 import networkx as nx
+import os
 from networkx.generators.atlas import graph_atlas_g
 from collections import OrderedDict
 from bokeh.plotting import Figure, curdoc
@@ -8,6 +9,9 @@ from bokeh.palettes import Reds9
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
+
+from isocket_settings import global_settings
+filename = os.path.join(global_settings['package_path'], 'isocket', 'data', '2016-11-15_graph_names.h5')
 
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
@@ -95,7 +99,7 @@ circle_xys = numpy.concatenate(all_circles)
 p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
 p.multi_line(xs=all_xs, ys=all_ys)
 
-filename = 'data/2016-11-15_graph_names.h5'
+#filename = 'data/2016-11-15_graph_names.h5'
 df = pandas.read_hdf(filename, 'graph_names')
 
 scut = Slider(
