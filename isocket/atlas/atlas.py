@@ -2,6 +2,7 @@ import pandas
 import numpy
 import networkx as nx
 import os
+import pickle
 from collections import OrderedDict
 from bokeh.plotting import Figure, curdoc
 from bokeh.palettes import Reds9
@@ -12,7 +13,10 @@ from bokeh.models import Slider, HBox, Select
 from isocket_settings import global_settings
 from isocket.graph_theory import AtlasHandler
 
-filename = os.path.join(global_settings['package_path'], 'isocket', 'data', '2016-11-29_graph_names.h5')
+data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
+filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
+with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
+    cc_plus_codes = pickle.load(foo)
 
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
@@ -102,6 +106,7 @@ def get_figure():
 p = get_figure()
 
 df = pandas.read_hdf(filename, 'graph_names')
+df = df[df.pdb.isin(cc_plus_codes)]
 
 scut = Slider(
     title="scut", name='scut',
@@ -191,13 +196,15 @@ def update_data():
 update_data()
 
 # Configure hover tool and add the rectangles with the hover tool set up.
-p.add_tools(HoverTool())
-hover = p.select(dict(type=HoverTool))
-hover.tooltips = OrderedDict([
+#p.add_tools(HoverTool())
+#hover = p.select(dict(type=HoverTool))
+hover = HoverTool(
+    tooltips=OrderedDict([
     ('Graph Name', "@gnames"),
     ('Count', '@counts'),
     ('Percentage', '@percents')
-])
+    ]))
+p.add_tools(hover)
 p.rect(x='r_xs', y='r_ys', width=1, height=1,
        width_units="data", height_units="data",
        color='r_colors', alpha=0.5, source=source)
