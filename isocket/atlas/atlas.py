@@ -196,8 +196,6 @@ def update_data():
 update_data()
 
 # Configure hover tool and add the rectangles with the hover tool set up.
-#p.add_tools(HoverTool())
-#hover = p.select(dict(type=HoverTool))
 hover = HoverTool(
     tooltips=OrderedDict([
     ('Graph Name', "@gnames"),
@@ -225,5 +223,4 @@ for w in [scut, kcut]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
-#session = push_session(curdoc())
-#script = autoload_server(p, session_id=session.id)
+
