@@ -2,7 +2,6 @@ import pandas
 import numpy
 import networkx as nx
 import os
-from networkx.generators.atlas import graph_atlas_g
 from collections import OrderedDict
 from bokeh.plotting import Figure, curdoc
 from bokeh.palettes import Reds9
@@ -60,49 +59,47 @@ def get_graph_array(atlas=True, cyclics=True, unknowns=False, paths=False, max_n
 max_nodes = 8
 sq_gag = get_graph_array(max_nodes=max_nodes)
 
-tools = "pan,wheel_zoom,box_zoom,reset,resize"
-# Define the figure.
-p = Figure(
-    plot_height=1000,
-    plot_width=1000,
-    webgl=True,
-    x_range=(-1, sq_gag.shape[0]),
-    y_range=(sq_gag.shape[1], -1),
-    tools=tools,
-)
-p.grid.grid_line_color = None
-p.axis.visible = False
-p.title.text = "AtlasCC: An Atlas of Coiled Coils"
-p.toolbar.logo = None
-p.outline_line_width = 5
-p.outline_line_color = "Black"
+def get_figure():
+    tools = "pan,wheel_zoom,box_zoom,reset,resize"
+    # Define the figure.
+    p = Figure(
+        plot_height=1000,
+        plot_width=1000,
+        webgl=True,
+        x_range=(-1, sq_gag.shape[0]),
+        y_range=(sq_gag.shape[1], -1),
+        tools=tools,
+    )
+    p.grid.grid_line_color = None
+    p.axis.visible = False
+    p.title.text = "AtlasCC: An Atlas of Coiled Coils"
+    p.toolbar.logo = None
+    p.outline_line_width = 5
+    p.outline_line_color = "Black"
+    circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
+    all_circles = []
+    all_xs = []
+    all_ys = []
+    for i, g in numpy.ndenumerate(sq_gag):
+        if g:
+            xs = []
+            ys = []
+            c = circles[g.number_of_nodes()] + numpy.array(i)
+            all_circles.append(c)
+            try:
+                for e1, e2 in g.edges_iter():
+                    xs.append([c[e1][0], c[e2][0]])
+                    ys.append([c[e1][1], c[e2][1]])
+            except IndexError:
+                print(g.name)
+            all_xs += xs
+            all_ys += ys
+    circle_xys = numpy.concatenate(all_circles)
+    p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
+    p.multi_line(xs=all_xs, ys=all_ys)
+    return p
 
-#
-#max_nodes = max([g.number_of_nodes() for g in gag])
-circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
-all_circles = []
-all_xs = []
-all_ys = []
-all_gnames = []
-for i, g in numpy.ndenumerate(sq_gag):
-    if g:
-        all_gnames.append(g.name)
-        xs = []
-        ys = []
-        c = circles[g.number_of_nodes()] + numpy.array(i)
-        all_circles.append(c)
-        try:
-            for e1, e2 in g.edges_iter():
-                xs.append([c[e1][0], c[e2][0]])
-                ys.append([c[e1][1], c[e2][1]])
-        except IndexError:
-            print(g.name)
-        all_xs += xs
-        all_ys += ys
-circle_xys = numpy.concatenate(all_circles)
-p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
-p.multi_line(xs=all_xs, ys=all_ys)
-
+p = get_figure()
 
 df = pandas.read_hdf(filename, 'graph_names')
 
