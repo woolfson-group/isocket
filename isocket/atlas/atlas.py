@@ -117,10 +117,13 @@ kcut = Slider(
     title="kcut", name='kcut',
     value=2, start=0, end=3, step=1)
 
+min_count = Slider(
+    title="Minimum count", name='min_count',
+    value=10, start=0, end=50, step=1)
 
 inputs = WidgetBox(
     children=[
-        scut, kcut
+        scut, kcut, min_count
     ]
 )
 hbox = HBox(children=[inputs, p])
@@ -148,6 +151,7 @@ def update_data():
     # Get the current slider values
     s = scut.value
     k = kcut.value
+    mc = min_count.value
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
     '''
     r = redundancy.value
@@ -170,14 +174,16 @@ def update_data():
     for i, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
-                counts.append(rgs[g.name])
-                rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
-                rel_freqs.append(rel_freq)
-                r_xs.append(i[0])
-                r_ys.append(i[1])
-                gnames.append(g.name)
-                color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
-                r_colors.append(cm[color_index])
+                count = rgs[g.name]
+                if count >= mc:
+                    counts.append(count)
+                    rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
+                    rel_freqs.append(rel_freq)
+                    r_xs.append(i[0])
+                    r_ys.append(i[1])
+                    gnames.append(g.name)
+                    color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
+                    r_colors.append(cm[color_index])
 
     percents = ['{0:.2f}'.format(x * 100) for x in rel_freqs]
 
@@ -219,7 +225,7 @@ def input_change(attrname, old, new):
     update_data()
 
 
-for w in [scut, kcut]:
+for w in [scut, kcut, min_count]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
