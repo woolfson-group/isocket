@@ -1,13 +1,22 @@
 import pandas
 import numpy
 import networkx as nx
-from networkx.generators.atlas import graph_atlas_g
+import os
+import pickle
 from collections import OrderedDict
 from bokeh.plotting import Figure, curdoc
 from bokeh.palettes import Reds9
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
+
+from isocket_settings import global_settings
+from isocket.graph_theory import AtlasHandler
+
+data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
+filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
+with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
+    cc_plus_codes = pickle.load(foo)
 
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
@@ -36,81 +45,85 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
 
 
 # Get graphs and format plot accordingly
-from isocket.graph_theory import AtlasHandler
-gag = AtlasHandler().get_graph_list(cyclics=True)
-#gag = graph_atlas_g()
+def get_graph_array(atlas=True, cyclics=True, unknowns=False, paths=False, max_nodes=8):
+    gag = AtlasHandler().get_graph_list(atlas=atlas, cyclics=cyclics,
+                                        unknowns=unknowns, paths=paths,
+                                        max_cyclics=max_nodes, max_paths=max_nodes)
+    gag = [g for g in gag if g.number_of_nodes() >= 2]
+    gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
+    gag = [g for g in gag if nx.connected.is_connected(g) and max(g.degree().values()) <= 4]
+    nrows = int(numpy.floor(numpy.sqrt(len(gag))))
+    ncols = int(numpy.ceil(len(gag)/float(nrows)))
+    size_diff = nrows*ncols - len(gag)
+    # Fill in square array with None
+    sq_gag = gag + [None]*size_diff
+    sq_gag = numpy.reshape(sq_gag, (ncols, nrows))
+    return sq_gag
+
 max_nodes = 8
-gag = [g for g in gag if g.number_of_nodes() >= 2]
-gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
-gag = [g for g in gag if nx.connected.is_connected(g) and max(g.degree().values()) <=4]
-nrows = int(numpy.floor(numpy.sqrt(len(gag))))
-ncols = int(numpy.ceil(len(gag)/float(nrows)))
-x_range = range(nrows)
-y_range = range(ncols)
-size_diff = nrows*ncols - len(gag)
-# Fill in square array with None
-sq_gag = gag + [None]*size_diff
-sq_gag = numpy.reshape(sq_gag, (ncols, nrows))
+sq_gag = get_graph_array(max_nodes=max_nodes)
 
-tools = "pan,wheel_zoom,box_zoom,reset,resize"
-# Define the figure.
-p = Figure(
-    plot_height=1000,
-    plot_width=1000,
-    webgl=True,
-    x_range=(-1, sq_gag.shape[0]),
-    y_range=(sq_gag.shape[1], -1),
-    tools=tools,
-)
-p.grid.grid_line_color = None
-p.axis.visible = False
-p.title.text = "AtlasCC: An Atlas of Coiled Coils"
-p.toolbar.logo = None
-p.outline_line_width = 5
-p.outline_line_color = "Black"
+def get_figure():
+    tools = "pan,wheel_zoom,box_zoom,reset,resize"
+    # Define the figure.
+    p = Figure(
+        plot_height=1000,
+        plot_width=1000,
+        webgl=True,
+        x_range=(-1, sq_gag.shape[0]),
+        y_range=(sq_gag.shape[1], -1),
+        tools=tools,
+    )
+    p.grid.grid_line_color = None
+    p.axis.visible = False
+    p.title.text = "AtlasCC: An Atlas of Coiled Coils"
+    p.toolbar.logo = None
+    p.outline_line_width = 5
+    p.outline_line_color = "Black"
+    circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
+    all_circles = []
+    all_xs = []
+    all_ys = []
+    for i, g in numpy.ndenumerate(sq_gag):
+        if g:
+            xs = []
+            ys = []
+            c = circles[g.number_of_nodes()] + numpy.array(i)
+            all_circles.append(c)
+            try:
+                for e1, e2 in g.edges_iter():
+                    xs.append([c[e1][0], c[e2][0]])
+                    ys.append([c[e1][1], c[e2][1]])
+            except IndexError:
+                print(g.name)
+            all_xs += xs
+            all_ys += ys
+    circle_xys = numpy.concatenate(all_circles)
+    p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
+    p.multi_line(xs=all_xs, ys=all_ys)
+    return p
 
-#
-#max_nodes = max([g.number_of_nodes() for g in gag])
-circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
-all_circles = []
-all_xs = []
-all_ys = []
-all_gnames = []
-for i, g in numpy.ndenumerate(sq_gag):
-    if g:
-        all_gnames.append(g.name)
-        xs = []
-        ys = []
-        c = circles[g.number_of_nodes()] + numpy.array(i)
-        all_circles.append(c)
-        try:
-            for e1, e2 in g.edges_iter():
-                xs.append([c[e1][0], c[e2][0]])
-                ys.append([c[e1][1], c[e2][1]])
-        except IndexError:
-            print(g.name)
-        all_xs += xs
-        all_ys += ys
-circle_xys = numpy.concatenate(all_circles)
-p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
-p.multi_line(xs=all_xs, ys=all_ys)
+p = get_figure()
 
-filename = 'data/2016-11-15_graph_names.h5'
 df = pandas.read_hdf(filename, 'graph_names')
+df = df[df.pdb.isin(cc_plus_codes)]
 
 scut = Slider(
     title="scut", name='scut',
-    value=7.0, start=7.0, end=10.0, step=0.5
+    value=7.0, start=7.0, end=9.0, step=0.5
 )
 
 kcut = Slider(
     title="kcut", name='kcut',
-    value=0, start=0, end=3, step=1)
+    value=2, start=0, end=3, step=1)
 
+min_count = Slider(
+    title="Minimum count", name='min_count',
+    value=10, start=0, end=50, step=1)
 
 inputs = WidgetBox(
     children=[
-        scut, kcut
+        scut, kcut, min_count
     ]
 )
 hbox = HBox(children=[inputs, p])
@@ -138,6 +151,7 @@ def update_data():
     # Get the current slider values
     s = scut.value
     k = kcut.value
+    mc = min_count.value
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
     '''
     r = redundancy.value
@@ -160,14 +174,16 @@ def update_data():
     for i, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
-                counts.append(rgs[g.name])
-                rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
-                rel_freqs.append(rel_freq)
-                r_xs.append(i[0])
-                r_ys.append(i[1])
-                gnames.append(g.name)
-                color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
-                r_colors.append(cm[color_index])
+                count = rgs[g.name]
+                if count >= mc:
+                    counts.append(count)
+                    rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
+                    rel_freqs.append(rel_freq)
+                    r_xs.append(i[0])
+                    r_ys.append(i[1])
+                    gnames.append(g.name)
+                    color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
+                    r_colors.append(cm[color_index])
 
     percents = ['{0:.2f}'.format(x * 100) for x in rel_freqs]
 
@@ -186,13 +202,13 @@ def update_data():
 update_data()
 
 # Configure hover tool and add the rectangles with the hover tool set up.
-p.add_tools(HoverTool())
-hover = p.select(dict(type=HoverTool))
-hover.tooltips = OrderedDict([
+hover = HoverTool(
+    tooltips=OrderedDict([
     ('Graph Name', "@gnames"),
     ('Count', '@counts'),
     ('Percentage', '@percents')
-])
+    ]))
+p.add_tools(hover)
 p.rect(x='r_xs', y='r_ys', width=1, height=1,
        width_units="data", height_units="data",
        color='r_colors', alpha=0.5, source=source)
@@ -209,9 +225,8 @@ def input_change(attrname, old, new):
     update_data()
 
 
-for w in [scut, kcut]:
+for w in [scut, kcut, min_count]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
-#session = push_session(curdoc())
-#script = autoload_server(p, session_id=session.id)
+
