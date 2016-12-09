@@ -119,7 +119,7 @@ kcut = Slider(
 
 min_count = Slider(
     title="Minimum count", name='min_count',
-    value=10, start=0, end=50, step=1)
+    value=10, start=1, end=50, step=1)
 
 inputs = WidgetBox(
     children=[
