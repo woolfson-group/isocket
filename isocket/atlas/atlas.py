@@ -5,7 +5,7 @@ import os
 import pickle
 from collections import OrderedDict
 from bokeh.plotting import Figure, curdoc
-from bokeh.palettes import Reds9
+from bokeh.palettes import viridis
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
@@ -18,6 +18,7 @@ filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
 
+_color_map = viridis(34)
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
     """ List of uniformly distributed (x, y) coordinates on the circumference of a circle.
@@ -141,6 +142,39 @@ source = ColumnDataSource(
     )
 )
 
+# TODO Invert based on max count!
+def get_box_color(count):
+    cm = _color_map
+    if count <= 20:
+        c = count
+    elif count <= 30:
+        c = 21
+    elif count <= 40:
+        c = 22
+    elif count <= 50:
+        c = 23
+    elif count <= 60:
+        c = 24
+    elif count <= 70:
+        c = 25
+    elif count <= 80:
+        c = 26
+    elif count <= 90:
+        c = 27
+    elif count <= 100:
+        c = 28
+    elif count <= 150:
+        c = 29
+    elif count <= 200:
+        c = 30
+    elif count <= 300:
+        c = 31
+    elif count <= 500:
+        c = 32
+    else:
+        c = 33
+    return cm[len(cm) - c]
+
 
 def update_data():
     """Called each time that any watched property changes.
@@ -170,7 +204,6 @@ def update_data():
     r_colors = []
     gnames = []
     counts = []
-    cm = [x for x in reversed(Reds9)]
     for i, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
@@ -182,8 +215,7 @@ def update_data():
                     r_xs.append(i[0])
                     r_ys.append(i[1])
                     gnames.append(g.name)
-                    color_index = min(len(cm) - 1, int(numpy.ceil(rel_freq * 10)))
-                    r_colors.append(cm[color_index])
+                    r_colors.append(get_box_color(count=count))
 
     percents = ['{0:.2f}'.format(x * 100) for x in rel_freqs]
 
