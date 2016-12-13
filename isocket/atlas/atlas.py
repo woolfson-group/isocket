@@ -142,7 +142,7 @@ source = ColumnDataSource(
     )
 )
 
-# TODO Invert based on max count!
+
 def get_box_color(count):
     cm = _color_map
     if count <= 20:
