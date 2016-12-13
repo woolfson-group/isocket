@@ -107,7 +107,6 @@ def get_figure():
 p = get_figure()
 
 df = pandas.read_hdf(filename, 'graph_names')
-df = df[df.pdb.isin(cc_plus_codes)]
 
 scut = Slider(
     title="scut", name='scut',
@@ -122,11 +121,15 @@ min_count = Slider(
     title="Minimum count", name='min_count',
     value=10, start=1, end=50, step=1)
 
+code_select = Select(title="PDB codes:", value="CC+", options=["CC+", "All"])
+
 inputs = WidgetBox(
     children=[
-        scut, kcut, min_count
+        scut, kcut, min_count, code_select
     ]
 )
+
+
 hbox = HBox(children=[inputs, p])
 
 # Use the above lists to populate a ColumnDataSource object with details needed for the hover labels.
@@ -186,7 +189,10 @@ def update_data():
     s = scut.value
     k = kcut.value
     mc = min_count.value
+    codes = code_select.value
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
+    if codes == 'CC+':
+        filtered_df = filtered_df[filtered_df.pdb.isin(cc_plus_codes)]
     '''
     r = redundancy.value
     if r != "No filter":
@@ -264,7 +270,7 @@ def input_change(attrname, old, new):
     update_data()
 
 
-for w in [scut, kcut, min_count]:
+for w in [scut, kcut, min_count, code_select]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
