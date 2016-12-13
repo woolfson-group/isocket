@@ -242,16 +242,15 @@ def update_data():
 update_data()
 
 # Configure hover tool and add the rectangles with the hover tool set up.
-hover = HoverTool(
-    tooltips=OrderedDict([
-    ('Graph Name', "@gnames"),
-    ('Count', '@counts'),
-    ('Percentage', '@percents')
-    ]))
+boxes = p.rect(x='r_xs', y='r_ys',
+               width=1, height=1, width_units="data", height_units="data",
+               color='r_colors', alpha='alphas', source=source)
+hover = HoverTool(renderers=[boxes],
+                  tooltips=OrderedDict([('Graph Name', "@gnames"),
+                                        ('Count', '@counts'),
+                                        ('Percentage', '@percents')])
+                  )
 p.add_tools(hover)
-p.rect(x='r_xs', y='r_ys', width=1, height=1,
-       width_units="data", height_units="data",
-       color='r_colors', alpha='alphas', source=source)
 
 
 def input_change(attrname, old, new):
