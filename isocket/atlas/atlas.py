@@ -204,19 +204,26 @@ def update_data():
     r_colors = []
     gnames = []
     counts = []
+    alphas = []
     for i, g in numpy.ndenumerate(sq_gag):
         if g:
             if g.name in rgs.index:
                 count = rgs[g.name]
-                if count >= mc:
-                    counts.append(count)
-                    rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
-                    rel_freqs.append(rel_freq)
-                    r_xs.append(i[0])
-                    r_ys.append(i[1])
-                    gnames.append(g.name)
-                    r_colors.append(get_box_color(count=count))
-
+                rel_freq = numpy.divide(float(rgs[g.name]), total_graphs)
+                rel_freqs.append(rel_freq)
+                r_colors.append(get_box_color(count=count))
+            else:
+                count = 0
+                rel_freqs.append(0)
+                r_colors.append('#ffffff') #white
+            counts.append(count)
+            r_xs.append(i[0])
+            r_ys.append(i[1])
+            gnames.append(g.name)
+            if count >= mc:
+                alphas.append(0.5)
+            else:
+                alphas.append(0.0)
     percents = ['{0:.2f}'.format(x * 100) for x in rel_freqs]
 
     data = dict(
@@ -226,7 +233,8 @@ def update_data():
         r_ys=r_ys,
         rel_freqs=rel_freqs,
         counts=counts,
-        percents=percents
+        percents=percents,
+        alphas=alphas
     )
 
     source.data = data
@@ -243,7 +251,7 @@ hover = HoverTool(
 p.add_tools(hover)
 p.rect(x='r_xs', y='r_ys', width=1, height=1,
        width_units="data", height_units="data",
-       color='r_colors', alpha=0.5, source=source)
+       color='r_colors', alpha='alphas', source=source)
 
 
 def input_change(attrname, old, new):
