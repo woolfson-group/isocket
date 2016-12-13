@@ -18,7 +18,7 @@ data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
 filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
-
+df = pandas.read_hdf(filename, 'graph_names')
 _color_map = viridis(34)
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
@@ -114,7 +114,7 @@ def add_graph_glyphs():
 p = get_base_figure()
 add_graph_glyphs()
 
-df = pandas.read_hdf(filename, 'graph_names')
+
 
 scut = Slider(
     title="scut", name='scut',
