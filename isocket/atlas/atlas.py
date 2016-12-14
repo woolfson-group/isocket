@@ -9,6 +9,7 @@ from bokeh.palettes import viridis
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
+from bokeh.models.ranges import Range1d
 
 from isocket_settings import global_settings
 from isocket.graph_theory import AtlasHandler
@@ -17,7 +18,7 @@ data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
 filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
-
+df = pandas.read_hdf(filename, 'graph_names')
 _color_map = viridis(34)
 
 def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
@@ -64,15 +65,14 @@ def get_graph_array(atlas=True, cyclics=True, unknowns=False, paths=False, max_n
 max_nodes = 8
 sq_gag = get_graph_array(max_nodes=max_nodes)
 
-def get_figure():
+
+def get_base_figure():
     tools = "pan,wheel_zoom,box_zoom,reset,resize"
     # Define the figure.
     p = Figure(
         plot_height=1000,
         plot_width=1000,
         webgl=True,
-        x_range=(-1, sq_gag.shape[0]),
-        y_range=(sq_gag.shape[1], -1),
         tools=tools,
     )
     p.grid.grid_line_color = None
@@ -81,6 +81,12 @@ def get_figure():
     p.toolbar.logo = None
     p.outline_line_width = 5
     p.outline_line_color = "Black"
+    return p
+
+
+def add_graph_glyphs():
+    p.x_range = Range1d(-1, sq_gag.shape[0])
+    p.y_range = Range1d(sq_gag.shape[1], -1)
     circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
     all_circles = []
     all_xs = []
@@ -100,14 +106,15 @@ def get_figure():
             all_xs += xs
             all_ys += ys
     circle_xys = numpy.concatenate(all_circles)
-    p.circle(x=circle_xys[:,0], y=circle_xys[:,1], radius=0.02)
+    p.circle(x=circle_xys[:, 0], y=circle_xys[:, 1], radius=0.02)
     p.multi_line(xs=all_xs, ys=all_ys)
-    return p
+    return
 
-p = get_figure()
 
-df = pandas.read_hdf(filename, 'graph_names')
-df = df[df.pdb.isin(cc_plus_codes)]
+p = get_base_figure()
+add_graph_glyphs()
+
+
 
 scut = Slider(
     title="scut", name='scut',
@@ -122,11 +129,15 @@ min_count = Slider(
     title="Minimum count", name='min_count',
     value=10, start=1, end=50, step=1)
 
+code_select = Select(title="PDB codes:", value="CC+", options=["CC+", "All"])
+
 inputs = WidgetBox(
     children=[
-        scut, kcut, min_count
+        scut, kcut, min_count, code_select
     ]
 )
+
+
 hbox = HBox(children=[inputs, p])
 
 # Use the above lists to populate a ColumnDataSource object with details needed for the hover labels.
@@ -186,7 +197,10 @@ def update_data():
     s = scut.value
     k = kcut.value
     mc = min_count.value
+    codes = code_select.value
     filtered_df = df[(df['scut'] == s) & (df['kcut'] == k)]
+    if codes == 'CC+':
+        filtered_df = filtered_df[filtered_df.pdb.isin(cc_plus_codes)]
     '''
     r = redundancy.value
     if r != "No filter":
@@ -264,7 +278,7 @@ def input_change(attrname, old, new):
     update_data()
 
 
-for w in [scut, kcut, min_count]:
+for w in [scut, kcut, min_count, code_select]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
