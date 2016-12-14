@@ -1,7 +1,7 @@
 # iSocket
 iSocket web applicaton.
 
-Version 0.0.4 (November 29, 2016), Woolfson Group, University of Bristol.
+Version 0.0.5 (December 14, 2016), Woolfson Group, University of Bristol.
 
 [![CircleCI](https://circleci.com/gh/woolfson-group/isocket.svg?style=shield&circle-token=355d5025e9404cf5b00fc2e6150f05bfbccc3036)](https://circleci.com/gh/woolfson-group/isocket)
 
