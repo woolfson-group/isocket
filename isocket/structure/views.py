@@ -27,7 +27,7 @@ def upload_file():
 
 #TODO add tokens to urls to avoid problems with same url and different data
 # (e.g. same filename with differnet file content).
-@structure_bp.route('/uploads/pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
+@structure_bp.route('/uploads.pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
 def uploaded_file(filename, scut, kcut):
     scut = float(scut)
     kcut = int(kcut)
