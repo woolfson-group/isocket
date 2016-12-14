@@ -11,7 +11,7 @@ from isocket.structure.forms import SocketForm
 from isocket.structure import structure_bp
 
 
-@structure_bp.route('/upload', methods=['GET', 'POST'])
+@structure_bp.route('/run', methods=['GET', 'POST'])
 def upload_file():
     structures = UploadSet(name='structures', extensions=current_app.config['UPLOADED_STRUCTURES_ALLOW'])
     form = SocketForm()
@@ -27,7 +27,7 @@ def upload_file():
 
 #TODO add tokens to urls to avoid problems with same url and different data
 # (e.g. same filename with differnet file content).
-@structure_bp.route('/uploads.pdb=<filename>_socket_cutoff=<scut>_knob_cutoff=<kcut>')
+@structure_bp.route('/uploads.<filename>.<float:scut>.<int:kcut>')
 def uploaded_file(filename, scut, kcut):
     scut = float(scut)
     kcut = int(kcut)
