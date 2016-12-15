@@ -73,7 +73,7 @@ class GraphHandlerTestCase(unittest.TestCase):
 
 
 class IsomorphismCheckerTestCase(unittest.TestCase):
-    """Tests for isambard.tools.graph_theory.isomorphism_checker"""
+    """Tests for graph_theory.isomorphism_checker"""
     def setUp(self):
         self.graph_list = AtlasHandler(mode=mode).get_graph_list()
 
