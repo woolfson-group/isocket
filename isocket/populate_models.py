@@ -37,13 +37,6 @@ class PopulateModel:
         return item
 
 
-def add_to_atlas(graph):
-    ah = GraphHandler(graph)
-    with session_scope() as session:
-        item = PopulateModel(AtlasDB, **ah.graph_parameters()).go(session)
-    return item
-
-
 def populate_atlas(graph_list):
     with session_scope() as session:
         s1 = set([x[0] for x in session.query(AtlasDB.name).all()])  # graph names of Atlas objects already in db.
