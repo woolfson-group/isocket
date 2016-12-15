@@ -46,11 +46,31 @@ class UpdateCodes:
 
 
 def all_graphs_named(knob_graphs):
+    """
+
+    Parameters
+    ----------
+    knob_graphs: list(networkx.Graph)
+
+    Returns
+    -------
+    True if all graphs have the .name attribute
+    """
     return all([x.name is not None for x in knob_graphs])
 
 
 def all_graph_dicts_valid(knob_graphs):
-    compare = lambda x, y: Counter(x) == Counter(y)
+    """
+
+    Parameters
+    ----------
+    knob_graphs: list(networkx.Graph)
+
+    Returns
+    -------
+    bool:
+        True if all data is ready for adding graphs to the database.
+    """
     key_names = ['cc_num',
                  'code',
                  'edges',
@@ -60,7 +80,7 @@ def all_graph_dicts_valid(knob_graphs):
                  'scut',
                  'name',
                  'preferred']
-    a = all([compare(x.graph.keys(), key_names) for x in knob_graphs])
+    a = all([Counter(x.graph.keys()) == Counter(key_names) for x in knob_graphs])
     b = all_graphs_named(knob_graphs=knob_graphs)
     return a and b
 
