@@ -17,11 +17,15 @@ _graph_list = AtlasHandler().get_graph_list(atlas=True, paths=True, cyclics=True
 
 
 class StructureHandler:
+    """ Class for parsing pdb/cif files into KIH graphs """
     def __init__(self, assembly):
         self.assembly = assembly
         self.is_preferred = False
         self.code = self.assembly.id
         self.mmol = None
+
+    def __repr__(self):
+        return '<StructureHandler(code={0}, mmol={1})>'.format(self.code, self.mmol)
 
     @classmethod
     def from_code(cls, code, mmol=None, store_files=False):
