@@ -4,7 +4,7 @@ from isocket.populate_models import populate_atlas, add_graph_to_db
 from collections import Counter
 
 
-class CodesToAdd:
+class UpdateCodes:
     def __init__(self, codes=None, store_files=False):
         self.store_files = store_files
         self.codes = codes
