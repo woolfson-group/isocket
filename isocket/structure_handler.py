@@ -24,7 +24,7 @@ class StructureHandler:
         self.mmol = None
 
     @classmethod
-    def from_code(cls, code, mmol=None, store_files=True):
+    def from_code(cls, code, mmol=None, store_files=False):
         pref_mmol = preferred_mmol(code=code)
         if mmol is None:
             mmol = pref_mmol
