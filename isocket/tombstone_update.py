@@ -15,13 +15,15 @@ class CodesToAdd:
 
     @property
     def knob_graphs(self):
-        kgs = []
+        all_kgs = []
         for sh in self.structure_handlers:
             try:
-                kgs.append(sh.get_knob_graphs(min_scut=7.0, max_scut=9.0, scut_increment=0.5))
+                kgs = sh.get_knob_graphs(min_scut=7.0, max_scut=9.0, scut_increment=0.5)
+                for x in kgs:
+                    all_kgs.append(x)
             except:
                 continue
-        return kgs
+        return all_kgs
 
     def run_update(self):
         kgs = self.knob_graphs
