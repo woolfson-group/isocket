@@ -116,6 +116,15 @@ class CodesToAddTestCase(BaseTestCase):
         c = db.session.query(PdbeDB).count()
         self.assertEqual(c, len(self.codes))
 
+    def test_graph_names(self):
+        q = db.session.query(GraphDB, AtlasDB).join(AtlasDB)
+        c = q.filter(AtlasDB.name == 'G7').count()
+        self.assertEqual(c, 3)
+        c = q.filter(AtlasDB.name == 'G17').count()
+        self.assertEqual(c, 1)
+        c = q.filter(AtlasDB.name == 'G163').count()
+        self.assertEqual(c, 16)
+
 
 class RemovePdbCodeTestCase(BaseTestCase):
 
