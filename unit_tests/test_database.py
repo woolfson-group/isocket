@@ -3,8 +3,7 @@ from flask_testing import TestCase
 
 from isocket.factory import create_app
 from isocket.extensions import db
-from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
-    remove_pdb_code
+from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atlas, remove_pdb_code
 from isocket.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket.graph_theory import AtlasHandler
 from isocket.tombstone_update import CodesToAdd
@@ -58,40 +57,6 @@ class AtlasDBTestCase(BaseTestCase):
         populate_atlas(graph_list=self.graph_list)
         c = db.session.query(AtlasDB).count()
         self.assertEqual(c, len(self.graph_list))
-
-
-class AddPdbCodeTestCase(BaseTestCase):
-
-    def setUp(self):
-        super().setUp()
-        populate_cutoff()
-        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
-        self.code = '2ebo'
-        add_pdb_code(code=self.code, mode=_mode)
-
-    def test_pdb_code_exists(self):
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
-        p = q.one()
-        self.assertEqual(p.pdb, self.code)
-
-    def test_pdbe_exists(self):
-        c = db.session.query(PdbeDB).count()
-        self.assertEqual(c, 1)
-
-    def test_graph_db(self):
-        q = db.session.query(GraphDB, AtlasDB).join(AtlasDB)
-        c = q.filter(AtlasDB.name == 'G7').count()
-        self.assertEqual(c, 3)
-        c = q.filter(AtlasDB.name == 'G17').count()
-        self.assertEqual(c, 1)
-        c = q.filter(AtlasDB.name == 'G163').count()
-        self.assertEqual(c, 16)
-
-    def test_10gs(self):
-        code = '10gs'
-        add_pdb_code(code=code, mode=_mode)
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
-        self.assertEqual(q.pdb, code)
 
 
 class CodesToAddTestCase(BaseTestCase):
