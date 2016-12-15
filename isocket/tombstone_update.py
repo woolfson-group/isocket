@@ -23,6 +23,13 @@ class CodesToAdd:
                 continue
         return kgs
 
+    def run_update(self):
+        kgs = self.knob_graphs
+        if not all_graphs_named(knob_graphs=kgs):
+            name_against_unknowns(knob_graphs=kgs)
+            if not all_graphs_named(knob_graphs=kgs):
+                add_unknowns(knob_graphs=kgs)
+        add_knob_graphs_to_db(knob_graphs=kgs)
 
 def all_graphs_named(knob_graphs):
     return all([x.name is not None for x in knob_graphs])
@@ -44,7 +51,7 @@ def all_graph_dicts_valid(knob_graphs):
     return a and b
 
 
-def name_against_unkowns(knob_graphs):
+def name_against_unknowns(knob_graphs):
     large_graph_list = AtlasHandler().get_graph_list(atlas=False, cyclics=False, paths=False, unknowns=True)
     for g in knob_graphs:
         if g.graph['name'] is None:
