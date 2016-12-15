@@ -72,7 +72,7 @@ class CodesToAddTestCase(BaseTestCase):
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.codes = ['2ebo', '10gs']
         self.cta = UpdateCodes(codes=self.codes, store_files=False)
-        self.cta.run_update()
+        self.cta.run_update(mode=_mode)
 
     def test_pdb_added(self):
         c = db.session.query(PdbDB).count()
@@ -104,7 +104,7 @@ class RemovePdbCodeTestCase(BaseTestCase):
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
         # add pdb code
-        UpdateCodes(codes=[self.code], store_files=False).run_update()
+        UpdateCodes(codes=[self.code], store_files=False).run_update(mode=_mode)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):
