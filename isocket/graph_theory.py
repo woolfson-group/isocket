@@ -102,28 +102,4 @@ def isomorphism_checker(g, graph_list=None):
             iso_name = str(graph_list.index(isomorph))
     return iso_name
 
-
-def sorted_connected_components(g, include_trivials=False):
-    """ List of connected component subgraphs of graph g, ordered in decreasing number of nodes.
-
-    Parameters
-    ----------
-    g : networkx.Graph
-    include_trivials : bool
-        If True, trivial connected components (i.e. singular nodes) will be included.
-
-    Returns
-    -------
-    [networkx.Graph]
-        List of connected component subgraphs.
-    """
-    h = graph_to_plain_graph(g)
-    components = sorted(networkx.connected_component_subgraphs(h, copy=False),
-                        key=lambda x: len(x.nodes()), reverse=True)
-    if not include_trivials:
-        components = [x for x in components if len(x.nodes()) > 1]
-    return components
-
-
 __author__ = 'Jack W. Heal'
-
