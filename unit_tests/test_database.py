@@ -100,12 +100,19 @@ class CodesToAddTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.codes = ['2ebo', '10gs']
+        self.cta = CodesToAdd(codes=self.codes, store_files=False)
+        self.cta.run_update()
 
-    def test_run_update(self):
-        cta = CodesToAdd(codes=self.codes, store_files=False)
-        cta.run_update()
+    def test_pdb_codes_added(self):
         c = db.session.query(PdbDB).count()
         self.assertEqual(c, 2)
+
+    def test_graphs_have_been_added(self):
+        kg_len = len(self.cta.knob_graphs)
+        c = db.session.query(GraphDB).count()
+        self.assertEqual(kg_len, c)
+
+
 
 
 
