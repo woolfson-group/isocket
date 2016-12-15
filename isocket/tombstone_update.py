@@ -33,6 +33,7 @@ class CodesToAdd:
                 add_unknowns(knob_graphs=kgs)
         add_knob_graphs_to_db(knob_graphs=kgs)
 
+
 def all_graphs_named(knob_graphs):
     return all([x.name is not None for x in knob_graphs])
 
