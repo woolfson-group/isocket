@@ -7,12 +7,13 @@ from isambard_dev.add_ons.filesystem import FileSystem, preferred_mmol, get_cif,
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
-from isocket.graph_theory import graph_to_plain_graph, GraphHandler
+from isocket.graph_theory import graph_to_plain_graph, GraphHandler, AtlasHandler, isomorphism_checker
 
 try:
     data_dir = global_settings['structural_database']['path']
 except KeyError:
     data_dir = None
+_graph_list = AtlasHandler().get_graph_list(atlas=True, paths=True, cyclics=True, unknowns=False)
 
 
 class StructureHandler:
@@ -93,7 +94,11 @@ class StructureHandler:
                     ccs = sorted(networkx.connected_component_subgraphs(h, copy=True),
                                  key=lambda x: len(x.nodes()), reverse=True)
                 for cc_num, cc in enumerate(ccs):
-                    cc.graph.update(cc_num=cc_num, scut=scut, kcut=kcut)
+                    name = isomorphism_checker(cc, graph_list=_graph_list)
+                    d = dict(scut=scut, kcut=kcut, code=self.code, cc_num=cc_num,
+                             preferred=self.is_preferred, mmol=self.mmol,
+                             name=name, nodes=cc.number_of_nodes(), edges=cc.number_of_edges())
+                    cc.graph.update(d)
                     knob_graphs.append(cc)
         else:
             knob_graphs = []
