@@ -1,13 +1,12 @@
 import os
 from flask_testing import TestCase
 
-from isocket_settings import global_settings
 from isocket.factory import create_app
 from isocket.extensions import db
-from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atlas, add_pdb_code, \
-    remove_pdb_code
+from isocket.populate_models import populate_cutoff, populate_atlas, remove_pdb_code
 from isocket.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket.graph_theory import AtlasHandler
+from isocket.update_db import UpdateCodes
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 _mode = 'testing'
@@ -27,8 +26,14 @@ class BaseTestCase(TestCase):
         db.drop_all()
 
 
-class AtlasDBTestCase(BaseTestCase):
+class CutoffDBTestCase(BaseTestCase):
+    def test_cutoff_rows(self):
+        populate_cutoff()
+        cutoff_count = db.session.query(CutoffDB).count()
+        self.assertEqual(cutoff_count, 28)
 
+
+class AtlasDBTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.graph_list = AtlasHandler().atlas_graphs
@@ -36,11 +41,11 @@ class AtlasDBTestCase(BaseTestCase):
     def test_first_element_of_graph_list(self):
         self.assertTrue(self.graph_list[0].name == 'G0')
 
-    def test_add_to_atlas(self):
+    def test_populate_singleton(self):
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 0)
         g = self.graph_list[0]
-        add_to_atlas(graph=g)
+        populate_atlas(graph_list=[g])
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 1)
 
@@ -60,25 +65,29 @@ class AtlasDBTestCase(BaseTestCase):
         self.assertEqual(c, len(self.graph_list))
 
 
-class AddPdbCodeTestCase(BaseTestCase):
-
+class CodesToAddTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
-        self.code = '2ebo'
-        add_pdb_code(code=self.code, mode=_mode)
+        self.codes = ['2ebo', '10gs']
+        self.cta = UpdateCodes(codes=self.codes, store_files=False)
+        self.cta.run_update(mode=_mode)
 
-    def test_pdb_code_exists(self):
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == self.code)
-        p = q.one()
-        self.assertEqual(p.pdb, self.code)
+    def test_pdb_added(self):
+        c = db.session.query(PdbDB).count()
+        self.assertEqual(c, len(self.codes))
 
-    def test_pdbe_exists(self):
+    def test_graphs_added(self):
+        kg_len = len(self.cta.knob_graphs)
+        c = db.session.query(GraphDB).count()
+        self.assertEqual(kg_len, c)
+
+    def test_pdbe_added(self):
         c = db.session.query(PdbeDB).count()
-        self.assertEqual(c, 1)
+        self.assertEqual(c, len(self.codes))
 
-    def test_graph_db(self):
+    def test_graph_names(self):
         q = db.session.query(GraphDB, AtlasDB).join(AtlasDB)
         c = q.filter(AtlasDB.name == 'G7').count()
         self.assertEqual(c, 3)
@@ -87,21 +96,15 @@ class AddPdbCodeTestCase(BaseTestCase):
         c = q.filter(AtlasDB.name == 'G163').count()
         self.assertEqual(c, 16)
 
-    def test_10gs(self):
-        code = '10gs'
-        add_pdb_code(code=code, mode=_mode)
-        q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
-        self.assertEqual(q.pdb, code)
-
 
 class RemovePdbCodeTestCase(BaseTestCase):
-
     def setUp(self):
         super().setUp()
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code(code=self.code, mode=_mode)
+        # add pdb code
+        UpdateCodes(codes=[self.code], store_files=False).run_update(mode=_mode)
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):
@@ -114,9 +117,3 @@ class RemovePdbCodeTestCase(BaseTestCase):
         self.assertEqual(c, 0)
 
 
-class CutoffDBTestCase(BaseTestCase):
-
-    def test_cutoff_rows(self):
-        populate_cutoff()
-        cutoff_count = db.session.query(CutoffDB).count()
-        self.assertEqual(cutoff_count, 28)

@@ -56,28 +56,6 @@ class AtlasHandler:
         return graph_list
 
 
-class GraphHandler(AtlasHandler):
-    def __init__(self, g, mode='production'):
-        super().__init__(mode=mode)
-        self.g = graph_to_plain_graph(g)
-        self.name = self.get_graph_name()
-
-    def get_graph_name(self):
-        if self.g.graph['name'] == 'unnamed':
-            name = isomorphism_checker(self.g, graph_list=self.get_graph_list(atlas=True, cyclics=True,
-                                                                          paths=True, unknowns=False))
-
-            if name is None:
-                name = isomorphism_checker(self.g, self.unknown_graphs)
-            self.g.graph['name'] = name
-        else:
-            name = self.g.graph['name']
-        return name
-
-    def graph_parameters(self):
-        return dict(name=self.name, nodes=self.g.number_of_nodes(), edges=self.g.number_of_edges())
-
-
 def graph_to_plain_graph(g):
     # construct h fully in case of unorderable/unsortable edges.
     h = networkx.Graph()
@@ -124,28 +102,4 @@ def isomorphism_checker(g, graph_list=None):
             iso_name = str(graph_list.index(isomorph))
     return iso_name
 
-
-def sorted_connected_components(g, include_trivials=False):
-    """ List of connected component subgraphs of graph g, ordered in decreasing number of nodes.
-
-    Parameters
-    ----------
-    g : networkx.Graph
-    include_trivials : bool
-        If True, trivial connected components (i.e. singular nodes) will be included.
-
-    Returns
-    -------
-    [networkx.Graph]
-        List of connected component subgraphs.
-    """
-    h = graph_to_plain_graph(g)
-    components = sorted(networkx.connected_component_subgraphs(h, copy=False),
-                        key=lambda x: len(x.nodes()), reverse=True)
-    if not include_trivials:
-        components = [x for x in components if len(x.nodes()) > 1]
-    return components
-
-
 __author__ = 'Jack W. Heal'
-

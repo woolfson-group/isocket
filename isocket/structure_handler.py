@@ -7,7 +7,7 @@ from isambard_dev.add_ons.filesystem import FileSystem, preferred_mmol, get_cif,
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
-from isocket.graph_theory import graph_to_plain_graph, GraphHandler, AtlasHandler, isomorphism_checker
+from isocket.graph_theory import graph_to_plain_graph, AtlasHandler, isomorphism_checker
 
 try:
     data_dir = global_settings['structural_database']['path']
@@ -17,14 +17,30 @@ _graph_list = AtlasHandler().get_graph_list(atlas=True, paths=True, cyclics=True
 
 
 class StructureHandler:
+    """ Class for parsing pdb/cif files into KIH graphs """
     def __init__(self, assembly):
         self.assembly = assembly
         self.is_preferred = False
         self.code = self.assembly.id
         self.mmol = None
 
+    def __repr__(self):
+        return '<StructureHandler(code={0}, mmol={1})>'.format(self.code, self.mmol)
+
     @classmethod
-    def from_code(cls, code, mmol=None, store_data=True):
+    def from_code(cls, code, mmol=None, store_files=False):
+        """ Instantiate from PDB code
+
+        Parameters
+        ----------
+        code: str
+            4-letter PDB accession code
+        mmol: int or None
+            Number of the biological unit.
+            If None, set to preferred biological unit as stated on the PDBe.
+        store_files: bool
+            If True, use FileSystem module from isambard.add_ons to write files to data_dir.
+        """
         pref_mmol = preferred_mmol(code=code)
         if mmol is None:
             mmol = pref_mmol
@@ -34,7 +50,7 @@ class StructureHandler:
         else:
             preferred = False
         # Use FileSystem if storing the cif/pdb files.
-        if (data_dir is not None) and store_data:
+        if (data_dir is not None) and store_files:
             fs = FileSystem(code=code, data_dir=data_dir)
             # Try with cif file, if that fails try with pdb file.
             try:
@@ -58,16 +74,41 @@ class StructureHandler:
         return instance
 
     @classmethod
-    def from_file(cls, filename, path=True, code='', cif=False):
+    def from_file(cls, filename, code='', cif=False):
+        """ Instantiate from cif or pdb file
+
+        Parameters
+        ----------
+        filename:
+            path to cif or pdb file
+        code: str
+            4-letter PDB accession code
+        cif: bool
+            True if cif file provided.
+            False if pdb file provided.
+        """
         if cif:
-            a = convert_cif_to_ampal(cif=filename, path=path)
+            a = convert_cif_to_ampal(cif=filename, path=True)
             a.id = code
         else:
-            a = convert_pdb_to_ampal(pdb=filename, path=path, pdb_id=code)
+            a = convert_pdb_to_ampal(pdb=filename, path=True, pdb_id=code)
         instance = cls(assembly=a)
         return instance
 
     def get_knob_group(self, cutoff=9.0, state_selection=0):
+        """ Find KnobGroup for structure. See isambard.add_ons.knobs_into_holes for KnobGroup documentation.
+
+        Parameters
+        ----------
+        cutoff: float
+            iSocket cutoff value
+        state_selection: int
+            Index to select when using AmpalContainers (e.g. NMR structures) containing many states.
+
+        Returns
+        -------
+        knob_group: isambard.add_ons.knobs_into_holes.KnobGroup instance.
+        """
         # try / except is for AmpalContainers
         try:
             knob_group = KnobGroup.from_helices(self.assembly, cutoff=cutoff)
@@ -76,6 +117,21 @@ class StructureHandler:
         return knob_group
 
     def get_knob_graphs(self, min_scut=7.0, max_scut=9.0, scut_increment=0.5):
+        """
+
+        Parameters
+        ----------
+        min_scut: float
+        max_scut: float
+        scut_increment: float
+            values between min and max scut at scut_increment are used as iSocket cutoffs for getting graphs
+
+        Returns
+        -------
+        knob_graphs: list[nextworkx.Graph]
+            List of graph objects representing each connected component subgraph at range of scut and kcut values.
+            Each graph g has a g.graph dictionary containing the data needed to populate the database.
+        """
         kg = self.get_knob_group(cutoff=max_scut)
         if kg is not None:
             scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
@@ -103,17 +159,3 @@ class StructureHandler:
         else:
             knob_graphs = []
         return knob_graphs
-
-    def get_atlas_graphs(self, mode='production', knob_graphs=None):
-        if knob_graphs is None:
-            knob_graphs = self.get_knob_graphs()
-        atlas_graphs = []
-        for g in knob_graphs:
-            # instantiated as GraphHandler object so it has the .name attribute.
-            gh = GraphHandler(g, mode=mode)
-            d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
-                     mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,
-                     nodes=g.number_of_nodes(), edges=g.number_of_edges())
-            gh.g.graph.update(d)
-            atlas_graphs.append(gh.g)
-        return atlas_graphs

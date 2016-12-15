@@ -17,13 +17,13 @@ class StructureHandlerTestCase(unittest.TestCase):
 
     def test_from_code_classmethod(self):
         for code in self.test_codes:
-            sh = StructureHandler.from_code(code=code, store_data=False)
+            sh = StructureHandler.from_code(code=code, store_files=False)
             self.assertTrue(sh.is_preferred)
             self.assertEqual(code, sh.code)
 
     def test_from_file_classmethod(self):
         for file in self.test_files:
-            sh = StructureHandler.from_file(filename=file, path=True)
+            sh = StructureHandler.from_file(filename=file)
             self.assertFalse(sh.is_preferred)
 
 
@@ -31,7 +31,7 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
 
     def setUp(self):
         code = '2ebo'
-        self.sh = StructureHandler.from_code(code=code, store_data=False)
+        self.sh = StructureHandler.from_code(code=code, store_files=False)
         self.kgs = self.sh.get_knob_graphs()
 
     def test_number_of_knob_graphs(self):
@@ -46,7 +46,6 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
 
     def test_graph_keys(self):
         """ Tests the knob graphs have precisely the expected set of keys in their graph dict attribute. """
-        compare = lambda x, y: Counter(x) == Counter(y)
         key_names = ['cc_num',
                      'code',
                      'edges',
@@ -56,6 +55,5 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
                      'scut',
                      'name',
                      'preferred']
-        a = all([compare(x.graph.keys(), key_names) for x in self.kgs])
+        a = all([Counter(x.graph.keys()) == Counter(key_names) for x in self.kgs])
         self.assertTrue(a)
-
