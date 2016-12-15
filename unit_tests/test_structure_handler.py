@@ -1,5 +1,6 @@
 import unittest
 import os
+from collections import Counter
 
 from isocket_settings import global_settings
 from isocket.structure_handler import StructureHandler
@@ -24,3 +25,23 @@ class StructureHandlerTestCase(unittest.TestCase):
         for file in self.test_files:
             sh = StructureHandler.from_file(filename=file, path=True)
             self.assertFalse(sh.is_preferred)
+
+
+class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
+
+    def setUp(self):
+        code = '2ebo'
+        self.sh = StructureHandler.from_code(code=code, store_data=False)
+        self.kgs = self.sh.get_knob_graphs()
+
+    def test_number_of_knob_graphs(self):
+        self.assertTrue(len(self.kgs) == 20)
+
+    def test_knob_graph_names(self):
+        kg_names_counter = Counter([x.name for x in self.kgs])
+        self.assertEqual(len(kg_names_counter), 3)
+        self.assertTrue(kg_names_counter['G163'], 16)
+        self.assertTrue(kg_names_counter['G7'], 3)
+        self.assertTrue(kg_names_counter['G17'], 1)
+
+
