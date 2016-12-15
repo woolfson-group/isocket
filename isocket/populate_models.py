@@ -64,19 +64,6 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_g_to_holding_pickle(g, mode='production'):
-    holding_pickle = global_settings["holding_unknowns"][mode]
-    with open(holding_pickle, 'rb') as foo:
-        try:
-            hp = pickle.load(foo)
-        except EOFError:
-            hp = []
-    hp.append(g)
-    with open(holding_pickle, 'wb') as foo:
-        pickle.dump(hp, foo)
-    return
-
-
 def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edges):
     with session_scope() as session:
         pdb = PopulateModel(model=PdbDB, pdb=code).go(session=session)
