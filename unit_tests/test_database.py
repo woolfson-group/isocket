@@ -124,7 +124,8 @@ class RemovePdbCodeTestCase(BaseTestCase):
         populate_cutoff()
         populate_atlas(graph_list=AtlasHandler().atlas_graphs)
         self.code = '2ebo'
-        add_pdb_code(code=self.code, mode=_mode)
+        # add pdb code
+        CodesToAdd(codes=[self.code], store_files=False).run_update()
         remove_pdb_code(code=self.code)
 
     def test_pdb_code_is_gone(self):
