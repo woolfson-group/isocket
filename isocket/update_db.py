@@ -86,6 +86,16 @@ def all_graph_dicts_valid(knob_graphs):
 
 
 def name_against_unknowns(knob_graphs):
+    """ Checks each unnamed graph for isomorphism against list of 'unknown' (large) graphs.
+
+    Parameters
+    ----------
+    knob_graphs: list(networkx.Graph)
+
+    Returns
+    -------
+    None
+    """
     large_graph_list = AtlasHandler().get_graph_list(atlas=False, cyclics=False, paths=False, unknowns=True)
     for g in knob_graphs:
         if g.graph['name'] is None:
@@ -96,6 +106,18 @@ def name_against_unknowns(knob_graphs):
 
 
 def add_unknowns(knob_graphs, mode):
+    """ Name all new unknown graphs, add them to unknown_pickle and to database.
+
+    Parameters
+    ----------
+    knob_graphs: list(networkx.Graph)
+    mode: str
+        Allowed values: 'production' or 'testing'.
+
+    Returns
+    -------
+    None
+    """
     large_graph_list = AtlasHandler().get_graph_list(atlas=False, cyclics=False, paths=False, unknowns=True)
     assert not all_graphs_named(knob_graphs=knob_graphs)
     assert all(isomorphism_checker(x, graph_list=large_graph_list) for x in knob_graphs)
@@ -119,6 +141,16 @@ def add_unknowns(knob_graphs, mode):
 
 
 def add_knob_graphs_to_db(knob_graphs):
+    """ Adds each valid knob graph g (i.e. all data in g.graph present and correct) to database
+
+    Parameters
+    ----------
+    knob_graphs: list(networkx.Graph)
+
+    Returns
+    -------
+    None
+    """
     assert all_graph_dicts_valid(knob_graphs=knob_graphs)
     for g in knob_graphs:
         add_graph_to_db(**g.graph)
