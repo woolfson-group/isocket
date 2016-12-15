@@ -1,20 +1,26 @@
+import pickle
+from collections import Counter
+
+from isocket_settings import global_settings
 from isocket.structure_handler import StructureHandler
 from isocket.graph_theory import AtlasHandler, isomorphism_checker, graph_to_plain_graph
 from isocket.populate_models import populate_atlas, add_graph_to_db
-from collections import Counter
 
 
 class UpdateCodes:
+    """ Class for updating database with data associated with list of PDB accession codes """
     def __init__(self, codes=None, store_files=False):
         self.store_files = store_files
         self.codes = codes
 
     @property
     def structure_handlers(self):
+        """ StructureHandler instances for preferred biological unit (mmol) for each code """
         return [StructureHandler.from_code(code=code, store_files=self.store_files) for code in self.codes]
 
     @property
     def knob_graphs(self):
+        """ Concatenates all knob_graphs associates with each code into one list """
         all_kgs = []
         for sh in self.structure_handlers:
             try:
@@ -25,13 +31,18 @@ class UpdateCodes:
                 continue
         return all_kgs
 
-    def run_update(self):
+    def run_update(self, mode):
+        """ Gets name for each knob graph and then adds them all to the database """
         kgs = self.knob_graphs
+        # is not all named, then need to turn to list of larger graphs.
         if not all_graphs_named(knob_graphs=kgs):
+            # Get names from list of larger graphs
             name_against_unknowns(knob_graphs=kgs)
+            # If still not named, add graphs to list of larger graphs, and write to the file.
             if not all_graphs_named(knob_graphs=kgs):
-                add_unknowns(knob_graphs=kgs)
+                add_unknowns(knob_graphs=kgs, mode=mode)
         add_knob_graphs_to_db(knob_graphs=kgs)
+        return
 
 
 def all_graphs_named(knob_graphs):
@@ -64,7 +75,7 @@ def name_against_unknowns(knob_graphs):
     return
 
 
-def add_unknowns(knob_graphs):
+def add_unknowns(knob_graphs, mode):
     large_graph_list = AtlasHandler().get_graph_list(atlas=False, cyclics=False, paths=False, unknowns=True)
     assert not all_graphs_named(knob_graphs=knob_graphs)
     assert all(isomorphism_checker(x, graph_list=large_graph_list) for x in knob_graphs)
@@ -79,6 +90,10 @@ def add_unknowns(knob_graphs):
             to_add_to_atlas.append(h)
             next_number_to_add += 1
         g.graph['name'] = n
+    large_graph_list += to_add_to_atlas
+    unknown_pickle = global_settings["unknown_graphs"][mode]
+    with open(unknown_pickle, 'wb') as foo:
+        pickle.dump(large_graph_list, foo)
     populate_atlas(graph_list=to_add_to_atlas)
     return
 
