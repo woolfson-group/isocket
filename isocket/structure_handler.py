@@ -29,6 +29,18 @@ class StructureHandler:
 
     @classmethod
     def from_code(cls, code, mmol=None, store_files=False):
+        """ Instantiate from PDB code
+
+        Parameters
+        ----------
+        code: str
+            4-letter PDB accession code
+        mmol: int or None
+            Number of the biological unit.
+            If None, set to preferred biological unit as stated on the PDBe.
+        store_files: bool
+            If True, use FileSystem module from isambard.add_ons to write files to data_dir.
+        """
         pref_mmol = preferred_mmol(code=code)
         if mmol is None:
             mmol = pref_mmol
@@ -62,16 +74,41 @@ class StructureHandler:
         return instance
 
     @classmethod
-    def from_file(cls, filename, path=True, code='', cif=False):
+    def from_file(cls, filename, code='', cif=False):
+        """ Instantiate from cif or pdb file
+
+        Parameters
+        ----------
+        filename:
+            path to cif or pdb file
+        code: str
+            4-letter PDB accession code
+        cif: bool
+            True if cif file provided.
+            False if pdb file provided.
+        """
         if cif:
-            a = convert_cif_to_ampal(cif=filename, path=path)
+            a = convert_cif_to_ampal(cif=filename, path=True)
             a.id = code
         else:
-            a = convert_pdb_to_ampal(pdb=filename, path=path, pdb_id=code)
+            a = convert_pdb_to_ampal(pdb=filename, path=True, pdb_id=code)
         instance = cls(assembly=a)
         return instance
 
     def get_knob_group(self, cutoff=9.0, state_selection=0):
+        """ Find KnobGroup for structure. See isambard.add_ons.knobs_into_holes for KnobGroup documentation.
+
+        Parameters
+        ----------
+        cutoff: float
+            iSocket cutoff value
+        state_selection: int
+            Index to select when using AmpalContainers (e.g. NMR structures) containing many states.
+
+        Returns
+        -------
+        knob_group: isambard.add_ons.knobs_into_holes.KnobGroup instance.
+        """
         # try / except is for AmpalContainers
         try:
             knob_group = KnobGroup.from_helices(self.assembly, cutoff=cutoff)
@@ -80,6 +117,21 @@ class StructureHandler:
         return knob_group
 
     def get_knob_graphs(self, min_scut=7.0, max_scut=9.0, scut_increment=0.5):
+        """
+
+        Parameters
+        ----------
+        min_scut: float
+        max_scut: float
+        scut_increment: float
+            values between min and max scut at scut_increment are used as iSocket cutoffs for getting graphs
+
+        Returns
+        -------
+        knob_graphs: list[nextworkx.Graph]
+            List of graph objects representing each connected component subgraph at range of scut and kcut values.
+            Each graph g has a g.graph dictionary containing the data needed to populate the database.
+        """
         kg = self.get_knob_group(cutoff=max_scut)
         if kg is not None:
             scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))
