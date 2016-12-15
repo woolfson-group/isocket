@@ -94,44 +94,6 @@ def add_g_to_holding_pickle(g, mode='production'):
     return
 
 
-def process_holding_pickle(mode='production'):
-    holding_pickle = global_settings["holding_unknowns"][mode]
-    unknown_pickle = global_settings["unknown_graphs"][mode]
-    with open(unknown_pickle, 'rb') as foo:
-        try:
-            unknown_pickle_list = pickle.load(foo)
-        except EOFError:
-            unknown_pickle_list = []
-    with open(holding_pickle, 'rb') as foo:
-        try:
-            holding_pickle_list = pickle.load(foo)
-        except EOFError:
-            holding_pickle_list = []
-    if len(unknown_pickle_list) > 0:
-        next_number_to_add = max([int(x.name[1:]) for x in unknown_pickle_list]) + 1
-    else:
-        next_number_to_add = 0
-    to_add_to_atlas = []
-    for i, g in enumerate(holding_pickle_list):
-        n = isomorphism_checker(g, graph_list=holding_pickle_list[:i])
-        if n is None:
-            g.name = 'U{}'.format(next_number_to_add)
-            to_add_to_atlas.append(g)
-            next_number_to_add += 1
-        else:
-            g.name = n
-    unknown_pickle_list += to_add_to_atlas
-    with open(unknown_pickle, 'wb') as foo:
-        pickle.dump(unknown_pickle_list, foo)
-    populate_atlas(graph_list=to_add_to_atlas)
-    for g in holding_pickle_list:
-        add_graph_to_db(**g.graph)
-    # clear holding list
-    with open(holding_pickle, 'wb') as foo:
-        pickle.dump([], foo)
-    return
-
-
 def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edges):
     with session_scope() as session:
         pdb = PopulateModel(model=PdbDB, pdb=code).go(session=session)
