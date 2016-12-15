@@ -3,13 +3,16 @@ import networkx
 import numpy
 
 from isocket_settings import global_settings
-from isambard_dev.add_ons.filesystem import FileSystem
+from isambard_dev.add_ons.filesystem import FileSystem, preferred_mmol, get_cif, get_mmol
 from isambard_dev.add_ons.knobs_into_holes import KnobGroup
 from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
 from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isocket.graph_theory import graph_to_plain_graph, GraphHandler
 
-data_dir = global_settings['structural_database']['path']
+try:
+    data_dir = global_settings['structural_database']['path']
+except KeyError:
+    data_dir = None
 
 
 class StructureHandler:
@@ -20,20 +23,31 @@ class StructureHandler:
         self.mmol = None
 
     @classmethod
-    def from_code(cls, code, mmol=None):
+    def from_code(cls, code, mmol=None, store_data=True):
+        pref_mmol = preferred_mmol(code=code)
         fs = FileSystem(code=code, data_dir=data_dir)
         if mmol is None:
-            mmol = fs.preferred_mmol
-        if mmol > fs.number_of_mmols:
-            mmol = None
-        preferred = True if mmol == fs.preferred_mmol else False
-        # Try with cif file, if that fails try with pdb file.
-        cif = fs.cifs[mmol]
-        try:
-            a = convert_cif_to_ampal(cif, assembly_id=code)
-        except ValueError:
-            pdb = fs.mmols[mmol]
-            a = convert_pdb_to_ampal(pdb=pdb, path=True, pdb_id=code)
+            mmol = pref_mmol
+            preferred = True
+        elif mmol == pref_mmol:
+            preferred = True
+        else:
+            preferred = False
+        if (data_dir is not None) and store_data:
+            # Try with cif file, if that fails try with pdb file.
+            cif = fs.cifs[mmol]
+            try:
+                a = convert_cif_to_ampal(cif=cif, path=True, assembly_id=code)
+            except ValueError:
+                pdb = fs.mmols[mmol]
+                a = convert_pdb_to_ampal(pdb=pdb, path=True, pdb_id=code)
+        else:
+            try:
+                cif = get_cif(code=code, mmol_number=mmol)
+                a = convert_cif_to_ampal(cif=cif, path=False, assembly_id=code)
+            except ValueError:
+                pdb = get_mmol(code=code, mmol_number=mmol)
+                a = convert_pdb_to_ampal(pdb=pdb, path=False, pdb_id=code)
         instance = cls(assembly=a)
         instance.is_preferred = preferred
         instance.mmol = mmol
