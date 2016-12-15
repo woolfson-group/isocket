@@ -50,12 +50,6 @@ class GraphHandlerTestCase(unittest.TestCase):
     def tearDown(self):
         self.clear_unknown_graphs()
 
-    def test_complete_graph(self):
-        gh = GraphHandler(g=self.g1, mode=mode)
-        self.assertIsNone(gh.name)
-        gh2 = GraphHandler(g=self.g2, mode=mode)
-        self.assertIsNone(gh2.name)
-
     def test_graph_parameters(self):
         gh = GraphHandler(g=self.g1, mode=mode)
         self.assertEqual(gh.graph_parameters()['nodes'], 8)
