@@ -66,7 +66,7 @@ class StructureHandler:
         instance = cls(assembly=a)
         return instance
 
-    def get_knob_group(self, cutoff=10.0, state_selection=0):
+    def get_knob_group(self, cutoff=9.0, state_selection=0):
         # try / except is for AmpalContainers
         try:
             knob_group = KnobGroup.from_helices(self.assembly, cutoff=cutoff)
@@ -74,7 +74,7 @@ class StructureHandler:
             knob_group = KnobGroup.from_helices(self.assembly[state_selection], cutoff=cutoff)
         return knob_group
 
-    def get_knob_graphs(self, min_scut=7.0, max_scut=10.0, scut_increment=0.5):
+    def get_knob_graphs(self, min_scut=7.0, max_scut=9.0, scut_increment=0.5):
         kg = self.get_knob_group(cutoff=max_scut)
         if kg is not None:
             scuts = list(numpy.arange(min_scut, max_scut + scut_increment, scut_increment))

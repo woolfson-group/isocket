@@ -85,7 +85,7 @@ class AddPdbCodeTestCase(BaseTestCase):
         c = q.filter(AtlasDB.name == 'G17').count()
         self.assertEqual(c, 1)
         c = q.filter(AtlasDB.name == 'G163').count()
-        self.assertEqual(c, 24)
+        self.assertEqual(c, 16)
 
     def test_10gs(self):
         code = '10gs'
