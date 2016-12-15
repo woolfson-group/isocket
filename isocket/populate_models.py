@@ -1,12 +1,8 @@
 import sqlalchemy
 import itertools
 from contextlib import contextmanager
-import pickle
 
-from isocket_settings import global_settings
-from isocket.graph_theory import GraphHandler, isomorphism_checker
 from isocket.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
-from isocket.structure_handler import StructureHandler
 
 
 @contextmanager
