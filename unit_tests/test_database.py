@@ -103,18 +103,18 @@ class CodesToAddTestCase(BaseTestCase):
         self.cta = CodesToAdd(codes=self.codes, store_files=False)
         self.cta.run_update()
 
-    def test_pdb_codes_added(self):
+    def test_pdb_added(self):
         c = db.session.query(PdbDB).count()
-        self.assertEqual(c, 2)
+        self.assertEqual(c, len(self.codes))
 
-    def test_graphs_have_been_added(self):
+    def test_graphs_added(self):
         kg_len = len(self.cta.knob_graphs)
         c = db.session.query(GraphDB).count()
         self.assertEqual(kg_len, c)
 
-
-
-
+    def test_pdbe_added(self):
+        c = db.session.query(PdbeDB).count()
+        self.assertEqual(c, len(self.codes))
 
 
 class RemovePdbCodeTestCase(BaseTestCase):
