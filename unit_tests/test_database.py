@@ -45,7 +45,8 @@ class AtlasDBTestCase(BaseTestCase):
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 0)
         g = self.graph_list[0]
-        add_to_atlas(graph=g)
+        populate_atlas(graph_list=[g])
+        #add_to_atlas(graph=g)
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 1)
 
