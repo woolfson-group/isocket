@@ -34,6 +34,17 @@ class PopulateModel:
 
 
 def populate_atlas(graph_list):
+    """ Add all graphs not yet in AtlasDB to AtlasDB
+
+    Parameters
+    ----------
+    graph_list: list(networkx.Graph)
+        Each graph must have a g.name attribute.
+
+    Returns
+    -------
+    None
+    """
     with session_scope() as session:
         s1 = set([x[0] for x in session.query(AtlasDB.name).all()])  # graph names of Atlas objects already in db.
     s2 = set([x.name for x in graph_list])
@@ -61,6 +72,33 @@ def populate_cutoff():
 
 
 def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edges):
+    """ Populates PdbDB, PdbeDB, AtlasDB (if necessary) and GraphDB with input data
+
+    Parameters
+    ----------
+    code: str
+        4-letter PDB accession code
+    mmol: int
+        Number of the biological unit
+    preferred: bool
+        True if the number of the preferred biological unit == mmol
+    cc_num: int
+        Connected component number
+    name: str
+        Name of the graph in the Atlas
+    kcut: int
+        Knob cutoff
+    scut: float
+        iSocket cutoff
+    nodes: int
+        Number of nodes in the graph
+    edges: int
+        Number of edges in the graph
+
+    Returns
+    -------
+    None
+    """
     with session_scope() as session:
         pdb = PopulateModel(model=PdbDB, pdb=code).go(session=session)
         pdbe = PopulateModel(model=PdbeDB, pdb_id=pdb.id, preferred=preferred, mmol=mmol).go(
@@ -74,6 +112,18 @@ def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edge
 
 
 def remove_pdb_code(code):
+    """ Remove all data associated with the given PDB accession code.
+
+    Parameters
+    ----------
+    code: str
+        4-letter PDB accession code
+
+    Returns
+    -------
+    None
+
+    """
     with session_scope() as session:
         q = session.query(PdbDB).filter(PdbDB.pdb == code)
         p = q.one_or_none()
