@@ -1,7 +1,5 @@
 import unittest
 import pickle
-import networkx
-import numpy
 from networkx.generators import cycle_graph, complete_graph
 
 from isocket_settings import global_settings
