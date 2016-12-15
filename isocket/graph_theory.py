@@ -56,28 +56,6 @@ class AtlasHandler:
         return graph_list
 
 
-class GraphHandler(AtlasHandler):
-    def __init__(self, g, mode='production'):
-        super().__init__(mode=mode)
-        self.g = graph_to_plain_graph(g)
-        self.name = self.get_graph_name()
-
-    def get_graph_name(self):
-        if self.g.graph['name'] == 'unnamed':
-            name = isomorphism_checker(self.g, graph_list=self.get_graph_list(atlas=True, cyclics=True,
-                                                                          paths=True, unknowns=False))
-
-            if name is None:
-                name = isomorphism_checker(self.g, self.unknown_graphs)
-            self.g.graph['name'] = name
-        else:
-            name = self.g.graph['name']
-        return name
-
-    def graph_parameters(self):
-        return dict(name=self.name, nodes=self.g.number_of_nodes(), edges=self.g.number_of_edges())
-
-
 def graph_to_plain_graph(g):
     # construct h fully in case of unorderable/unsortable edges.
     h = networkx.Graph()
