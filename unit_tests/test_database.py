@@ -7,6 +7,7 @@ from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atla
     remove_pdb_code
 from isocket.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket.graph_theory import AtlasHandler
+from isocket.tombstone_update import CodesToAdd
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 _mode = 'testing'
@@ -91,6 +92,22 @@ class AddPdbCodeTestCase(BaseTestCase):
         add_pdb_code(code=code, mode=_mode)
         q = db.session.query(PdbDB).filter(PdbDB.pdb == code).one()
         self.assertEqual(q.pdb, code)
+
+
+class CodesToAddTestCase(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+        populate_cutoff()
+        populate_atlas(graph_list=AtlasHandler().atlas_graphs)
+        self.codes = ['2ebo', '10gs']
+
+    def test_run_update(self):
+        cta = CodesToAdd(codes=self.codes, store_files=False)
+        cta.run_update()
+        c = db.session.query(PdbDB).count()
+        self.assertEqual(c, 2)
+
+
 
 
 class RemovePdbCodeTestCase(BaseTestCase):
