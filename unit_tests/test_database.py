@@ -3,7 +3,7 @@ from flask_testing import TestCase
 
 from isocket.factory import create_app
 from isocket.extensions import db
-from isocket.populate_models import populate_cutoff, populate_atlas, add_to_atlas, remove_pdb_code
+from isocket.populate_models import populate_cutoff, populate_atlas, remove_pdb_code
 from isocket.models import CutoffDB, AtlasDB, PdbDB, PdbeDB, GraphDB
 from isocket.graph_theory import AtlasHandler
 from isocket.tombstone_update import CodesToAdd
@@ -41,12 +41,11 @@ class AtlasDBTestCase(BaseTestCase):
     def test_first_element_of_graph_list(self):
         self.assertTrue(self.graph_list[0].name == 'G0')
 
-    def test_add_to_atlas(self):
+    def test_populate_singleton(self):
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 0)
         g = self.graph_list[0]
         populate_atlas(graph_list=[g])
-        #add_to_atlas(graph=g)
         c = db.session.query(AtlasDB).filter(AtlasDB.name == 'G0').count()
         self.assertEqual(c, 1)
 
