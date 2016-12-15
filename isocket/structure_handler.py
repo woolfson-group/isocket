@@ -103,17 +103,3 @@ class StructureHandler:
         else:
             knob_graphs = []
         return knob_graphs
-
-    def get_atlas_graphs(self, mode='production', knob_graphs=None):
-        if knob_graphs is None:
-            knob_graphs = self.get_knob_graphs()
-        atlas_graphs = []
-        for g in knob_graphs:
-            # instantiated as GraphHandler object so it has the .name attribute.
-            gh = GraphHandler(g, mode=mode)
-            d = dict(scut=g.graph['scut'], kcut=g.graph['kcut'], code=self.code,
-                     mmol=self.mmol, cc_num=g.graph['cc_num'], preferred=self.is_preferred,
-                     nodes=g.number_of_nodes(), edges=g.number_of_edges())
-            gh.g.graph.update(d)
-            atlas_graphs.append(gh.g)
-        return atlas_graphs
