@@ -64,23 +64,6 @@ def populate_cutoff():
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
 
 
-def add_pdb_code(code, mmol=None, mode='production'):
-    # If pdb is already in database, exit before doing anything.
-    with session_scope() as session:
-        pdb = session.query(PdbDB).filter(PdbDB.pdb == code).one_or_none()
-        if pdb is not None:
-            return
-    structure = StructureHandler.from_code(code=code, mmol=mmol)
-    atlas_graphs = structure.get_atlas_graphs(mode=mode)
-    for ag in atlas_graphs:
-        if ag.name is None:
-            # add to holding list
-            add_g_to_holding_pickle(g=ag, mode=mode)
-        else:
-            add_graph_to_db(**ag.graph)
-    return
-
-
 def add_g_to_holding_pickle(g, mode='production'):
     holding_pickle = global_settings["holding_unknowns"][mode]
     with open(holding_pickle, 'rb') as foo:
