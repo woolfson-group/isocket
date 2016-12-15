@@ -116,20 +116,6 @@ def remove_pdb_code(code):
     return
 
 
-def datasets_are_valid(mode='production'):
-    valid = False
-    with session_scope() as session:
-        adbs = set([x[0] for x in session.query(AtlasDB.name).filter(AtlasDB.name.startswith('U')).all()])
-    unknown_pickle = global_settings["unknown_graphs"][mode]
-    with open(unknown_pickle, 'rb') as foo:
-        unks = {x.name for x in pickle.load(foo)}
-    if len(adbs - unks) == 0:
-        valid = True
-    # run checks and return True if they pass.
-    # Checks: is db consistent with shelf? Check graph properties and names.
-    return valid
-
-
 def get_or_create(model, session, **kwargs):
     """Uses kwargs to get instance of model. If can't get that instance from session, add it to session.
 
