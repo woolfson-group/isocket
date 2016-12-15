@@ -26,8 +26,14 @@ class BaseTestCase(TestCase):
         db.drop_all()
 
 
-class AtlasDBTestCase(BaseTestCase):
+class CutoffDBTestCase(BaseTestCase):
+    def test_cutoff_rows(self):
+        populate_cutoff()
+        cutoff_count = db.session.query(CutoffDB).count()
+        self.assertEqual(cutoff_count, 28)
 
+
+class AtlasDBTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.graph_list = AtlasHandler().atlas_graphs
@@ -92,7 +98,6 @@ class CodesToAddTestCase(BaseTestCase):
 
 
 class RemovePdbCodeTestCase(BaseTestCase):
-
     def setUp(self):
         super().setUp()
         populate_cutoff()
@@ -112,9 +117,3 @@ class RemovePdbCodeTestCase(BaseTestCase):
         self.assertEqual(c, 0)
 
 
-class CutoffDBTestCase(BaseTestCase):
-
-    def test_cutoff_rows(self):
-        populate_cutoff()
-        cutoff_count = db.session.query(CutoffDB).count()
-        self.assertEqual(cutoff_count, 28)
