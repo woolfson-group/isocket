@@ -25,7 +25,6 @@ class StructureHandler:
     @classmethod
     def from_code(cls, code, mmol=None, store_data=True):
         pref_mmol = preferred_mmol(code=code)
-        fs = FileSystem(code=code, data_dir=data_dir)
         if mmol is None:
             mmol = pref_mmol
             preferred = True
@@ -33,15 +32,18 @@ class StructureHandler:
             preferred = True
         else:
             preferred = False
+        # Use FileSystem if storing the cif/pdb files.
         if (data_dir is not None) and store_data:
+            fs = FileSystem(code=code, data_dir=data_dir)
             # Try with cif file, if that fails try with pdb file.
-            cif = fs.cifs[mmol]
             try:
+                cif = fs.cifs[mmol]
                 a = convert_cif_to_ampal(cif=cif, path=True, assembly_id=code)
             except ValueError:
                 pdb = fs.mmols[mmol]
                 a = convert_pdb_to_ampal(pdb=pdb, path=True, pdb_id=code)
         else:
+            # Try with cif file, if that fails try with pdb file.
             try:
                 cif = get_cif(code=code, mmol_number=mmol)
                 a = convert_cif_to_ampal(cif=cif, path=False, assembly_id=code)
