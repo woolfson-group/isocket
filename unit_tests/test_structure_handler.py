@@ -17,7 +17,7 @@ class StructureHandlerTestCase(unittest.TestCase):
 
     def test_from_code_classmethod(self):
         for code in self.test_codes:
-            sh = StructureHandler.from_code(code=code, store_data=False)
+            sh = StructureHandler.from_code(code=code, store_files=False)
             self.assertTrue(sh.is_preferred)
             self.assertEqual(code, sh.code)
 
@@ -31,7 +31,7 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
 
     def setUp(self):
         code = '2ebo'
-        self.sh = StructureHandler.from_code(code=code, store_data=False)
+        self.sh = StructureHandler.from_code(code=code, store_files=False)
         self.kgs = self.sh.get_knob_graphs()
 
     def test_number_of_knob_graphs(self):

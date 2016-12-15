@@ -24,7 +24,7 @@ class StructureHandler:
         self.mmol = None
 
     @classmethod
-    def from_code(cls, code, mmol=None, store_data=True):
+    def from_code(cls, code, mmol=None, store_files=True):
         pref_mmol = preferred_mmol(code=code)
         if mmol is None:
             mmol = pref_mmol
@@ -34,7 +34,7 @@ class StructureHandler:
         else:
             preferred = False
         # Use FileSystem if storing the cif/pdb files.
-        if (data_dir is not None) and store_data:
+        if (data_dir is not None) and store_files:
             fs = FileSystem(code=code, data_dir=data_dir)
             # Try with cif file, if that fails try with pdb file.
             try:
