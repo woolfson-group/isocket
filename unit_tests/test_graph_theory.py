@@ -36,36 +36,6 @@ class AtlasHandlerTestCase(unittest.TestCase):
         self.assertEqual(len(self.atlas_handler.path_graphs(max_nodes=88)), 81)
 
 
-class GraphHandlerTestCase(unittest.TestCase):
-    def setUp(self):
-        self.g1 = complete_graph(8)
-        self.g2 = complete_graph(9)
-        self.g1_name = 'U1'
-        self.g2_name = 'jack_test_graph'
-
-    def clear_unknown_graphs(self):
-        with open(unknown_graphs, 'wb') as foo:
-            pickle.dump([], foo)
-
-    def tearDown(self):
-        self.clear_unknown_graphs()
-
-    def test_graph_parameters(self):
-        gh = GraphHandler(g=self.g1, mode=mode)
-        self.assertEqual(gh.graph_parameters()['nodes'], 8)
-        self.assertEqual(gh.graph_parameters()['edges'], 28)
-
-    def test_isomorphism_checker_with_atlas_handler(self):
-        self.clear_unknown_graphs()
-        g1 = self.g1.copy()
-        g1.name = self.g1_name
-        g2 = self.g2.copy()
-        g2.name = self.g2_name
-        graph_list = [g1, g2]
-        self.assertEqual(isomorphism_checker(self.g1, graph_list=graph_list), self.g1_name)
-        self.assertEqual(isomorphism_checker(self.g2, graph_list=graph_list), self.g2_name)
-
-
 class IsomorphismCheckerTestCase(unittest.TestCase):
     """Tests for graph_theory.isomorphism_checker"""
     def setUp(self):
