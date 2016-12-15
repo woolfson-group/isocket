@@ -46,7 +46,6 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
 
     def test_graph_keys(self):
         """ Tests the knob graphs have precisely the expected set of keys in their graph dict attribute. """
-        compare = lambda x, y: Counter(x) == Counter(y)
         key_names = ['cc_num',
                      'code',
                      'edges',
@@ -56,6 +55,5 @@ class StructureHandlerGetKnobGraphsTestCase(unittest.TestCase):
                      'scut',
                      'name',
                      'preferred']
-        a = all([compare(x.graph.keys(), key_names) for x in self.kgs])
+        a = all([Counter(x.graph.keys()) == Counter(key_names) for x in self.kgs])
         self.assertTrue(a)
-
