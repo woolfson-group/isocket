@@ -23,7 +23,7 @@ class StructureHandlerTestCase(unittest.TestCase):
 
     def test_from_file_classmethod(self):
         for file in self.test_files:
-            sh = StructureHandler.from_file(filename=file, path=True)
+            sh = StructureHandler.from_file(filename=file)
             self.assertFalse(sh.is_preferred)
 
 
