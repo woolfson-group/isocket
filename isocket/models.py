@@ -69,7 +69,6 @@ class PdbDB(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     pdb = db.Column(db.String(4), nullable=False, unique=True)
 
-    cdhit_full = db.relationship('CdhitFullDB', back_populates='pdb', cascade='all, delete-orphan', passive_deletes=True)
     pdbes = db.relationship('PdbeDB', back_populates='pdb', cascade='all, delete-orphan', passive_deletes=True)
 
     def __repr__(self):
@@ -91,20 +90,3 @@ class PdbeDB(db.Model):
 
     def __repr__(self):
         return '<PdbeDB(pdb={0}, mmol={1}, preferred={2})>'.format(self.pdb.pdb, self.mmol, bool(self.preferred))
-
-
-class CdhitFullDB(db.Model):
-    __tablename__ = 'cdhit_full'
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-
-    id = db.Column(db.Integer, primary_key=True)
-    c90 = db.Column(db.Boolean, default=False)
-    c80 = db.Column(db.Boolean, default=False)
-    c70 = db.Column(db.Boolean, default=False)
-    c60 = db.Column(db.Boolean, default=False)
-    pdb_id = db.Column(db.ForeignKey('pdb.id', ondelete='CASCADE'), nullable=False, index=True)
-
-    pdb = db.relationship('PdbDB', back_populates='cdhit_full')
-
-    def __repr__(self):
-        return '<CdhitFullDB(pdb={0}, c90={1})>'.format(self.pdb.pdb, self.c90)
