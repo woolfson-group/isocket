@@ -57,12 +57,13 @@ class AtlasHandler:
 
 
 def graph_to_plain_graph(g):
+    """ Convert complex (MultiDiGraph) into Graph, with integer nodes and tuple edges """
     # construct h fully in case of unorderable/unsortable edges.
     h = networkx.Graph()
     h.add_nodes_from(range(len(g.nodes())))
     edges = [(g.nodes().index(e1), g.nodes().index(e2)) for e1, e2 in g.edges()]
     h.add_edges_from(edges)
-    h.graph['name'] = 'unnamed'
+    h.graph['name'] = None
     return h
 
 
