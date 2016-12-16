@@ -44,5 +44,3 @@ def configure_app(app):
     config_name = os.getenv(key='ISOCKET_CONFIG', default='default')
     app.config.from_object(config[config_name])
     app.config.from_pyfile('config.cfg', silent=True)
-
-
