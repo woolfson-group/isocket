@@ -15,7 +15,7 @@ from isocket_settings import global_settings
 from isocket.graph_theory import AtlasHandler
 
 data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
-filename = os.path.join(data_folder, '2016-11-29_graph_names.h5')
+filename = os.path.join(data_folder, 'atlas.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
 df = pandas.read_hdf(filename, 'graph_names')
