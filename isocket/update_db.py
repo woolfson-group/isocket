@@ -13,6 +13,14 @@ class UpdateCodes:
         self.store_files = store_files
         self.codes = codes
 
+    def __repr__(self):
+        if len(self.codes) <= 3:
+            codes_repr = '{}'.format(self.codes)
+        else:
+            codes_repr = '{}...'.format(self.codes[:3])
+        return '<UpdateCodes({})>'.format(codes_repr)
+
+
     @property
     def structure_handlers(self):
         """ StructureHandler instances for preferred biological unit (mmol) for each code """
