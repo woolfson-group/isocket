@@ -30,7 +30,7 @@ class CutoffDBTestCase(BaseTestCase):
     def test_cutoff_rows(self):
         populate_cutoff()
         cutoff_count = db.session.query(CutoffDB).count()
-        self.assertEqual(cutoff_count, 28)
+        self.assertEqual(cutoff_count, 20)
 
 
 class AtlasDBTestCase(BaseTestCase):

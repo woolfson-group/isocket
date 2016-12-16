@@ -64,11 +64,12 @@ def populate_cutoff():
     True if new values added to database
     False otherwise
     """
-    scuts = [7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0]
+    scuts = [7.0, 7.5, 8.0, 8.5, 9.0]
     kcuts = list(range(4))
     with session_scope() as session:
         for kcut, scut in itertools.product(kcuts, scuts):
             PopulateModel(CutoffDB, kcut=kcut, scut=scut).go(session)
+    return
 
 
 def add_graph_to_db(code, mmol, preferred, cc_num, name, kcut, scut, nodes, edges):
