@@ -39,7 +39,7 @@ class UpdateCodes:
                 continue
         return all_kgs
 
-    def run_update(self, mode):
+    def run_update(self, mode=None):
         """ Gets name for each knob graph and then adds them all to the database """
         kgs = self.knob_graphs
         # is not all named, then need to turn to list of larger graphs.
@@ -48,6 +48,10 @@ class UpdateCodes:
             name_against_unknowns(knob_graphs=kgs)
             # If still not named, add graphs to list of larger graphs, and write to the file.
             if not all_graphs_named(knob_graphs=kgs):
+                if mode is None:
+                    allowed_modes = ['production', 'testing']
+                    raise ValueError('Please provide running mode for adding new unknown_graphs.'
+                                     ' Currently allowed values are {}'.format(allowed_modes))
                 add_unknowns(knob_graphs=kgs, mode=mode)
         add_knob_graphs_to_db(knob_graphs=kgs)
         return
