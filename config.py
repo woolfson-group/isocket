@@ -21,13 +21,15 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/jackheal/Projects/isocket/isocket/data/atlas.db'
+    database_filepath = os.path.join(basedir, 'isocket', 'data', 'atlas.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_filepath)
 
 
 class TestingConfig(BaseConfig):
     DEBUG = False
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../unit_tests/tests.db'
+    database_filepath = os.path.join(basedir, 'unit_tests', 'tests.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_filepath)
 
 
 config = {
@@ -42,5 +44,3 @@ def configure_app(app):
     config_name = os.getenv(key='ISOCKET_CONFIG', default='default')
     app.config.from_object(config[config_name])
     app.config.from_pyfile('config.cfg', silent=True)
-
-
