@@ -21,15 +21,15 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    database_uri = os.path.join(basedir, 'isocket', 'data', 'atlas.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_uri)
+    database_filepath = os.path.join(basedir, 'isocket', 'data', 'atlas.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_filepath)
 
 
 class TestingConfig(BaseConfig):
     DEBUG = False
     TESTING = True
-    database_uri = os.path.join(basedir, 'unit_tests', 'tests.db')
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_uri)
+    database_filepath = os.path.join(basedir, 'unit_tests', 'tests.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_filepath)
 
 
 config = {
