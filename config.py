@@ -28,7 +28,8 @@ class DevelopmentConfig(BaseConfig):
 class TestingConfig(BaseConfig):
     DEBUG = False
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///../unit_tests/tests.db'
+    database_uri = os.path.join(basedir, 'unit_tests', 'tests.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(database_uri)
 
 
 config = {
