@@ -34,7 +34,7 @@ def uploaded_file(filename, scut, kcut):
     uploaded_structures_dest = current_app.config['UPLOADED_STRUCTURES_DEST']
     static_file_path = os.path.join(uploaded_structures_dest, filename)
     # Deal with file extension here (is it cif or pdb)
-    structure = StructureHandler.from_file(filename=static_file_path, path=True)
+    structure = StructureHandler.from_file(filename=static_file_path)
     kg = structure.get_knob_group(cutoff=scut)
     g = kg.filter_graph(kg.graph, cutoff=scut, min_kihs=kcut)
     h = networkx.Graph()
