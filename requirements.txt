@@ -18,6 +18,7 @@ networkx
 numpy
 numpydoc
 parmed
+pandas
 recommonmark
 requests
 scipy
