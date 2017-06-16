@@ -1,5 +1,5 @@
 alembic
-bokeh
+bokeh #0.12.6
 bs4
 Cython
 deap
@@ -19,6 +19,7 @@ numpy
 numpydoc
 parmed
 pandas
+pytables
 recommonmark
 requests
 scipy
