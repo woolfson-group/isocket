@@ -3,10 +3,10 @@ import networkx
 import numpy
 
 from isocket_settings import global_settings
-from isambard_dev.add_ons.filesystem import FileSystem, preferred_mmol, get_cif, get_mmol
-from isambard_dev.add_ons.knobs_into_holes import KnobGroup
-from isambard_dev.ampal.pdb_parser import convert_pdb_to_ampal
-from isambard_dev.add_ons.parmed_to_ampal import convert_cif_to_ampal
+from isambard.add_ons.filesystem import FileSystem, preferred_mmol, get_cif, get_mmol
+from isambard.add_ons.knobs_into_holes import KnobGroup
+from isambard.ampal.pdb_parser import convert_pdb_to_ampal
+from isambard.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isocket.graph_theory import graph_to_plain_graph, AtlasHandler, isomorphism_checker
 
 try:
