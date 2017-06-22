@@ -1,6 +1,6 @@
 """Loads a json file containing settings that the isocket use.
 
-A settings.json file must be made in this directory, template_settings.py can be copied and paths for your system
+A settings.json file must be made in this directory, template_settings.json can be copied and paths for your system
 can be added. Json files look like python dictionaries, and in fact all json files are valid python dictionary code
 (although this isn't necessarily true in reverse). The settings.json file is ignored by git to it avoid being
 overwritten with another systems paths. When the isocket is imported a isocket.settings dictionary is generated, which
