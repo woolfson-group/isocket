@@ -28,7 +28,7 @@ def main(args):
     readline.parse_and_bind("tab: complete")
     readline.set_completer(complete)
 
-    settings_path = isocket_path / 'settings.json'
+    settings_path = os.path.join(isocket_path, 'web', 'settings.json')
     if args.circleci:
         install_for_circleci(settings_path)
         return
