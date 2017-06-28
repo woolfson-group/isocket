@@ -16,6 +16,7 @@ class BaseConfig(object):
     TEMP_FOLDER = os.path.join(basedir, 'tmp')
     UPLOADED_STRUCTURES_ALLOW = ('pdb', 'mmol', 'cif', 'mmcif')
     ASSETS_DEBUG = DEBUG
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(BaseConfig):
