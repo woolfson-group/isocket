@@ -1,0 +1,4 @@
+bokeh==0.12.6
+pandas==0.20.2
+networkx==1.11
+tables==3.3.0
