@@ -7,6 +7,6 @@ web/isocket/static/.webassets-cache/
 web/isocket/static/js/lib
 web/isocket/static/css/lib
 web/isocket/static/uploads
-unit_tests/tests.db
+web/unit_tests/tests.db
 .gitignore
 web/settings.json

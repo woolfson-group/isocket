@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_uploads import UploadSet, configure_uploads
 
-from config import configure_app
+from web.config import configure_app
 
 
 def create_app(config=None):

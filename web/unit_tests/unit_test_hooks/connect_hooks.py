@@ -2,7 +2,7 @@ import shutil
 import os
 
 unit_test_hooks_folder = os.path.dirname(os.path.abspath(__file__), )
-module_path = os.path.abspath(os.path.join(unit_test_hooks_folder, '..', '..'))
+module_path = os.path.abspath(os.path.join(unit_test_hooks_folder, '../', '..', '..'))
 
 
 def main(args):

@@ -8,6 +8,7 @@
 # To enable this hook, rename this file to "pre-commit".
 
 source activate isocket
+cd web
 python -m unittest discover unit_tests/.
 
 if [ $? -eq 1 ]

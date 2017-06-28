@@ -1,5 +1,6 @@
 import pickle
 import unittest
+import os
 
 from networkx.generators import cycle_graph, complete_graph
 
@@ -7,7 +8,8 @@ from web.isocket.graph_theory import AtlasHandler, isomorphism_checker
 from web.isocket_settings import global_settings
 
 mode = 'testing'
-unknown_graphs = global_settings["unknown_graphs"][mode]
+unknown_graphs = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'unknown_graphs_tests.p')
+#unknown_graphs = global_settings["unknown_graphs"][mode]
 
 
 class AtlasHandlerTestCase(unittest.TestCase):
