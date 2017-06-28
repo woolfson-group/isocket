@@ -3,7 +3,6 @@
 import glob
 import json
 import os
-import pathlib
 import readline
 
 text_colours = {
@@ -17,7 +16,7 @@ text_colours = {
     'UNDERLINE': '\033[4m'
 }
 
-isocket_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
+isocket_path = os.path.dirname(os.path.realpath(__file__))
 
 settings = {}
 
