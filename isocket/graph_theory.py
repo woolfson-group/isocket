@@ -110,15 +110,15 @@ def get_filtered_graph_list(atlas=True, cyclics=True, unknowns=False, paths=Fals
     This is a temporary home for this function.
     Write the result of the array to a pickle file for use as basis of visualistaion.
     """
-    gag = AtlasHandler().get_graph_list(atlas=atlas, cyclics=cyclics,
+    graph_list = AtlasHandler().get_graph_list(atlas=atlas, cyclics=cyclics,
                                         unknowns=unknowns, paths=paths,
                                         max_cyclics=max_nodes, max_paths=max_nodes)
-    gag = [g for g in gag if g.number_of_nodes() >= min_nodes]
-    gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
+    graph_list = [g for g in graph_list if g.number_of_nodes() >= min_nodes]
+    graph_list = [g for g in graph_list if g.number_of_nodes() <= max_nodes]
     if all_connected:
-        gag = [g for g in gag if networkx.connected.is_connected(g)]
-    gag = [g for g in gag if max(g.degree().values()) <= max_degree]
-    return gag
+        graph_list = [g for g in graph_list if networkx.connected.is_connected(g)]
+    graph_list = [g for g in graph_list if max(g.degree().values()) <= max_degree]
+    return graph_list
 
 
 __author__ = 'Jack W. Heal'
