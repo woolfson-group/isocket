@@ -1,6 +1,5 @@
 import pandas
 import numpy
-import networkx as nx
 import os
 import pickle
 from collections import OrderedDict
@@ -11,10 +10,7 @@ from bokeh.models import HoverTool, ColumnDataSource
 from bokeh.models import Slider, HBox, Select
 from bokeh.models.ranges import Range1d
 
-from isocket_settings import global_settings
-from isocket.graph_theory import AtlasHandler
-
-data_folder = os.path.join(global_settings['package_path'], 'isocket', 'data')
+data_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 filename = os.path.join(data_folder, 'atlas.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
@@ -47,24 +43,37 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
     return points
 
 
-# Get graphs and format plot accordingly
-def get_graph_array(atlas=True, cyclics=True, unknowns=False, paths=False, max_nodes=8):
-    gag = AtlasHandler().get_graph_list(atlas=atlas, cyclics=cyclics,
-                                        unknowns=unknowns, paths=paths,
-                                        max_cyclics=max_nodes, max_paths=max_nodes)
-    gag = [g for g in gag if g.number_of_nodes() >= 2]
-    gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
-    gag = [g for g in gag if nx.connected.is_connected(g) and max(g.degree().values()) <= 4]
-    nrows = int(numpy.floor(numpy.sqrt(len(gag))))
-    ncols = int(numpy.ceil(len(gag)/float(nrows)))
-    size_diff = nrows*ncols - len(gag)
+def graph_list_to_array(graph_list, nrows=None, ncols=None):
+    ngraphs = len(graph_list)
+    if (nrows is None) and (ncols is None):
+        nrows = int(numpy.floor(numpy.sqrt(len(graph_list))))
+        ncols = int(numpy.ceil(len(graph_list) / float(nrows)))
+    elif nrows is None:
+        if ngraphs % ncols == 0:
+            nrows = ngraphs / ncols
+        else:
+            nrows = int(numpy.floor(ngraphs / ncols )) + 1
+    elif ncols is None:
+        if ngraphs % nrows == 0:
+            ncols = ngraphs / nrows
+        else:
+            ncols = int(numpy.floor(ngraphs / nrows)) + 1
+    size_diff = nrows * ncols - len(graph_list)
+    if size_diff < 0:
+        # defaults to square array
+        nrows = int(numpy.floor(numpy.sqrt(len(graph_list))))
+        ncols = int(numpy.ceil(len(graph_list) / float(nrows)))
     # Fill in square array with None
-    sq_gag = gag + [None]*size_diff
-    sq_gag = numpy.reshape(sq_gag, (ncols, nrows))
-    return sq_gag
+    graph_array = graph_list + [None] * size_diff
+    graph_array = numpy.reshape(graph_array, (ncols, nrows))
+    return graph_array
+
 
 max_nodes = 8
-sq_gag = get_graph_array(max_nodes=max_nodes)
+graph_list_pickle = os.path.join(data_folder, 'graph_list.p')
+with open(graph_list_pickle, 'rb') as foo:
+    graph_list  = pickle.load(foo)
+graph_array = graph_list_to_array(graph_list=graph_list)
 
 
 def get_base_figure():
@@ -86,13 +95,13 @@ def get_base_figure():
 
 
 def add_graph_glyphs():
-    p.x_range = Range1d(-1, sq_gag.shape[0])
-    p.y_range = Range1d(sq_gag.shape[1], -1)
+    p.x_range = Range1d(-1, graph_array.shape[0])
+    p.y_range = Range1d(graph_array.shape[1], -1)
     circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
     all_circles = []
     all_xs = []
     all_ys = []
-    for i, g in numpy.ndenumerate(sq_gag):
+    for i, g in numpy.ndenumerate(graph_array):
         if g:
             xs = []
             ys = []
@@ -220,7 +229,7 @@ def update_data():
     gnames = []
     counts = []
     alphas = []
-    for i, g in numpy.ndenumerate(sq_gag):
+    for i, g in numpy.ndenumerate(graph_array):
         if g:
             if g.name in rgs.index:
                 count = rgs[g.name]

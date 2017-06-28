@@ -103,4 +103,22 @@ def isomorphism_checker(g, graph_list=None):
             iso_name = str(graph_list.index(isomorph))
     return iso_name
 
+
+def get_filtered_graph_list(atlas=True, cyclics=True, unknowns=False, paths=False, max_nodes=8,
+                    min_nodes=2, max_degree=4, all_connected=True):
+    """ Gets a square array of named graphs for use in atlas_visualisation.
+    This is a temporary home for this function.
+    Write the result of the array to a pickle file for use as basis of visualistaion.
+    """
+    gag = AtlasHandler().get_graph_list(atlas=atlas, cyclics=cyclics,
+                                        unknowns=unknowns, paths=paths,
+                                        max_cyclics=max_nodes, max_paths=max_nodes)
+    gag = [g for g in gag if g.number_of_nodes() >= min_nodes]
+    gag = [g for g in gag if g.number_of_nodes() <= max_nodes]
+    if all_connected:
+        gag = [g for g in gag if networkx.connected.is_connected(g)]
+    gag = [g for g in gag if max(g.degree().values()) <= max_degree]
+    return gag
+
+
 __author__ = 'Jack W. Heal'
