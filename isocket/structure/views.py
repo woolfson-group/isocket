@@ -1,7 +1,7 @@
 import json
 import os
 import networkx
-from flask import render_template, flash, redirect, request, url_for, current_app, Blueprint
+from flask import render_template, flash, redirect, request, url_for, current_app
 from flask_uploads import UploadSet
 from networkx.readwrite import json_graph
 from werkzeug.utils import secure_filename
