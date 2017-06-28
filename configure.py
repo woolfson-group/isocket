@@ -42,7 +42,7 @@ def install_for_circleci(settings_path):
     cci_settings = {
         "unknown_graphs": {
             "production": "/home/ubuntu/isocket/web/isocket/data/unknown_graphs.p",
-            "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_tests.p"
+            "testing": "/home/ubuntu/isocket/web/unit_tests/unknown_graphs_tests.p"
         },
         "structural_database": {"path": "."}
         }
