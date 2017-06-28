@@ -4,7 +4,7 @@ from collections import Counter
 from isocket_settings import global_settings
 from isocket.structure_handler import StructureHandler
 from isocket.graph_theory import AtlasHandler, isomorphism_checker, graph_to_plain_graph
-from isocket.populate_models import populate_atlas, add_graph_to_db
+from isocket.database_management.populate_models import populate_atlas, add_graph_to_db
 
 
 class UpdateCodes:

@@ -2,7 +2,7 @@ import sqlalchemy
 import itertools
 from contextlib import contextmanager
 
-from isocket.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket.database_management.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 
 @contextmanager

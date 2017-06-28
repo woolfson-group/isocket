@@ -11,5 +11,5 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 from isocket.home import views
 from isocket.atlas import views
 from isocket.structure import views
-from isocket import models, populate_models, update_db
+from isocket.database_management import models
 from .util import assets
