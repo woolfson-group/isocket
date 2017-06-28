@@ -19,4 +19,4 @@ test:
     - cd /home/ubuntu/isocket
     - python configure.py -C
     - cd web/
-    - PYTHONPATH=$PYTHONPATH:/home/ubuntu/isambard/ python -m unittest discover /home/ubuntu/isocket/webunit_tests/. -v
+    - PYTHONPATH=$PYTHONPATH:/home/ubuntu/isambard/ python -m unittest discover /home/ubuntu/isocket/web/unit_tests/. -v
