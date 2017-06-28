@@ -69,10 +69,10 @@ def graph_list_to_array(graph_list, nrows=None, ncols=None):
     return graph_array
 
 
-max_nodes = 8
 graph_list_pickle = os.path.join(data_folder, 'graph_list.p')
 with open(graph_list_pickle, 'rb') as foo:
     graph_list  = pickle.load(foo)
+max_nodes = max([g.number_of_nodes() for g in graph_list])
 graph_array = graph_list_to_array(graph_list=graph_list)
 
 
