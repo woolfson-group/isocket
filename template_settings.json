@@ -1,6 +1,0 @@
-{
-  "unknown_graphs": {
-    "production": "<path-to-isocket-root>/isocket/data/unknown_graphs.p",
-    "testing": "<path-to-isocket-root>/unit_tests/unknown_graphs_tests.p"
-  }
-}

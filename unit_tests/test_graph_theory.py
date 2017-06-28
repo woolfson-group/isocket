@@ -1,9 +1,10 @@
-import unittest
 import pickle
+import unittest
+
 from networkx.generators import cycle_graph, complete_graph
 
-from isocket_settings import global_settings
-from isocket.graph_theory import AtlasHandler, isomorphism_checker
+from web.isocket.graph_theory import AtlasHandler, isomorphism_checker
+from web.isocket_settings import global_settings
 
 mode = 'testing'
 unknown_graphs = global_settings["unknown_graphs"][mode]

@@ -1,18 +1,16 @@
-import unittest
 import os
+import unittest
 from collections import Counter
 
-from isocket_settings import global_settings
-from isocket.structure_handler import StructureHandler
+from web.isocket.structure_handler import StructureHandler
 
-install_folder = global_settings['package_path']
-
+testing_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'testing_files')
 
 class StructureHandlerTestCase(unittest.TestCase):
     """ Tests for the valid_backbone_distance method of Polypeptide class. """
     def setUp(self):
         self.test_codes = ['1ek9', '2ht0', '3qy1']
-        self.test_files = [os.path.join(install_folder, 'unit_tests', 'testing_files', '{}.pdb'.format(x))
+        self.test_files = [os.path.join(testing_folder, '{}.pdb'.format(x))
                            for x in self.test_codes]
 
     def test_from_code_classmethod(self):
