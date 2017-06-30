@@ -44,6 +44,25 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
 
 
 def graph_list_to_array(graph_list, nrows=None, ncols=None):
+    """ Converts list of graphs into an (nrows x ncols) array of graphs to be drawn in the atlas visualisation.
+
+    Parameters
+    ----------
+    graph_list: list(networkx.Graph)
+        Graphs to be arranged in array for the atlas visualisation. Graph.name attribute is accessed in hover tool.
+    nrows: int, or None
+        Number of rows in the array in the visualisation.
+        If nrows is None, value determined based on ncols. If both None, array is square.
+    ncols: int, None
+        Number of columns in the array in the visualisation.
+        If ncols is None, value determined based on nrows. If both None, array is square.
+
+    Returns
+    -------
+    graph_array: numpy.array
+        Array of graphs to be drawn in the atlas visualisation.
+
+    """
     ngraphs = len(graph_list)
     if (nrows is None) and (ncols is None):
         nrows = int(numpy.floor(numpy.sqrt(len(graph_list))))
@@ -68,12 +87,13 @@ def graph_list_to_array(graph_list, nrows=None, ncols=None):
     graph_array = numpy.reshape(graph_array, (ncols, nrows))
     return graph_array
 
-
+# graph_array is compiled from the file 'graph_list.p' in the ./data folder.
+# To change the graphs displayed, change this file.
 graph_list_pickle = os.path.join(data_folder, 'graph_list.p')
 with open(graph_list_pickle, 'rb') as foo:
-    graph_list  = pickle.load(foo)
-max_nodes = max([g.number_of_nodes() for g in graph_list])
-graph_array = graph_list_to_array(graph_list=graph_list)
+    _graph_list = pickle.load(foo)
+max_nodes = max([g.number_of_nodes() for g in _graph_list])
+graph_array = graph_list_to_array(graph_list=_graph_list)
 
 
 def get_base_figure():
