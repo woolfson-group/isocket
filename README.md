@@ -22,7 +22,7 @@ Install docker and docker-compose. Navigate to the isocket folder and run:
 
     $ docker-compose up 
 
-Then in your browser navigate to localhost:5000.
+Then in your browser navigate to localhost:19878.
 
  
  
