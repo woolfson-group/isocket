@@ -8,15 +8,15 @@ dependencies:
     # isambard
     - pip install --upgrade pip
     - cd /home/ubuntu/
-    - git clone https://github.com/woolfson-group/isambard_dev.git
-    - mv isambard_dev /home/ubuntu/
-    - git clone git@github.com:woolfson-group/dependencies_for_isambard.git
-    - mv dependencies_for_isambard /home/ubuntu/isambard_dev
+    - git clone https://github.com/woolfson-group/isambard.git
+    - mv isambard /home/ubuntu/
+    - mv web/dependencies_for_isambard /home/ubuntu/isambard
     # DSSP
-    - chmod +x /home/ubuntu/isambard_dev/dependencies_for_isambard/dssp/dssp-2.0.4
-    - python /home/ubuntu/isambard_dev/isambard_dev/configure.py -C
+    - chmod +x /home/ubuntu/isambard/dependencies_for_isambard/dssp/dssp-2.0.4
+    - python /home/ubuntu/isambard/isambard/configure.py -C
 test:
   override:
     - cd /home/ubuntu/isocket
     - python configure.py -C
-    - PYTHONPATH=$PYTHONPATH:/home/ubuntu/isambard_dev/ python -m unittest discover unit_tests/. -v
+    - cd web/
+    - PYTHONPATH=$PYTHONPATH:/home/ubuntu/isambard/:/home/ubuntu/isocket/web/ python -m unittest discover /home/ubuntu/isocket/web/unit_tests/. -v

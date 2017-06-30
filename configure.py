@@ -3,7 +3,6 @@
 import glob
 import json
 import os
-import pathlib
 import readline
 
 text_colours = {
@@ -17,7 +16,7 @@ text_colours = {
     'UNDERLINE': '\033[4m'
 }
 
-isocket_path = pathlib.Path(os.path.dirname(os.path.realpath(__file__)))
+isocket_path = os.path.dirname(os.path.realpath(__file__))
 
 settings = {}
 
@@ -28,7 +27,7 @@ def main(args):
     readline.parse_and_bind("tab: complete")
     readline.set_completer(complete)
 
-    settings_path = isocket_path / 'settings.json'
+    settings_path = os.path.join(isocket_path, 'web', 'settings.json')
     if args.circleci:
         install_for_circleci(settings_path)
         return
@@ -42,8 +41,8 @@ def complete(text, state):
 def install_for_circleci(settings_path):
     cci_settings = {
         "unknown_graphs": {
-            "production": "/home/ubuntu/isocket/isocket/data/unknown_graphs.p",
-            "testing": "/home/ubuntu/isocket/unit_tests/unknown_graphs_tests.p"
+            "production": "/home/ubuntu/isocket/web/isocket/data/unknown_graphs.p",
+            "testing": "/home/ubuntu/isocket/web/unit_tests/unknown_graphs_tests.p"
         },
         "structural_database": {"path": "."}
         }
