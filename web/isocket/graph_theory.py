@@ -4,7 +4,7 @@ import networkx
 from networkx.generators import cycle_graph, path_graph
 from networkx.generators.atlas import graph_atlas_g
 
-from web.isocket_settings import global_settings
+from isocket_settings import global_settings
 
 
 class AtlasHandler:

@@ -1,7 +1,7 @@
 from bokeh.embed import autoload_server
 from flask import render_template
 
-from web.isocket.atlas import atlas_bp
+from isocket.atlas import atlas_bp
 
 
 @atlas_bp.route('/atlas')

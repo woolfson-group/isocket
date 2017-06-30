@@ -8,4 +8,4 @@ home_bp = Blueprint(
     static_url_path='/{}'.format(__name__)
 )
 
-from web.isocket.home import views
+from isocket.home import views

@@ -2,7 +2,7 @@ import os
 
 from flask_testing import TestCase
 
-from web.isocket.factory import create_app
+from isocket.factory import create_app
 
 os.environ['ISOCKET_CONFIG'] = 'testing'
 

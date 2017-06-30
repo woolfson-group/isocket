@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 import sqlalchemy
 
-from web.isocket.database_management.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
+from isocket.database_management.models import db, GraphDB, PdbDB, PdbeDB, CutoffDB, AtlasDB
 
 
 @contextmanager
