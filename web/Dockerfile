@@ -5,7 +5,7 @@ COPY ./requirements.txt .
 RUN pip install -r ./requirements.txt
 COPY ./dependencies_for_isambard/ /dependencies_for_isambard/
 COPY ./dependencies_for_isambard/.isambard_settings /root/
-COPY . /web/
-WORKDIR /web
+COPY . /app/
+WORKDIR /app
 ENV PYTHONPATH $PYTHONPATH:/
 CMD ["python", "main.py"]
