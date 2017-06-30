@@ -4,12 +4,12 @@ import os
 import networkx
 from flask import render_template, flash, redirect, request, url_for, current_app
 from flask_uploads import UploadSet
-from web.isocket.structure import structure_bp
-from web.isocket.structure.forms import SocketForm
+from isocket.structure import structure_bp
+from isocket.structure.forms import SocketForm
 from networkx.readwrite import json_graph
 from werkzeug.utils import secure_filename
 
-from web.isocket.structure_handler import StructureHandler
+from isocket.structure_handler import StructureHandler
 
 
 @structure_bp.route('/run', methods=['GET', 'POST'])

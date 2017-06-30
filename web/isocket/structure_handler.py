@@ -7,8 +7,8 @@ from isambard.add_ons.knobs_into_holes import KnobGroup
 from isambard.add_ons.parmed_to_ampal import convert_cif_to_ampal
 from isambard.ampal.pdb_parser import convert_pdb_to_ampal
 
-from web.isocket.graph_theory import graph_to_plain_graph, AtlasHandler, isomorphism_checker
-from web.isocket_settings import global_settings
+from isocket.graph_theory import graph_to_plain_graph, AtlasHandler, isomorphism_checker
+from isocket_settings import global_settings
 
 try:
     data_dir = global_settings['structural_database']['path']

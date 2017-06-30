@@ -8,4 +8,4 @@ atlas_bp = Blueprint(
     static_url_path='/{}'.format(__name__)
 )
 
-from web.isocket.atlas import views
+from isocket.atlas import views

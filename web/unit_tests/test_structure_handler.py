@@ -2,7 +2,7 @@ import os
 import unittest
 from collections import Counter
 
-from web.isocket.structure_handler import StructureHandler
+from isocket.structure_handler import StructureHandler
 
 testing_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'testing_files')
 

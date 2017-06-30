@@ -1,11 +1,11 @@
 import pickle
 from collections import Counter
 
-from web.isocket.graph_theory import AtlasHandler, isomorphism_checker, graph_to_plain_graph
-from web.isocket.structure_handler import StructureHandler
+from isocket.graph_theory import AtlasHandler, isomorphism_checker, graph_to_plain_graph
+from isocket.structure_handler import StructureHandler
 
-from web.isocket.database_management.populate_models import populate_atlas, add_graph_to_db
-from web.isocket_settings import global_settings
+from isocket.database_management.populate_models import populate_atlas, add_graph_to_db
+from isocket_settings import global_settings
 
 
 class UpdateCodes:

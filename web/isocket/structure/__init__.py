@@ -8,4 +8,4 @@ structure_bp = Blueprint(
     static_url_path='/{}'.format(__name__)
 )
 
-from web.isocket.structure import views
+from isocket.structure import views
