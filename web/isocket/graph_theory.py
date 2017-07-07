@@ -19,10 +19,14 @@ class AtlasHandler:
 
     @property
     def unknown_graphs(self):
-        unknown_pickle = global_settings["unknown_graphs"][self.mode]
         try:
+            unknown_pickle = global_settings["unknown_graphs"][self.mode]
             with open(unknown_pickle, 'rb') as foo:
                 graph_list = pickle.load(foo)
+        # No 'unknown_graphs' entry in settings.json
+        except KeyError:
+            graph_list = []
+        # 'unknown_graphs' entry in settings.json does not point to correct file.
         except (FileNotFoundError, EOFError):
             graph_list = []
         return graph_list
