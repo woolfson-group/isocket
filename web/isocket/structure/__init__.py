@@ -5,7 +5,7 @@ structure_bp = Blueprint(
     __name__,
     template_folder='templates',
     static_folder='static',
-    static_url_path='/{}'.format(__name__)
+    static_url_path='/atlas/static'
 )
 
 from isocket.structure import views
