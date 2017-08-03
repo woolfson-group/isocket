@@ -8,4 +8,3 @@ COPY ./dependencies_for_isambard/.isambard_settings /root/
 COPY . /app/
 WORKDIR /app/
 ENV PYTHONPATH $PYTHONPATH:/
-CMD ["python", "main.py"]

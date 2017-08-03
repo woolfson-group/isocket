@@ -5,7 +5,7 @@ from config import configure_app
 
 
 def create_app(config=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, static_url_path='/atlas/static')
     configure_app(app=app)
     if config is not None:
         app.config.from_pyfile(config)
