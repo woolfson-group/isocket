@@ -13,10 +13,10 @@ python -m unittest discover unit_tests/.
 
 if [ $? -eq 1 ]
 then
-  echo "Unit tests failed while committing isocket, please check them and recommit."
+  echo "Unit tests failed while pushing isocket branch, please check them and repush."
   exit 1
 else
-  echo "isocket unit tests passed, committing."
+  echo "isocket unit tests passed, pushing."
 fi
 
 exit 0
