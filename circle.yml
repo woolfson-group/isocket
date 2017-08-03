@@ -14,6 +14,7 @@ dependencies:
     # DSSP
     - chmod +x /home/ubuntu/isambard/dependencies_for_isambard/dssp/dssp-2.0.4
     - python /home/ubuntu/isambard/isambard/configure.py -C
+    - pip install -r web/requirements.txt
 test:
   override:
     - cd /home/ubuntu/isocket
