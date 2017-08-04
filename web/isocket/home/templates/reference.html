@@ -7,8 +7,54 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <div>
-        REFERENCE PAGE
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="imgAbt">
+                    <img src="{{ url_for('home_bp.static', filename = 'img/isocket_logo.png') }}" width="100%" height="100%">
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>iSocket</h1>
+                <p>
+                    Any publication arising from use of the Atlas of Coiled Coils should cite the following reference:
+                    <br>
+                    <br>
+                    Jack W. Heal, Gail J. Bartlett, Christopher W. Wood, Andrew R. Thomson, Derek N. Woolfson;
+                    <br>
+                    Applying graph theory to protein structures: an atlas of coiled coils (TBC).
+                    <br>
+                    <br>
+                    The source code is available here: <a href="https://github.com/woolfson-group/isocket">https://github.com/woolfson-group/isocket</a>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="imgAbt">
+                    <img src="{{ url_for('static', filename = 'img/logo_small.png') }}" width="100%" height="100%">
+                </div>
+            </div>
+            <div class="col-md-8">
+                <br>
+                <br>
+                <h1>ISAMBARD</h1>
+                <p>
+                    Any publication arising from use of the ISAMBARD software package should cite the following reference:
+                    <br>
+                    <br>
+                    Christopher W. Wood, Jack W. Heal, Andrew R. Thomson, Gail J. Bartlett, Amaurys A. Ibarra, R. Leo Brady,
+                    Richard B. Sessions, Derek N. Woolfson;
+                    <br>
+                    ISAMBARD: an open-source computational environment for biomolecular analysis, modelling and design.
+                    Bioinformatics 2017 btx352.
+                    <a href="https://doi.org/10.1093/bioinformatics/btx352">doi: 10.1093/bioinformatics/btx352</a>
+                    <br>
+                    <br>
+                    The source code is available here: <a href="https://github.com/woolfson-group/isambard">https://github.com/woolfson-group/isambard</a>
+                </p>
+            </div>
+        </div>
     </div>
 </body>
 {% endblock %}
