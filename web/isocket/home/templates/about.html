@@ -22,7 +22,14 @@
         <br>
         <br>
         <br>
-        <h1>Parameters</h1>
+        <h1>Details</h1>
+        The classification is implemented in Python.
+        <br>
+        For identifying coiled coils,
+        we use the ISAMBARD (Intelligent System for Analysis, Model Building And Rational Design)
+        Python package developed in the Woolfson group.
+        <br>
+        <br>
         The SOCKET cutoff (<i>scut</i>):
         <br>
         The maximum distance between the centre of mass of a knob residue and those for each of the hole residues
@@ -31,7 +38,12 @@
         The knob cutoff (<i>kcut</i>):
         <br>
         There must be more than <i>kcut</i> knob-into-hole interactions between each pair of helices defined to be interacting.
-
+        <h1>For more information...</h1>
+        The original publications for the Atlas of Coiled Coils and for ISAMBARD are available
+        <a href="{{ url_for('home_bp.reference') }}">here</a>.
+        <br>
+        There are tutorials for working with the Atlas data and source code avialable here:
+        <a href="https://github.com/woolfson-group/isocket/wiki">https://github.com/woolfson-group/isocket/wiki</a>.
     </div>
 </body>
 {% endblock %}
