@@ -74,3 +74,10 @@ stroke:#fff;
 stroke-width:3px;
 fill: #ff0021;
 }
+
+.alignleft {
+	float: left;
+}
+.alignright {
+	float: right;
+}
