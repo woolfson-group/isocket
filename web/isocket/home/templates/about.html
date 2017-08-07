@@ -7,44 +7,18 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <div>
-        <h1>Overview</h1>
-        The Atlas of Coiled Coils is a fully automated, updated overview of extant coiled coils.
-        <br>
-        <br>
-        Coiled coils are categorised using graph theory.
-        <br>
-        Each helix in the coiled coil is represented by a node.
-        <br>
-        Helices that interact via knob-into-hole interactions are joined by an edge.
-        <br>
-        This gives the graph of the coiled coil: those with the same graphs belong to the same category.
-        <br>
-        <br>
-        <br>
-        <h1>Details</h1>
-        The classification is implemented in Python.
-        <br>
-        For identifying coiled coils,
-        we use the ISAMBARD (Intelligent System for Analysis, Model Building And Rational Design)
-        Python package developed in the Woolfson group.
-        <br>
-        <br>
-        The SOCKET cutoff (<i>scut</i>):
-        <br>
-        The maximum distance between the centre of mass of a knob residue and those for each of the hole residues
-        <br>
-        <br>
-        The knob cutoff (<i>kcut</i>):
-        <br>
-        There must be more than <i>kcut</i> knob-into-hole interactions between each pair of helices defined to be interacting.
-        <h1>For more information...</h1>
-        The original publications for the Atlas of Coiled Coils and for ISAMBARD are available
-        <a href="{{ url_for('home_bp.reference') }}">here</a>.
-        <br>
-        There are tutorials for working with the Atlas data and source code avialable here:
-        <a href="https://github.com/woolfson-group/isocket/wiki">https://github.com/woolfson-group/isocket/wiki</a>.
-    </div>
+    The Atlas of Coiled Coils is a fully automated, updated overview of extant coiled coils.
+    <br>
+    It also provides a glimpse at the 'dark matter' of coiled coils:
+    those arrangements for which there currently are have no extant examples
+    but which may be accessible through <i>de novo</i> design.
+    <br>
+    <br>
+    The original publications and source code for the Atlas of Coiled Coils and for ISAMBARD are available
+    <a href="{{ url_for('home_bp.reference') }}">here</a>.
+    <br>
+    There are tutorials for working with the Atlas data and source code avialable here:
+    <a href="https://github.com/woolfson-group/isocket/wiki">https://github.com/woolfson-group/isocket/wiki</a>.
 </body>
 {% endblock %}
 </html>
