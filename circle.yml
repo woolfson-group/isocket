@@ -9,6 +9,9 @@ dependencies:
     - pip install --upgrade pip
     - cd /home/ubuntu/
     - git clone https://github.com/woolfson-group/isambard.git
+    - cd isambard
+    - git checkout tags/<2017.1.0>
+    - cd /home/ubuntu/
     - mv isambard /home/ubuntu/
     - mv web/dependencies_for_isambard /home/ubuntu/isambard
     # DSSP
