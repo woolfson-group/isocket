@@ -9,7 +9,7 @@ def main(args):
     hooks_dir = os.path.join(module_path, '.git', 'hooks')
     if not args.unhook:
         add_hooks(hooks_dir)
-        print('Finished: Hooks created, unit tests will now be run before "git commit".')
+        print('Finished: Hooks created, unit tests will now be run before "git push".')
     else:
         remove_hooks(hooks_dir)
         print('Finished: Hooks deleted.')
@@ -37,7 +37,7 @@ def remove_hooks(dest_path):
 if __name__ == '__main__':
     import argparse
 
-    description = "Connects hooks to isocket git repository to enforce that unit tests must run before a commit."
+    description = "Connects hooks to isocket git repository to enforce that unit tests must run before a push."
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('-u', '--unhook', help="Removes hooks from git repository.", action="store_true")
     arguments = parser.parse_args()

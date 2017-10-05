@@ -3,9 +3,14 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="row">
-        <div class="col-lg-12 text-center">
-            <a href="/atlas/index">
+        <div class="text-center col-md-6">
+            <a href="/isocket">
                 <img src="{{ url_for('home_bp.static', filename = 'img/isocket_logo.png') }}">
+            </a>
+        </div>
+        <div class="text-center col-md-6">
+            <a href="/atlas">
+                <img src="{{ url_for('home_bp.static', filename = 'img/atlas_logo.png') }}">
             </a>
         </div>
     </div>
