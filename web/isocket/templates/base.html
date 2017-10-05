@@ -35,14 +35,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand active" href="index">iSocket</a>
+      <a class="navbar-brand active" href="{{ url_for('home_bp.index') }}">Home</a>
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <!--<li class="active"><a href="index"><span class="glyphicon glyphicon-home"></span> Home</a></li>-->
-        <li><a href="{{ url_for('home_bp.about') }}"><span class="glyphicon glyphicon-info-sign"></span> About</a></li>
         <li><a href="{{ url_for('atlas_bp.atlas') }}"><span class="glyphicon glyphicon-map-marker"></span> Atlas </a></li>
-        <li><a href="{{ url_for('structure_bp.upload_file') }}"><span class="glyphicon glyphicon-eye-open"></span> Run</a></li>
+        <li><a href="{{ url_for('home_bp.isocket') }}"><span class="glyphicon glyphicon-eye-open"></span> iSocket</a></li>
         <li><a href="{{ url_for('home_bp.contact') }}"><span class="glyphicon glyphicon-envelope"></span> Contact</a></li>
         <li><a href="{{ url_for('home_bp.reference') }}"><span class="glyphicon glyphicon-book"></span> Reference</a></li>
       </ul>

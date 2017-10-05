@@ -8,6 +8,9 @@ from isocket.home import home_bp
 def index():
     return render_template('index.html', title='iSOCKET')
 
+@home_bp.route('/isocket')
+def isocket():
+    return render_template('isocket.html', title='iSOCKET')
 
 @home_bp.route('/contact')
 def contact():
