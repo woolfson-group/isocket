@@ -16,7 +16,7 @@ dependencies:
     - cd /home/ubuntu/
     - pip install --upgrade pip
     #- python /home/ubuntu/isambard/isambard/configure.py -C
-    - pip install -r isocket/web/requirements.txt
+    - pip install -r /home/ubuntu/isocket/web/requirements.txt
 test:
   override:
     - cd /home/ubuntu/isocket
