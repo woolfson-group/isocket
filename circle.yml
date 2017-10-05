@@ -12,11 +12,11 @@ dependencies:
     - /home/ubuntu/isocket/dependencies_for_isambard/scwrl/install_Scwrl4_Linux < /home/ubuntu/isocket/dependencies_for_isambard/scwrl/scwrl_install.txt
     # DSSP
     - chmod +x /home/ubuntu/isocket/dependencies_for_isambard/dssp/dssp-2.0.4
-    - cp /home/ubuntu/isocket/web/.isambard_settings /home/ubuntu/
+    - cp /home/ubuntu/isocket/.cc_isambard_settings /home/ubuntu/.isambard_settings
     - cd /home/ubuntu/
     - pip install --upgrade pip
     #- python /home/ubuntu/isambard/isambard/configure.py -C
-    - pip install -r web/requirements.txt
+    - pip install -r isocket/web/requirements.txt
 test:
   override:
     - cd /home/ubuntu/isocket
