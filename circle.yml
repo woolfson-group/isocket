@@ -6,18 +6,18 @@ machine:
 dependencies:
   pre:
     # isambard
-    - pip install --upgrade pip
-    - cd /home/ubuntu/
-    - git clone https://github.com/woolfson-group/isambard.git
-    - cd isambard
-    - git fetch
-    - git checkout tags/2017.1.0
-    - cd /home/ubuntu/
-    - mv isambard /home/ubuntu/
-    - mv web/dependencies_for_isambard /home/ubuntu/isambard
+    - mkdir /home/ubuntu/isambard
+    - cd /home/ubuntu/isambard
+    - git clone git@github.com:woolfson-group/dependencies_for_isambard.git
+    # Scwrl
+    - chmod +x /home/ubuntu/isambard/dependencies_for_isambard/scwrl/install_Scwrl4_Linux
+    - /home/ubuntu/isambard/dependencies_for_isambard/scwrl/install_Scwrl4_Linux < /home/ubuntu/isambard/dependencies_for_isambard/scwrl/scwrl_install.txt
     # DSSP
     - chmod +x /home/ubuntu/isambard/dependencies_for_isambard/dssp/dssp-2.0.4
-    - python /home/ubuntu/isambard/isambard/configure.py -C
+    - cp /home/ubuntu/isocket/web/.isambard_settings /home/ubuntu/
+    - cd /home/ubuntu/
+    - pip install --upgrade pip
+    #- python /home/ubuntu/isambard/isambard/configure.py -C
     - pip install -r web/requirements.txt
 test:
   override:
