@@ -2,19 +2,23 @@ import pandas
 import numpy
 import os
 import pickle
+import sys
 from collections import OrderedDict
+from bokeh import events
 from bokeh.plotting import Figure, curdoc
 from bokeh.palettes import viridis
 from bokeh.layouts import WidgetBox
 from bokeh.models import HoverTool, ColumnDataSource
-from bokeh.models import Slider, HBox, Select
+from bokeh.models import Slider, HBox, Select, CustomJS
 from bokeh.models.ranges import Range1d
+from bokeh.models.widgets import Button
 
 data_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 filename = os.path.join(data_folder, 'atlas.h5')
 with open(os.path.join(data_folder, 'ccplus_codes.p'), 'rb') as foo:
     cc_plus_codes = pickle.load(foo)
 df = pandas.read_hdf(filename, 'graph_names')
+df = df[~df['gname'].str.contains('^U', regex=True)]
 _color_map = viridis(34)
 
 
@@ -39,7 +43,8 @@ def points_on_a_circle(n, radius=1, centre=(0, 0), rotation=0):
     """
     rotation = numpy.deg2rad(rotation)
     thetas = [numpy.divide(i * numpy.pi * 2, n) + rotation for i in range(n)]
-    points = [(radius * numpy.cos(theta) + centre[0], radius * numpy.sin(theta) + centre[1]) for theta in thetas]
+    points = [(radius * numpy.cos(theta) + centre[0], radius *
+               numpy.sin(theta) + centre[1]) for theta in thetas]
     return points
 
 
@@ -52,7 +57,7 @@ def graph_list_to_array(graph_list, nrows=None, ncols=None):
         if ngraphs % ncols == 0:
             nrows = ngraphs / ncols
         else:
-            nrows = int(numpy.floor(ngraphs / ncols )) + 1
+            nrows = int(numpy.floor(ngraphs / ncols)) + 1
     elif ncols is None:
         if ngraphs % nrows == 0:
             ncols = ngraphs / nrows
@@ -71,7 +76,7 @@ def graph_list_to_array(graph_list, nrows=None, ncols=None):
 
 graph_list_pickle = os.path.join(data_folder, 'graph_list.p')
 with open(graph_list_pickle, 'rb') as foo:
-    graph_list  = pickle.load(foo)
+    graph_list = pickle.load(foo)
 max_nodes = max([g.number_of_nodes() for g in graph_list])
 graph_array = graph_list_to_array(graph_list=graph_list)
 
@@ -97,7 +102,8 @@ def get_base_figure():
 def add_graph_glyphs():
     p.x_range = Range1d(-1, graph_array.shape[0])
     p.y_range = Range1d(graph_array.shape[1], -1)
-    circles = {n: points_on_a_circle(n=n, radius=0.4) for n in range(1, max_nodes + 1)}
+    circles = {n: points_on_a_circle(n=n, radius=0.4)
+               for n in range(1, max_nodes + 1)}
     all_circles = []
     all_xs = []
     all_ys = []
@@ -125,7 +131,6 @@ p = get_base_figure()
 add_graph_glyphs()
 
 
-
 scut = Slider(
     title="scut", name='scut',
     value=7.0, start=7.0, end=9.0, step=0.5
@@ -141,25 +146,17 @@ min_count = Slider(
 
 code_select = Select(title="PDB codes:", value="CC+", options=["CC+", "All"])
 
-inputs = WidgetBox(
-    children=[
-        scut, kcut, min_count, code_select
-    ]
-)
-
-
-hbox = HBox(children=[inputs, p])
 
 # Use the above lists to populate a ColumnDataSource object with details needed for the hover labels.
 source = ColumnDataSource(
     data=dict(
-            gnames=[],
-            r_colors=[],
-            r_xs=[],
-            r_ys=[],
-            rel_freqs=[],
-            counts=[],
-            percents=[]
+        gnames=[],
+        r_colors=[],
+        r_xs=[],
+        r_ys=[],
+        rel_freqs=[],
+        counts=[],
+        percents=[]
     )
 )
 
@@ -215,10 +212,10 @@ def update_data():
     r = redundancy.value
     if r != "No filter":
         rstring = "c{0}".format(r)
-        pdbs = cddf[cddf[rstring] == True].pdb.values
         filtered_df = filtered_df[filtered_df['pdb'].isin(pdbs)]
     '''
     gb = filtered_df.groupby(df['gname'])
+    pdbs_data = dict(gb['pdb'].apply(lambda x: list(set(x))))
     rgs = gb.count().gname
     # From the graph counts, get the lists of rectangle positions and frequencies for the hover labels.
     total_graphs = sum(rgs.values)
@@ -229,6 +226,7 @@ def update_data():
     gnames = []
     counts = []
     alphas = []
+    pdbs = []
     for i, g in numpy.ndenumerate(graph_array):
         if g:
             if g.name in rgs.index:
@@ -239,11 +237,15 @@ def update_data():
             else:
                 count = 0
                 rel_freqs.append(0)
-                r_colors.append('#ffffff') #white
+                r_colors.append('#ffffff')  # white
             counts.append(count)
             r_xs.append(i[0])
             r_ys.append(i[1])
             gnames.append(g.name)
+            try:
+                pdbs.append(pdbs_data[g.name])
+            except KeyError:
+                pdbs.append([])
             if count >= mc:
                 alphas.append(0.5)
             else:
@@ -258,12 +260,41 @@ def update_data():
         rel_freqs=rel_freqs,
         counts=counts,
         percents=percents,
-        alphas=alphas
+        alphas=alphas,
+        pdbs=pdbs
     )
 
     source.data = data
 
+
 update_data()
+
+download_data_button = Button(
+    label="Download Current Data", button_type="success")
+download_data_button.js_on_event(
+    events.ButtonClick,
+    CustomJS(args=dict(source=source), code="""
+        var outputData = new Object();
+        for (var i = 0; i < source.data['pdbs'].length; i++) {
+            outputData[source.data['gnames'][i]] = source.data['pdbs'][i]
+        }
+        const text = JSON.stringify(outputData);
+        const blob = new Blob([text], {
+            type: "text/plain;charset=utf-8;",
+        });
+        saveAs(blob, 'graph_pdbs.json');
+        """
+             )
+)
+
+inputs = WidgetBox(
+    children=[
+        scut, kcut, min_count, code_select, download_data_button
+    ]
+)
+
+hbox = HBox(children=[inputs, p])
+
 
 # Configure hover tool and add the rectangles with the hover tool set up.
 boxes = p.rect(x='r_xs', y='r_ys',
@@ -292,4 +323,3 @@ for w in [scut, kcut, min_count, code_select]:
     w.on_change('value', input_change)
 
 curdoc().add_root(hbox)
-
